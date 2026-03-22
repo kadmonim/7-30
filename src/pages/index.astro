@@ -7,7 +7,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <title>חישוב שבעה ושלושים</title>
+  <title>מתי קמים?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
@@ -17,7 +17,7 @@
 <div class="container">
   <button id="lang-toggle" class="lang-toggle" type="button">EN</button>
 
-  <h1 id="title">חישוב שבעה ושלושים</h1>
+  <h1 id="title">מתי קמים?</h1>
   <p id="subtitle" class="subtitle">הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים</p>
 
   <!-- Israel/Diaspora banner -->
@@ -32,37 +32,40 @@
   <form id="calc-form" autocomplete="off">
     <!-- Date of passing -->
     <div class="field">
-      <label id="label-death-date" for="death-date">תאריך הפטירה</label>
-      <div class="date-input-row">
-        <input type="date" id="death-date" />
-        <button type="button" class="heb-cal-btn" data-target="death-date" title="לוח עברי">
-          <span class="heb-cal-icon">📅</span> <span class="heb-cal-label">עברי</span>
-        </button>
-      </div>
-      <span id="death-date-heb-display" class="heb-date-display"></span>
+      <label id="label-death-date">תאריך הפטירה</label>
+      <input type="hidden" id="death-date" />
+      <button type="button" class="date-picker-trigger" data-target="death-date">
+        <span class="date-picker-display" id="death-date-display">בחר תאריך...</span>
+      </button>
       <span id="death-date-hint" class="field-hint">השאר ריק אם זהה לתאריך הקבורה</span>
     </div>
 
     <!-- Burial date -->
     <div class="field">
-      <label id="label-date" for="burial-date">תאריך הקבורה</label>
-      <div class="date-input-row">
-        <input type="date" id="burial-date" required />
-        <button type="button" class="heb-cal-btn" data-target="burial-date" title="לוח עברי">
-          <span class="heb-cal-icon">📅</span> <span class="heb-cal-label">עברי</span>
-        </button>
-      </div>
-      <span id="burial-date-heb-display" class="heb-date-display"></span>
+      <label id="label-date">תאריך הקבורה</label>
+      <input type="hidden" id="burial-date" />
+      <button type="button" class="date-picker-trigger" data-target="burial-date">
+        <span class="date-picker-display" id="burial-date-display">בחר תאריך...</span>
+      </button>
     </div>
 
-    <!-- Hebrew calendar picker modal -->
-    <div id="heb-cal-overlay" class="heb-cal-overlay" style="display:none;">
+    <!-- Unified calendar picker modal -->
+    <div id="cal-overlay" class="heb-cal-overlay" style="display:none;">
       <div class="heb-cal-modal">
+        <!-- Tabs -->
+        <div class="cal-tabs">
+          <button type="button" class="cal-tab active" id="tab-jewish">עברי</button>
+          <button type="button" class="cal-tab" id="tab-civil">לועזי</button>
+        </div>
         <div class="heb-cal-header">
           <button type="button" id="heb-cal-prev" class="heb-cal-nav">‹</button>
-          <div class="heb-cal-selects">
+          <div class="heb-cal-selects" id="cal-selects-jewish">
             <select id="heb-cal-month"></select>
             <select id="heb-cal-year"></select>
+          </div>
+          <div class="heb-cal-selects" id="cal-selects-civil" style="display:none;">
+            <select id="civil-cal-month"></select>
+            <select id="civil-cal-year"></select>
           </div>
           <button type="button" id="heb-cal-next" class="heb-cal-nav">›</button>
         </div>
@@ -112,15 +115,15 @@
         <div class="result-line">
           <span id="shiva-start-label" class="result-key">תחילה:</span>
           <div class="result-dates">
-            <span id="shiva-start-value" class="result-value"></span>
-            <span id="shiva-start-heb" class="result-heb-date"></span>
+            <span id="shiva-start-heb" class="result-value highlight"></span>
+            <span id="shiva-start-value" class="result-greg-date"></span>
           </div>
         </div>
         <div class="result-line">
           <span id="shiva-end-label" class="result-key">סיום:</span>
           <div class="result-dates">
-            <span id="shiva-end-value" class="result-value highlight"></span>
-            <span id="shiva-end-heb" class="result-heb-date"></span>
+            <span id="shiva-end-heb" class="result-value highlight"></span>
+            <span id="shiva-end-value" class="result-greg-date"></span>
           </div>
         </div>
         <div id="shiva-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
@@ -137,15 +140,15 @@
         <div class="result-line">
           <span id="shloshim-start-label" class="result-key">תחילה:</span>
           <div class="result-dates">
-            <span id="shloshim-start-value" class="result-value"></span>
-            <span id="shloshim-start-heb" class="result-heb-date"></span>
+            <span id="shloshim-start-heb" class="result-value highlight"></span>
+            <span id="shloshim-start-value" class="result-greg-date"></span>
           </div>
         </div>
         <div class="result-line">
           <span id="shloshim-end-label" class="result-key">סיום:</span>
           <div class="result-dates">
-            <span id="shloshim-end-value" class="result-value highlight"></span>
-            <span id="shloshim-end-heb" class="result-heb-date"></span>
+            <span id="shloshim-end-heb" class="result-value highlight"></span>
+            <span id="shloshim-end-value" class="result-greg-date"></span>
           </div>
         </div>
         <div id="shloshim-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
@@ -163,8 +166,8 @@
         <div class="result-line">
           <span id="kaddish-end-label" class="result-key">סיום:</span>
           <div class="result-dates">
-            <span id="kaddish-end-value" class="result-value highlight"></span>
-            <span id="kaddish-end-heb" class="result-heb-date"></span>
+            <span id="kaddish-end-heb" class="result-value highlight"></span>
+            <span id="kaddish-end-value" class="result-greg-date"></span>
           </div>
         </div>
         <p id="kaddish-note" class="result-note">קדיש נאמר למשך 11 חודש מיום הפטירה</p>
@@ -184,15 +187,15 @@
         <div class="result-line">
           <span id="yahrzeit-first-label" class="result-key">יארצייט ראשון:</span>
           <div class="result-dates">
-            <span id="yahrzeit-first-value" class="result-value highlight"></span>
-            <span id="yahrzeit-first-heb" class="result-heb-date"></span>
+            <span id="yahrzeit-first-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-first-value" class="result-greg-date"></span>
           </div>
         </div>
         <div class="result-line">
           <span id="yahrzeit-second-label" class="result-key">יארצייט שני:</span>
           <div class="result-dates">
-            <span id="yahrzeit-second-value" class="result-value"></span>
-            <span id="yahrzeit-second-heb" class="result-heb-date"></span>
+            <span id="yahrzeit-second-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-second-value" class="result-greg-date"></span>
           </div>
         </div>
         <p id="yahrzeit-note" class="result-note"></p>
@@ -219,216 +222,322 @@
   import { formatJewishDateInHebrew, formatJewishDate, JewishMonth, toGregorianDate, toJewishDate, getJewishMonthsInOrder } from 'jewish-date';
 
   // =====================
-  // Hebrew Calendar Picker
+  // Unified Calendar Picker (Jewish + Civil tabs)
   // =====================
-  let hebCalTarget: string | null = null; // which input the picker is for
-  let hebCalState = {
-    year: 0,
-    month: '' as string,
-    isHebrew: true,
-  };
+  let calTarget: string | null = null;
+  let calMode: 'jewish' | 'civil' = 'jewish'; // default tab
 
-  function initHebCal(targetDate?: Date) {
+  // Jewish calendar state
+  let jewishState = { year: 0, month: '' as string };
+  // Civil calendar state
+  let civilState = { year: 0, month: 0 }; // month is 0-based
+
+  const civilMonthsHe = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  const civilMonthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function initCal(targetDate?: Date) {
     const d = targetDate || new Date();
     const jd = getJewishDate(d);
-    hebCalState.year = jd.year;
-    hebCalState.month = jd.monthName;
-    hebCalState.isHebrew = currentLang === 'he';
+    jewishState.year = jd.year;
+    jewishState.month = jd.monthName;
+    civilState.year = d.getFullYear();
+    civilState.month = d.getMonth();
   }
 
-  function renderHebCal() {
+  function setCalTab(mode: 'jewish' | 'civil') {
+    calMode = mode;
+    document.getElementById('tab-jewish')!.classList.toggle('active', mode === 'jewish');
+    document.getElementById('tab-civil')!.classList.toggle('active', mode === 'civil');
+    document.getElementById('cal-selects-jewish')!.style.display = mode === 'jewish' ? '' : 'none';
+    document.getElementById('cal-selects-civil')!.style.display = mode === 'civil' ? '' : 'none';
+    renderCal();
+  }
+
+  // Holiday lookup (shared between both views)
+  function getHolidayData() {
+    const yomTovSet = new Set(getHolidays(isIsrael));
+    const cholHamoedDates: string[] = [];
+    // Pesach: Israel 16-20 Nisan is Chol HaMoed, Diaspora 17-20
+    const pesachStart = isIsrael ? 16 : 17;
+    for (let d = pesachStart; d <= 20; d++) cholHamoedDates.push(`${d} Nisan`);
+    // Sukkot: Israel 16-21 Tishri is Chol HaMoed, Diaspora 17-21
+    const sukkotStart = isIsrael ? 16 : 17;
+    for (let d = sukkotStart; d <= 21; d++) cholHamoedDates.push(`${d} Tishri`);
+    return { yomTovSet, cholHamoedSet: new Set(cholHamoedDates) };
+  }
+
+  function renderCal() {
+    if (calMode === 'jewish') renderJewishCal();
+    else renderCivilCal();
+  }
+
+  function renderJewishCal() {
     const isHeb = currentLang === 'he';
     const monthSelect = document.getElementById('heb-cal-month') as HTMLSelectElement;
     const yearSelect = document.getElementById('heb-cal-year') as HTMLSelectElement;
     const grid = document.getElementById('heb-cal-grid')!;
     const weekdaysEl = document.getElementById('heb-cal-weekdays')!;
 
-    // Populate month dropdown
-    const months = getJewishMonths(hebCalState.year, isHeb);
+    const months = getJewishMonths(jewishState.year, isHeb);
     monthSelect.innerHTML = months.map(m =>
-      `<option value="${m.id}" ${m.id === hebCalState.month ? 'selected' : ''}>${m.text}</option>`
+      `<option value="${m.id}" ${m.id === jewishState.month ? 'selected' : ''}>${m.text}</option>`
     ).join('');
 
-    // Populate year dropdown
-    const years = getJewishYears(hebCalState.year);
+    const currentJewishYear = getJewishDate(new Date()).year;
+    const years = getJewishYears(jewishState.year).filter(y => y >= 5700 && y <= currentJewishYear);
     yearSelect.innerHTML = years.map(y =>
-      `<option value="${y}" ${y === hebCalState.year ? 'selected' : ''}>${y}</option>`
+      `<option value="${y}" ${y === jewishState.year ? 'selected' : ''}>${y}</option>`
     ).join('');
 
-    // Get the Gregorian date for the 1st of this Jewish month
     const gregDate = getGregDate({
       day: 1,
-      monthName: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
-      year: hebCalState.year,
+      monthName: JewishMonth[jewishState.month as keyof typeof JewishMonth],
+      year: jewishState.year,
     });
-
-    // Get calendar grid
     const calData = getJewishMonth(gregDate);
-
-    // Weekday headers
     const weekdays = isHeb ? getHebWeekdays() : getEngWeekdays();
     weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
 
-    // Build holiday lookup for coloring
-    // getHolidays returns strings like "1 Tishri", "15 Nisan", etc.
-    const yomTovList = getHolidays(isIsrael);
-    const yomTovSet = new Set(yomTovList);
+    const { yomTovSet, cholHamoedSet } = getHolidayData();
 
-    // Chol HaMoed dates (not in yomTovList but part of the festival)
-    const cholHamoedDates: string[] = [];
-    // Pesach Chol HaMoed: 17-20 Nisan (Israel) or 17-20 Nisan (Diaspora)
-    for (let d = 17; d <= 20; d++) cholHamoedDates.push(`${d} Nisan`);
-    // Sukkot Chol HaMoed: 17-21 Tishri (Israel) or 17-21 Tishri (Diaspora)
-    for (let d = 17; d <= 21; d++) cholHamoedDates.push(`${d} Tishri`);
-    const cholHamoedSet = new Set(cholHamoedDates);
+    const todayStr = new Date().toISOString().split('T')[0];
 
-    // Day cells
     grid.innerHTML = calData.days.map(day => {
-      const isCurrentMonth = day.isCurrentMonth;
       const dateStr = day.dayjsDate.format('YYYY-MM-DD');
       const hebStr = formatJewishDateInHebrew(day.jewishDate);
       const dayNum = hebStr.split(' ')[0];
-
-      // Determine special day classes
       const classes = ['heb-cal-day'];
-      if (!isCurrentMonth) classes.push('other-month');
+      if (!day.isCurrentMonth) classes.push('other-month');
+      if (dateStr === todayStr) classes.push('today');
 
       const jewishKey = `${day.jewishDate.day} ${day.jewishDate.monthName}`;
-      const isShabat = day.date.getDay() === 6;
-
-      if (isCurrentMonth) {
-        if (yomTovSet.has(jewishKey)) {
-          classes.push('yom-tov');
-        } else if (cholHamoedSet.has(jewishKey)) {
-          classes.push('chol-hamoed');
-        }
-        if (isShabat) {
-          classes.push('shabat');
-        }
+      if (day.isCurrentMonth) {
+        if (yomTovSet.has(jewishKey)) classes.push('yom-tov');
+        else if (cholHamoedSet.has(jewishKey)) classes.push('chol-hamoed');
+        if (day.date.getDay() === 6) classes.push('shabat');
       }
 
       const tooltip = isHeb ? hebStr : day.jewishDateStr;
       return `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" title="${tooltip}">${isHeb ? dayNum : day.jewishDate.day}</button>`;
     }).join('');
+
+    // Sync civil state from jewish view
+    civilState.year = gregDate.getFullYear();
+    civilState.month = gregDate.getMonth();
   }
 
-  function openHebCal(targetId: string) {
-    hebCalTarget = targetId;
-    const input = document.getElementById(targetId) as HTMLInputElement;
-    const targetDate = input.value ? new Date(input.value + 'T12:00:00') : new Date();
-    initHebCal(targetDate);
-    renderHebCal();
-    document.getElementById('heb-cal-overlay')!.style.display = '';
+  function renderCivilCal() {
+    const isHeb = currentLang === 'he';
+    const monthSelect = document.getElementById('civil-cal-month') as HTMLSelectElement;
+    const yearSelect = document.getElementById('civil-cal-year') as HTMLSelectElement;
+    const grid = document.getElementById('heb-cal-grid')!;
+    const weekdaysEl = document.getElementById('heb-cal-weekdays')!;
+
+    const monthNames = isHeb ? civilMonthsHe : civilMonthsEn;
+    monthSelect.innerHTML = monthNames.map((name, i) =>
+      `<option value="${i}" ${i === civilState.month ? 'selected' : ''}>${name}</option>`
+    ).join('');
+
+    const baseYear = civilState.year;
+    const yearOptions: number[] = [];
+    const currentCivilYear = new Date().getFullYear();
+    for (let y = 1940; y <= currentCivilYear; y++) yearOptions.push(y);
+    yearSelect.innerHTML = yearOptions.map(y =>
+      `<option value="${y}" ${y === civilState.year ? 'selected' : ''}>${y}</option>`
+    ).join('');
+
+    const weekdays = isHeb ? getHebWeekdays() : getEngWeekdays();
+    weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
+
+    // Build civil calendar grid
+    const firstOfMonth = new Date(civilState.year, civilState.month, 1);
+    const startDay = firstOfMonth.getDay(); // 0=Sun
+    const daysInMonth = new Date(civilState.year, civilState.month + 1, 0).getDate();
+    const prevMonthDays = new Date(civilState.year, civilState.month, 0).getDate();
+
+    const { yomTovSet, cholHamoedSet } = getHolidayData();
+    const todayStr = new Date().toISOString().split('T')[0];
+    let cells = '';
+
+    // Previous month padding
+    for (let i = startDay - 1; i >= 0; i--) {
+      const day = prevMonthDays - i;
+      const d = new Date(civilState.year, civilState.month - 1, day);
+      const dateStr = d.toISOString().split('T')[0];
+      cells += `<button type="button" class="heb-cal-day other-month" data-date="${dateStr}">${day}</button>`;
+    }
+
+    // Current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(civilState.year, civilState.month, day);
+      const dateStr = `${civilState.year}-${String(civilState.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const jd = getJewishDate(d);
+      const jewishKey = `${jd.day} ${jd.monthName}`;
+      const hebStr = formatJewishDateInHebrew(jd);
+
+      const classes = ['heb-cal-day'];
+      if (dateStr === todayStr) classes.push('today');
+      if (yomTovSet.has(jewishKey)) classes.push('yom-tov');
+      else if (cholHamoedSet.has(jewishKey)) classes.push('chol-hamoed');
+      if (d.getDay() === 6) classes.push('shabat');
+
+      const tooltip = `${day} ${monthNames[civilState.month]} — ${hebStr}`;
+      cells += `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" title="${tooltip}">${day}</button>`;
+    }
+
+    // Next month padding
+    const totalCells = startDay + daysInMonth;
+    const remaining = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+    for (let day = 1; day <= remaining; day++) {
+      const d = new Date(civilState.year, civilState.month + 1, day);
+      const dateStr = d.toISOString().split('T')[0];
+      cells += `<button type="button" class="heb-cal-day other-month" data-date="${dateStr}">${day}</button>`;
+    }
+
+    grid.innerHTML = cells;
+
+    // Sync jewish state
+    const jdFirst = getJewishDate(firstOfMonth);
+    jewishState.year = jdFirst.year;
+    jewishState.month = jdFirst.monthName;
   }
 
-  function closeHebCal() {
-    document.getElementById('heb-cal-overlay')!.style.display = 'none';
-    hebCalTarget = null;
-  }
-
-  function selectHebCalDate(dateStr: string) {
-    if (!hebCalTarget) return;
-    const input = document.getElementById(hebCalTarget) as HTMLInputElement;
-    input.value = dateStr;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-    updateHebDisplay(hebCalTarget);
-    closeHebCal();
-  }
-
-  function updateHebDisplay(inputId: string) {
+  function updateDateDisplay(inputId: string) {
     const input = document.getElementById(inputId) as HTMLInputElement;
-    const display = document.getElementById(inputId + '-heb-display');
-    if (!display) return;
+    const display = document.getElementById(inputId + '-display')!;
     if (!input.value) {
-      display.textContent = '';
+      const t = translations[currentLang];
+      display.textContent = currentLang === 'he' ? 'בחר תאריך...' : 'Select date...';
+      display.classList.add('placeholder');
       return;
     }
     const d = new Date(input.value + 'T12:00:00');
     const jd = getJewishDate(d);
-    display.textContent = currentLang === 'he'
-      ? formatJewishDateInHebrew(jd)
-      : formatJewishDate(jd);
+    const hebStr = currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
+    const gregStr = formatDate(input.value, currentLang);
+    display.textContent = `${hebStr}  •  ${gregStr}`;
+    display.classList.remove('placeholder');
   }
 
-  // Event delegation for calendar
+  function openCal(targetId: string) {
+    calTarget = targetId;
+    const input = document.getElementById(targetId) as HTMLInputElement;
+    const targetDate = input.value ? new Date(input.value + 'T12:00:00') : new Date();
+    initCal(targetDate);
+    setCalTab('jewish'); // always open on Jewish tab
+    document.getElementById('cal-overlay')!.style.display = '';
+  }
+
+  function closeCal() {
+    document.getElementById('cal-overlay')!.style.display = 'none';
+    calTarget = null;
+  }
+
+  function selectCalDate(dateStr: string) {
+    if (!calTarget) return;
+    const input = document.getElementById(calTarget) as HTMLInputElement;
+    input.value = dateStr;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    updateDateDisplay(calTarget);
+    closeCal();
+  }
+
+  // Event delegation
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
 
-    // Open calendar buttons
-    if (target.closest('.heb-cal-btn')) {
-      const btn = target.closest('.heb-cal-btn') as HTMLElement;
-      const targetId = btn.dataset.target!;
-      openHebCal(targetId);
+    // Open calendar
+    if (target.closest('.date-picker-trigger')) {
+      const btn = target.closest('.date-picker-trigger') as HTMLElement;
+      openCal(btn.dataset.target!);
       return;
     }
 
     // Day selection
     if (target.classList.contains('heb-cal-day') && !target.classList.contains('other-month')) {
-      const dateStr = target.dataset.date!;
-      selectHebCalDate(dateStr);
+      selectCalDate(target.dataset.date!);
       return;
     }
 
     // Close on overlay click
-    if (target.id === 'heb-cal-overlay') {
-      closeHebCal();
+    if (target.id === 'cal-overlay') {
+      closeCal();
       return;
     }
   });
 
+  // Tab switching
+  document.getElementById('tab-jewish')?.addEventListener('click', () => setCalTab('jewish'));
+  document.getElementById('tab-civil')?.addEventListener('click', () => setCalTab('civil'));
+
   // Nav buttons
   document.getElementById('heb-cal-prev')?.addEventListener('click', () => {
-    const prev = getPrevMonth({
-      year: hebCalState.year,
-      month: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
-      isHebrew: currentLang === 'he',
-    });
-    hebCalState.year = prev.year;
-    hebCalState.month = JewishMonth[prev.month as keyof typeof JewishMonth] || prev.month;
-    // Convert numeric month back to string
-    if (typeof prev.month === 'number') {
-      hebCalState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === prev.month) || hebCalState.month;
+    if (calMode === 'jewish') {
+      const prev = getPrevMonth({
+        year: jewishState.year,
+        month: JewishMonth[jewishState.month as keyof typeof JewishMonth],
+        isHebrew: currentLang === 'he',
+      });
+      jewishState.year = prev.year;
+      jewishState.month = JewishMonth[prev.month as keyof typeof JewishMonth] || prev.month;
+      if (typeof prev.month === 'number') {
+        jewishState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === prev.month) || jewishState.month;
+      }
+    } else {
+      civilState.month--;
+      if (civilState.month < 0) { civilState.month = 11; civilState.year--; }
     }
-    renderHebCal();
+    renderCal();
   });
 
   document.getElementById('heb-cal-next')?.addEventListener('click', () => {
-    const next = getNextMonth({
-      year: hebCalState.year,
-      month: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
-      isHebrew: currentLang === 'he',
-    });
-    hebCalState.year = next.year;
-    hebCalState.month = JewishMonth[next.month as keyof typeof JewishMonth] || next.month;
-    if (typeof next.month === 'number') {
-      hebCalState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === next.month) || hebCalState.month;
+    if (calMode === 'jewish') {
+      const next = getNextMonth({
+        year: jewishState.year,
+        month: JewishMonth[jewishState.month as keyof typeof JewishMonth],
+        isHebrew: currentLang === 'he',
+      });
+      jewishState.year = next.year;
+      jewishState.month = JewishMonth[next.month as keyof typeof JewishMonth] || next.month;
+      if (typeof next.month === 'number') {
+        jewishState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === next.month) || jewishState.month;
+      }
+    } else {
+      civilState.month++;
+      if (civilState.month > 11) { civilState.month = 0; civilState.year++; }
     }
-    renderHebCal();
+    renderCal();
   });
 
-  // Month/Year select changes
+  // Month/Year selects (Jewish)
   document.getElementById('heb-cal-month')?.addEventListener('change', (e) => {
-    hebCalState.month = (e.target as HTMLSelectElement).value;
-    renderHebCal();
+    jewishState.month = (e.target as HTMLSelectElement).value;
+    renderCal();
+  });
+  document.getElementById('heb-cal-year')?.addEventListener('change', (e) => {
+    jewishState.year = parseInt((e.target as HTMLSelectElement).value);
+    renderCal();
   });
 
-  document.getElementById('heb-cal-year')?.addEventListener('change', (e) => {
-    hebCalState.year = parseInt((e.target as HTMLSelectElement).value);
-    renderHebCal();
+  // Month/Year selects (Civil)
+  document.getElementById('civil-cal-month')?.addEventListener('change', (e) => {
+    civilState.month = parseInt((e.target as HTMLSelectElement).value);
+    renderCal();
+  });
+  document.getElementById('civil-cal-year')?.addEventListener('change', (e) => {
+    civilState.year = parseInt((e.target as HTMLSelectElement).value);
+    renderCal();
   });
 
   // Today button
   document.getElementById('heb-cal-today')?.addEventListener('click', () => {
-    initHebCal(new Date());
-    renderHebCal();
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    selectCalDate(dateStr);
   });
 
   // Close button
-  document.getElementById('heb-cal-close')?.addEventListener('click', closeHebCal);
-
-  // Update Hebrew date display when Gregorian input changes
-  document.getElementById('death-date')?.addEventListener('change', () => updateHebDisplay('death-date'));
-  document.getElementById('burial-date')?.addEventListener('change', () => updateHebDisplay('burial-date'));
+  document.getElementById('heb-cal-close')?.addEventListener('click', closeCal);
 
   // =====================
   // Types
@@ -464,7 +573,7 @@
   // =====================
   const translations: Record<string, Record<string, string>> = {
     he: {
-      title: 'חישוב שבעה ושלושים',
+      title: 'מתי קמים?',
       subtitle: 'הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים',
       'label-death-date': 'תאריך הפטירה',
       'death-date-hint': 'השאר ריק אם זהה לתאריך הקבורה',
@@ -484,14 +593,16 @@
       'after-nightfall-hint': 'קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.',
       'zmanim-link': 'לא בטוח? בדוק זמנים ב-Chabad.org',
       disclaimer: '* יש לוודא את החישוב עם פוסק הלכה, במיוחד במקרים מורכבים.',
-      'heb-cal-label': 'עברי',
+      'tab-jewish': 'עברי',
+      'tab-civil': 'לועזי',
+      'date-placeholder': 'בחר תאריך...',
       'heb-cal-today': 'היום',
       'heb-cal-close': 'סגור',
       'legend-yomtov': 'יו״ט',
       'legend-cholhamoed': 'חוה״מ',
       'legend-shabat': 'שבת',
       calculating: 'מחשב...',
-      'page-title': 'חישוב שבעה ושלושים',
+      'page-title': 'מתי קמים?',
       'lang-btn': 'EN',
       'days': 'ימים',
       'cancelled': 'בוטל',
@@ -528,7 +639,9 @@
       'after-nightfall-hint': 'Burial during twilight (bein hashemashot) still counts as that day. Only after nightfall (tzeis hakochavim) does the first halachic day shift to the next day.',
       'zmanim-link': 'Not sure? Check Zmanim at Chabad.org',
       disclaimer: '* Please verify this calculation with a posek, especially in complex cases.',
-      'heb-cal-label': 'Hebrew',
+      'tab-jewish': 'Jewish',
+      'tab-civil': 'Civil',
+      'date-placeholder': 'Select date...',
       'heb-cal-today': 'Today',
       'heb-cal-close': 'Close',
       'legend-yomtov': 'Yom Tov',
@@ -603,18 +716,14 @@
     const langBtn = document.getElementById('lang-toggle');
     if (langBtn) langBtn.textContent = t['lang-btn'];
 
-    // Update Hebrew calendar button labels
-    document.querySelectorAll('.heb-cal-label').forEach(el => {
-      el.textContent = t['heb-cal-label'];
-    });
     const todayBtn = document.getElementById('heb-cal-today');
     if (todayBtn) todayBtn.textContent = t['heb-cal-today'];
     const closeBtn = document.getElementById('heb-cal-close');
     if (closeBtn) closeBtn.textContent = t['heb-cal-close'];
 
-    // Update Hebrew date displays
-    updateHebDisplay('death-date');
-    updateHebDisplay('burial-date');
+    // Update date displays
+    updateDateDisplay('death-date');
+    updateDateDisplay('burial-date');
   }
 
   applyLang();
@@ -1046,11 +1155,15 @@
     document.getElementById('shloshim-start-value')!.textContent = formatDate(result.day1, currentLang);
     document.getElementById('shloshim-end-value')!.textContent = formatDate(result.shloshimEnd, currentLang);
 
-    // Hebrew dates (using local library, no API needed)
+    // Hebrew dates with day of week
+    const hebDayNames = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'שבת'];
+    const engDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Shabbat'];
     const formatHeb = (dateStr: string) => {
       const d = new Date(dateStr + 'T12:00:00');
       const jd = getJewishDate(d);
-      return currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
+      const dayName = currentLang === 'he' ? hebDayNames[d.getDay()] : engDayNames[d.getDay()];
+      const hebDate = currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
+      return `${dayName}, ${hebDate}`;
     };
     document.getElementById('shiva-start-heb')!.textContent = formatHeb(result.day1);
     document.getElementById('shiva-end-heb')!.textContent = formatHeb(result.shivaEnd);
@@ -1464,10 +1577,9 @@
     align-items: flex-end;
     gap: 0.1rem;
   }
-  .result-heb-date {
-    font-size: 0.82rem;
-    color: #8b7355;
-    font-weight: 700;
+  .result-greg-date {
+    font-size: 0.8rem;
+    color: #999;
   }
 
   .result-note {
@@ -1496,40 +1608,54 @@
     line-height: 1.5;
   }
 
-  /* Date input row with Hebrew cal button */
-  .date-input-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: stretch;
-  }
-  .date-input-row input { flex: 1; }
-  .heb-cal-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: #e8e0d0;
+  /* Date picker trigger */
+  .date-picker-trigger {
+    display: block;
+    width: 100%;
+    text-align: start;
+    font-family: 'Heebo', sans-serif;
+    font-size: 1.05rem;
+    padding: 0.65rem 0.75rem;
     border: 2px solid #d4c5a9;
     border-radius: 8px;
-    color: #6d5a43;
-    padding: 0 0.7rem;
+    background: #fff;
+    color: #2c2c2c;
     cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: 'Heebo', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    white-space: nowrap;
+    transition: border-color 0.15s ease;
   }
-  .heb-cal-btn:hover {
-    background: #d4c5a9;
+  .date-picker-trigger:hover {
     border-color: #8b7355;
   }
-  .heb-cal-icon { font-size: 1rem; }
+  .date-picker-display.placeholder {
+    color: #999;
+  }
 
-  .heb-date-display {
-    font-size: 0.85rem;
-    color: #8b7355;
+  /* Calendar tabs */
+  .cal-tabs {
+    display: flex;
+    border-bottom: 2px solid #e0d8c8;
+    margin-bottom: 0.75rem;
+  }
+  .cal-tab {
+    flex: 1;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
     font-weight: 700;
-    min-height: 1.2em;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: -2px;
+  }
+  .cal-tab.active {
+    color: #8b7355;
+    border-bottom-color: #8b7355;
+  }
+  .cal-tab:hover:not(.active) {
+    color: #6d5a43;
   }
 
   /* Hebrew calendar overlay */
@@ -1636,6 +1762,10 @@
     background: #e8e0d0;
     border-color: #8b7355;
   }
+  .heb-cal-day.today {
+    border: 2px solid #8b7355;
+  }
+
   .heb-cal-day.other-month {
     color: #ccc;
     cursor: default;
