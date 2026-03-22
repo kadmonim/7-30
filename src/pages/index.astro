@@ -24,14 +24,46 @@
     <!-- Date of passing -->
     <div class="field">
       <label id="label-death-date" for="death-date">תאריך הפטירה</label>
-      <input type="date" id="death-date" />
+      <div class="date-input-row">
+        <input type="date" id="death-date" />
+        <button type="button" class="heb-cal-btn" data-target="death-date" title="לוח עברי">
+          <span class="heb-cal-icon">📅</span> <span class="heb-cal-label">עברי</span>
+        </button>
+      </div>
+      <span id="death-date-heb-display" class="heb-date-display"></span>
       <span id="death-date-hint" class="field-hint">השאר ריק אם זהה לתאריך הקבורה</span>
     </div>
 
     <!-- Burial date -->
     <div class="field">
       <label id="label-date" for="burial-date">תאריך הקבורה</label>
-      <input type="date" id="burial-date" required />
+      <div class="date-input-row">
+        <input type="date" id="burial-date" required />
+        <button type="button" class="heb-cal-btn" data-target="burial-date" title="לוח עברי">
+          <span class="heb-cal-icon">📅</span> <span class="heb-cal-label">עברי</span>
+        </button>
+      </div>
+      <span id="burial-date-heb-display" class="heb-date-display"></span>
+    </div>
+
+    <!-- Hebrew calendar picker modal -->
+    <div id="heb-cal-overlay" class="heb-cal-overlay" style="display:none;">
+      <div class="heb-cal-modal">
+        <div class="heb-cal-header">
+          <button type="button" id="heb-cal-prev" class="heb-cal-nav">‹</button>
+          <div class="heb-cal-selects">
+            <select id="heb-cal-month"></select>
+            <select id="heb-cal-year"></select>
+          </div>
+          <button type="button" id="heb-cal-next" class="heb-cal-nav">›</button>
+        </div>
+        <div class="heb-cal-weekdays" id="heb-cal-weekdays"></div>
+        <div class="heb-cal-grid" id="heb-cal-grid"></div>
+        <div class="heb-cal-footer">
+          <button type="button" id="heb-cal-today" class="heb-cal-today-btn">היום</button>
+          <button type="button" id="heb-cal-close" class="heb-cal-close-btn">סגור</button>
+        </div>
+      </div>
     </div>
 
     <!-- After nightfall -->
@@ -130,6 +162,201 @@
 </div>
 
 <script>
+  import {
+    getJewishMonth,
+    getJewishMonths,
+    getJewishYears,
+    getGregDate,
+    getJewishDate,
+    getPrevMonth,
+    getNextMonth,
+    getHebWeekdays,
+    getEngWeekdays,
+  } from 'jewish-dates-core';
+  import { formatJewishDateInHebrew, formatJewishDate, JewishMonth } from 'jewish-date';
+
+  // =====================
+  // Hebrew Calendar Picker
+  // =====================
+  let hebCalTarget: string | null = null; // which input the picker is for
+  let hebCalState = {
+    year: 0,
+    month: '' as string,
+    isHebrew: true,
+  };
+
+  function initHebCal(targetDate?: Date) {
+    const d = targetDate || new Date();
+    const jd = getJewishDate(d);
+    hebCalState.year = jd.year;
+    hebCalState.month = jd.monthName;
+    hebCalState.isHebrew = currentLang === 'he';
+  }
+
+  function renderHebCal() {
+    const isHeb = currentLang === 'he';
+    const monthSelect = document.getElementById('heb-cal-month') as HTMLSelectElement;
+    const yearSelect = document.getElementById('heb-cal-year') as HTMLSelectElement;
+    const grid = document.getElementById('heb-cal-grid')!;
+    const weekdaysEl = document.getElementById('heb-cal-weekdays')!;
+
+    // Populate month dropdown
+    const months = getJewishMonths(hebCalState.year, isHeb);
+    monthSelect.innerHTML = months.map(m =>
+      `<option value="${m.id}" ${m.id === hebCalState.month ? 'selected' : ''}>${m.text}</option>`
+    ).join('');
+
+    // Populate year dropdown
+    const years = getJewishYears(hebCalState.year);
+    yearSelect.innerHTML = years.map(y =>
+      `<option value="${y}" ${y === hebCalState.year ? 'selected' : ''}>${y}</option>`
+    ).join('');
+
+    // Get the Gregorian date for the 1st of this Jewish month
+    const gregDate = getGregDate({
+      day: 1,
+      monthName: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
+      year: hebCalState.year,
+    });
+
+    // Get calendar grid
+    const calData = getJewishMonth(gregDate);
+
+    // Weekday headers
+    const weekdays = isHeb ? getHebWeekdays() : getEngWeekdays();
+    weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
+
+    // Day cells
+    grid.innerHTML = calData.days.map(day => {
+      const isCurrentMonth = day.isCurrentMonth;
+      const cls = isCurrentMonth ? 'heb-cal-day' : 'heb-cal-day other-month';
+      const dateStr = day.dayjsDate.format('YYYY-MM-DD');
+      const dayLabel = isHeb ? day.jewishDateStr.split(' ')[0] : day.jewishDate.day;
+      // Show gematriya for Hebrew, number for English
+      const hebStr = formatJewishDateInHebrew(day.jewishDate);
+      const dayNum = hebStr.split(' ')[0]; // just the day part
+      return `<button type="button" class="${cls}" data-date="${dateStr}" title="${isHeb ? hebStr : day.jewishDateStr}">${isHeb ? dayNum : day.jewishDate.day}</button>`;
+    }).join('');
+  }
+
+  function openHebCal(targetId: string) {
+    hebCalTarget = targetId;
+    const input = document.getElementById(targetId) as HTMLInputElement;
+    const targetDate = input.value ? new Date(input.value + 'T12:00:00') : new Date();
+    initHebCal(targetDate);
+    renderHebCal();
+    document.getElementById('heb-cal-overlay')!.style.display = '';
+  }
+
+  function closeHebCal() {
+    document.getElementById('heb-cal-overlay')!.style.display = 'none';
+    hebCalTarget = null;
+  }
+
+  function selectHebCalDate(dateStr: string) {
+    if (!hebCalTarget) return;
+    const input = document.getElementById(hebCalTarget) as HTMLInputElement;
+    input.value = dateStr;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    updateHebDisplay(hebCalTarget);
+    closeHebCal();
+  }
+
+  function updateHebDisplay(inputId: string) {
+    const input = document.getElementById(inputId) as HTMLInputElement;
+    const display = document.getElementById(inputId + '-heb-display');
+    if (!display) return;
+    if (!input.value) {
+      display.textContent = '';
+      return;
+    }
+    const d = new Date(input.value + 'T12:00:00');
+    const jd = getJewishDate(d);
+    display.textContent = currentLang === 'he'
+      ? formatJewishDateInHebrew(jd)
+      : formatJewishDate(jd);
+  }
+
+  // Event delegation for calendar
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    // Open calendar buttons
+    if (target.closest('.heb-cal-btn')) {
+      const btn = target.closest('.heb-cal-btn') as HTMLElement;
+      const targetId = btn.dataset.target!;
+      openHebCal(targetId);
+      return;
+    }
+
+    // Day selection
+    if (target.classList.contains('heb-cal-day') && !target.classList.contains('other-month')) {
+      const dateStr = target.dataset.date!;
+      selectHebCalDate(dateStr);
+      return;
+    }
+
+    // Close on overlay click
+    if (target.id === 'heb-cal-overlay') {
+      closeHebCal();
+      return;
+    }
+  });
+
+  // Nav buttons
+  document.getElementById('heb-cal-prev')?.addEventListener('click', () => {
+    const prev = getPrevMonth({
+      year: hebCalState.year,
+      month: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
+      isHebrew: currentLang === 'he',
+    });
+    hebCalState.year = prev.year;
+    hebCalState.month = JewishMonth[prev.month as keyof typeof JewishMonth] || prev.month;
+    // Convert numeric month back to string
+    if (typeof prev.month === 'number') {
+      hebCalState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === prev.month) || hebCalState.month;
+    }
+    renderHebCal();
+  });
+
+  document.getElementById('heb-cal-next')?.addEventListener('click', () => {
+    const next = getNextMonth({
+      year: hebCalState.year,
+      month: JewishMonth[hebCalState.month as keyof typeof JewishMonth],
+      isHebrew: currentLang === 'he',
+    });
+    hebCalState.year = next.year;
+    hebCalState.month = JewishMonth[next.month as keyof typeof JewishMonth] || next.month;
+    if (typeof next.month === 'number') {
+      hebCalState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === next.month) || hebCalState.month;
+    }
+    renderHebCal();
+  });
+
+  // Month/Year select changes
+  document.getElementById('heb-cal-month')?.addEventListener('change', (e) => {
+    hebCalState.month = (e.target as HTMLSelectElement).value;
+    renderHebCal();
+  });
+
+  document.getElementById('heb-cal-year')?.addEventListener('change', (e) => {
+    hebCalState.year = parseInt((e.target as HTMLSelectElement).value);
+    renderHebCal();
+  });
+
+  // Today button
+  document.getElementById('heb-cal-today')?.addEventListener('click', () => {
+    initHebCal(new Date());
+    renderHebCal();
+  });
+
+  // Close button
+  document.getElementById('heb-cal-close')?.addEventListener('click', closeHebCal);
+
+  // Update Hebrew date display when Gregorian input changes
+  document.getElementById('death-date')?.addEventListener('change', () => updateHebDisplay('death-date'));
+  document.getElementById('burial-date')?.addEventListener('change', () => updateHebDisplay('burial-date'));
+
   // =====================
   // Types
   // =====================
@@ -188,6 +415,9 @@
       'after-nightfall-hint': 'קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.',
       'zmanim-link': 'לא בטוח? בדוק זמנים ב-Chabad.org',
       disclaimer: '* יש לוודא את החישוב עם פוסק הלכה, במיוחד במקרים מורכבים.',
+      'heb-cal-label': 'עברי',
+      'heb-cal-today': 'היום',
+      'heb-cal-close': 'סגור',
       calculating: 'מחשב...',
       'page-title': 'חישוב שבעה ושלושים',
       'lang-btn': 'EN',
@@ -221,6 +451,9 @@
       'after-nightfall-hint': 'Burial during twilight (bein hashemashot) still counts as that day. Only after nightfall (tzeis hakochavim) does the first halachic day shift to the next day.',
       'zmanim-link': 'Not sure? Check Zmanim at Chabad.org',
       disclaimer: '* Please verify this calculation with a posek, especially in complex cases.',
+      'heb-cal-label': 'Hebrew',
+      'heb-cal-today': 'Today',
+      'heb-cal-close': 'Close',
       calculating: 'Calculating...',
       'page-title': 'Shiva & Shloshim Calculator',
       'lang-btn': 'עב',
@@ -280,6 +513,19 @@
 
     const langBtn = document.getElementById('lang-toggle');
     if (langBtn) langBtn.textContent = t['lang-btn'];
+
+    // Update Hebrew calendar button labels
+    document.querySelectorAll('.heb-cal-label').forEach(el => {
+      el.textContent = t['heb-cal-label'];
+    });
+    const todayBtn = document.getElementById('heb-cal-today');
+    if (todayBtn) todayBtn.textContent = t['heb-cal-today'];
+    const closeBtn = document.getElementById('heb-cal-close');
+    if (closeBtn) closeBtn.textContent = t['heb-cal-close'];
+
+    // Update Hebrew date displays
+    updateHebDisplay('death-date');
+    updateHebDisplay('burial-date');
   }
 
   applyLang();
@@ -1021,6 +1267,184 @@
     line-height: 1.5;
   }
 
+  /* Date input row with Hebrew cal button */
+  .date-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .date-input-row input { flex: 1; }
+  .heb-cal-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #e8e0d0;
+    border: 2px solid #d4c5a9;
+    border-radius: 8px;
+    color: #6d5a43;
+    padding: 0 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .heb-cal-btn:hover {
+    background: #d4c5a9;
+    border-color: #8b7355;
+  }
+  .heb-cal-icon { font-size: 1rem; }
+
+  .heb-date-display {
+    font-size: 0.85rem;
+    color: #8b7355;
+    font-weight: 700;
+    min-height: 1.2em;
+  }
+
+  /* Hebrew calendar overlay */
+  .heb-cal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .heb-cal-modal {
+    background: #faf9f6;
+    border: 1px solid #d4c5a9;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 320px;
+    max-width: 95vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+
+  .heb-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .heb-cal-nav {
+    background: none;
+    border: 1px solid #d4c5a9;
+    border-radius: 6px;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    color: #6d5a43;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .heb-cal-nav:hover {
+    background: #e8e0d0;
+    border-color: #8b7355;
+  }
+
+  .heb-cal-selects {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    justify-content: center;
+  }
+  .heb-cal-selects select {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid #d4c5a9;
+    border-radius: 6px;
+    background: #fff;
+    color: #4a3c2c;
+    cursor: pointer;
+  }
+
+  .heb-cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+  .heb-cal-wd {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #8b7355;
+    padding: 0.2rem 0;
+  }
+
+  .heb-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .heb-cal-day {
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.35rem 0;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.82rem;
+    color: #2c2c2c;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .heb-cal-day:hover {
+    background: #e8e0d0;
+    border-color: #8b7355;
+  }
+  .heb-cal-day.other-month {
+    color: #ccc;
+    cursor: default;
+  }
+  .heb-cal-day.other-month:hover {
+    background: #fff;
+    border-color: transparent;
+  }
+
+  .heb-cal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    gap: 0.5rem;
+  }
+  .heb-cal-today-btn,
+  .heb-cal-close-btn {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid #d4c5a9;
+  }
+  .heb-cal-today-btn {
+    background: #8b7355;
+    color: #fff;
+    border-color: #8b7355;
+  }
+  .heb-cal-today-btn:hover { background: #6d5a43; }
+  .heb-cal-close-btn {
+    background: #e8e0d0;
+    color: #6d5a43;
+  }
+  .heb-cal-close-btn:hover { background: #d4c5a9; }
+
   @media (max-width: 500px) {
     .container { padding: 2rem 1rem 2rem; }
     h1 { font-size: 1.6rem; }
@@ -1030,6 +1454,8 @@
     }
     .result-value { text-align: start; }
     .toggle-btn { padding: 0.45rem 0.8rem; font-size: 0.88rem; }
+    .heb-cal-modal { width: 300px; }
+    .heb-cal-day { font-size: 0.75rem; min-height: 1.8rem; }
   }
 </style>
 </body>
