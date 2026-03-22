@@ -1,0 +1,1036 @@
+---
+// Shiva & Shloshim Calculator
+---
+
+<html lang="he" dir="rtl" data-lang="he">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>חישוב שבעה ושלושים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container">
+  <button id="lang-toggle" class="lang-toggle" type="button">EN</button>
+
+  <h1 id="title">חישוב שבעה ושלושים</h1>
+  <p id="subtitle" class="subtitle">הזן את תאריך הפטירה, הקבורה ומיקום כדי לחשב מתי נגמרים השבעה והשלושים</p>
+
+  <form id="calc-form" autocomplete="off">
+    <!-- Date of passing -->
+    <div class="field">
+      <label id="label-death-date" for="death-date">תאריך הפטירה</label>
+      <input type="date" id="death-date" />
+      <span id="death-date-hint" class="field-hint">השאר ריק אם זהה לתאריך הקבורה</span>
+    </div>
+
+    <!-- Burial date -->
+    <div class="field">
+      <label id="label-date" for="burial-date">תאריך הקבורה</label>
+      <input type="date" id="burial-date" required />
+    </div>
+
+    <!-- After nightfall -->
+    <div class="field">
+      <label class="checkbox-label">
+        <input type="checkbox" id="after-nightfall" />
+        <span id="label-after-nightfall">הקבורה היתה אחרי צאת הכוכבים</span>
+      </label>
+      <span id="after-nightfall-hint" class="field-hint">קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.</span>
+      <a id="zmanim-link" class="zmanim-link" href="https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm" target="_blank" rel="noopener">לא בטוח? בדוק זמנים ב-Chabad.org</a>
+    </div>
+
+    <!-- Israel / Diaspora -->
+    <div class="field">
+      <label id="label-israel-diaspora">שמירת חגים</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="toggle-israel" data-value="israel">ישראל</button>
+        <button type="button" class="toggle-btn" id="toggle-diaspora" data-value="diaspora">חו״ל</button>
+      </div>
+    </div>
+
+
+    <button type="submit" id="calc-btn" class="btn-primary">
+      <span id="calc-btn-text">חשב</span>
+    </button>
+  </form>
+
+  <!-- Results -->
+  <div id="results" class="results" style="display:none;">
+    <h2 id="results-title">תוצאות</h2>
+
+    <!-- Holiday notice -->
+    <div id="holiday-notice" class="holiday-notice" style="display:none;"></div>
+
+    <div class="result-card shiva-card">
+      <div class="result-header">
+        <h3 id="shiva-label">שבעה</h3>
+        <span class="badge shiva-badge" id="shiva-badge"></span>
+      </div>
+      <div class="result-body">
+        <div class="result-line">
+          <span id="shiva-start-label" class="result-key">תחילה:</span>
+          <span id="shiva-start-value" class="result-value"></span>
+        </div>
+        <div class="result-line">
+          <span id="shiva-end-label" class="result-key">סיום:</span>
+          <span id="shiva-end-value" class="result-value highlight"></span>
+        </div>
+        <div id="shiva-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
+        <p id="shiva-note" class="result-note"></p>
+      </div>
+    </div>
+
+    <div class="result-card shloshim-card">
+      <div class="result-header">
+        <h3 id="shloshim-label">שלושים</h3>
+        <span class="badge shloshim-badge" id="shloshim-badge"></span>
+      </div>
+      <div class="result-body">
+        <div class="result-line">
+          <span id="shloshim-start-label" class="result-key">תחילה:</span>
+          <span id="shloshim-start-value" class="result-value"></span>
+        </div>
+        <div class="result-line">
+          <span id="shloshim-end-label" class="result-key">סיום:</span>
+          <span id="shloshim-end-value" class="result-value highlight"></span>
+        </div>
+        <div id="shloshim-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
+        <p id="shloshim-note" class="result-note"></p>
+      </div>
+    </div>
+
+    <!-- Hebrew dates section -->
+    <div class="result-card dates-card">
+      <div class="result-header">
+        <h3 id="hebrew-dates-label">תאריכים עבריים</h3>
+      </div>
+      <div class="result-body">
+        <div class="result-line">
+          <span id="burial-heb-label" class="result-key">קבורה (יום א׳):</span>
+          <span id="burial-heb-value" class="result-value"></span>
+        </div>
+        <div class="result-line">
+          <span id="shiva-end-heb-label" class="result-key">סוף שבעה:</span>
+          <span id="shiva-end-heb-value" class="result-value"></span>
+        </div>
+        <div class="result-line">
+          <span id="shloshim-end-heb-label" class="result-key">סוף שלושים:</span>
+          <span id="shloshim-end-heb-value" class="result-value"></span>
+        </div>
+      </div>
+    </div>
+
+    <p id="disclaimer" class="disclaimer"></p>
+  </div>
+</div>
+
+<script>
+  // =====================
+  // Types
+  // =====================
+  interface HolidayPeriod {
+    id: string;
+    nameHe: string;
+    nameEn: string;
+    erev: string;        // day before first yom tov (holiday starts at sunset)
+    firstDay: string;
+    lastDay: string;     // last day of entire period including chol hamoed
+    yomTovDays: string[];
+    cholHamoedDays: string[];
+    // How many "equivalent days" this holiday counts toward shloshim when it cancels shiva
+    shloshimEquivalent: number;
+  }
+
+  interface MourningResult {
+    day1: string;
+    shivaEnd: string;
+    shloshimEnd: string;
+    shivaCancelled: boolean;
+    shivaCancelledBy: string | null;
+    shloshimCancelled: boolean;
+    shloshimCancelledBy: string | null;
+    shivaDelayed: boolean;
+    shivaDelayedUntilAfter: string | null;
+    notes: string[];
+  }
+
+  // =====================
+  // i18n
+  // =====================
+  const translations: Record<string, Record<string, string>> = {
+    he: {
+      title: 'חישוב שבעה ושלושים',
+      subtitle: 'הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים',
+      'label-death-date': 'תאריך הפטירה',
+      'death-date-hint': 'השאר ריק אם זהה לתאריך הקבורה',
+      'label-date': 'תאריך הקבורה',
+      'calc-btn-text': 'חשב',
+      'results-title': 'תוצאות',
+      'shiva-label': 'שבעה',
+      'shloshim-label': 'שלושים',
+      'shiva-start-label': 'תחילה:',
+      'shiva-end-label': 'סיום:',
+      'shloshim-start-label': 'תחילה:',
+      'shloshim-end-label': 'סיום:',
+      'hebrew-dates-label': 'תאריכים עבריים',
+      'burial-heb-label': 'קבורה (יום א׳):',
+      'shiva-end-heb-label': 'סוף שבעה:',
+      'shloshim-end-heb-label': 'סוף שלושים:',
+      'label-israel-diaspora': 'שמירת חגים',
+      'toggle-israel': 'ישראל',
+      'toggle-diaspora': 'חו״ל',
+      'label-after-nightfall': 'הקבורה היתה אחרי צאת הכוכבים',
+      'after-nightfall-hint': 'קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.',
+      'zmanim-link': 'לא בטוח? בדוק זמנים ב-Chabad.org',
+      disclaimer: '* יש לוודא את החישוב עם פוסק הלכה, במיוחד במקרים מורכבים.',
+      calculating: 'מחשב...',
+      'page-title': 'חישוב שבעה ושלושים',
+      'lang-btn': 'EN',
+      'days': 'ימים',
+      'cancelled': 'בוטל',
+      'shiva-normal-note': 'השבעה מסתיימת בבוקר של היום השביעי, לאחר שחרית',
+      'shloshim-normal-note': 'השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית',
+    },
+    en: {
+      title: 'Shiva & Shloshim Calculator',
+      subtitle: 'Enter the date of passing and burial to calculate when shiva and shloshim end',
+      'label-death-date': 'Date of Passing',
+      'death-date-hint': 'Leave blank if same as burial date',
+      'label-date': 'Burial Date',
+      'calc-btn-text': 'Calculate',
+      'results-title': 'Results',
+      'shiva-label': 'Shiva',
+      'shloshim-label': 'Shloshim',
+      'shiva-start-label': 'Starts:',
+      'shiva-end-label': 'Ends:',
+      'shloshim-start-label': 'Starts:',
+      'shloshim-end-label': 'Ends:',
+      'hebrew-dates-label': 'Hebrew Dates',
+      'burial-heb-label': 'Burial (Day 1):',
+      'shiva-end-heb-label': 'End of Shiva:',
+      'shloshim-end-heb-label': 'End of Shloshim:',
+      'label-israel-diaspora': 'Holiday observance',
+      'toggle-israel': 'Israel',
+      'toggle-diaspora': 'Diaspora',
+      'label-after-nightfall': 'The burial was after nightfall',
+      'after-nightfall-hint': 'Burial during twilight (bein hashemashot) still counts as that day. Only after nightfall (tzeis hakochavim) does the first halachic day shift to the next day.',
+      'zmanim-link': 'Not sure? Check Zmanim at Chabad.org',
+      disclaimer: '* Please verify this calculation with a posek, especially in complex cases.',
+      calculating: 'Calculating...',
+      'page-title': 'Shiva & Shloshim Calculator',
+      'lang-btn': 'עב',
+      'days': 'days',
+      'cancelled': 'Cancelled',
+      'shiva-normal-note': 'Shiva ends on the morning of the 7th day, after Shacharit',
+      'shloshim-normal-note': 'Shloshim ends on the morning of the 30th day, after Shacharit',
+    },
+  };
+
+  // Holiday names
+  const holidayNames: Record<string, {he: string; en: string}> = {
+    pesach:           { he: 'פסח',            en: 'Pesach' },
+    shavuot:          { he: 'שבועות',          en: 'Shavuot' },
+    sukkot:           { he: 'סוכות',           en: 'Sukkot' },
+    'shmini-atzeret': { he: 'שמיני עצרת',      en: 'Shmini Atzeret' },
+    'rosh-hashana':   { he: 'ראש השנה',        en: 'Rosh Hashana' },
+    'yom-kippur':     { he: 'יום כיפור',       en: 'Yom Kippur' },
+  };
+
+  let currentLang: 'he' | 'en' = 'he';
+  let isIsrael: boolean = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+
+  // Auto-detect language
+  if (navigator.language && !navigator.language.startsWith('he')) {
+    currentLang = 'en';
+  }
+
+  // Set initial Israel/Diaspora toggle state
+  function initToggle() {
+    const israelBtn = document.getElementById('toggle-israel')!;
+    const diasporaBtn = document.getElementById('toggle-diaspora')!;
+    if (isIsrael) {
+      israelBtn.classList.add('active');
+      diasporaBtn.classList.remove('active');
+    } else {
+      diasporaBtn.classList.add('active');
+      israelBtn.classList.remove('active');
+    }
+  }
+
+  // =====================
+  // Language switching
+  // =====================
+  function applyLang() {
+    const t = translations[currentLang];
+    const html = document.documentElement;
+    html.lang = currentLang === 'he' ? 'he' : 'en';
+    html.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+    html.dataset.lang = currentLang;
+    document.title = t['page-title'];
+
+    for (const [id, text] of Object.entries(t)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    const langBtn = document.getElementById('lang-toggle');
+    if (langBtn) langBtn.textContent = t['lang-btn'];
+  }
+
+  applyLang();
+  initToggle();
+
+  document.getElementById('lang-toggle')?.addEventListener('click', () => {
+    currentLang = currentLang === 'he' ? 'en' : 'he';
+    applyLang();
+  });
+
+  // Update Chabad zmanim link when burial date changes
+  document.getElementById('burial-date')?.addEventListener('change', () => {
+    const val = (document.getElementById('burial-date') as HTMLInputElement).value;
+    const link = document.getElementById('zmanim-link') as HTMLAnchorElement;
+    if (val && link) {
+      const [y, m, d] = val.split('-');
+      link.href = `https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/tdate/${parseInt(m)}-${parseInt(d)}-${y}/jewish/Halachic-Times.htm`;
+    }
+  });
+
+  // Israel/Diaspora toggle
+  document.getElementById('toggle-israel')?.addEventListener('click', () => {
+    isIsrael = true;
+    document.getElementById('toggle-israel')!.classList.add('active');
+    document.getElementById('toggle-diaspora')!.classList.remove('active');
+  });
+  document.getElementById('toggle-diaspora')?.addEventListener('click', () => {
+    isIsrael = false;
+    document.getElementById('toggle-diaspora')!.classList.add('active');
+    document.getElementById('toggle-israel')!.classList.remove('active');
+  });
+
+  // =====================
+  // Date helpers
+  // =====================
+  function addDays(dateStr: string, days: number): string {
+    const d = new Date(dateStr + 'T12:00:00');
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  }
+
+  function daysBetween(a: string, b: string): number {
+    const da = new Date(a + 'T12:00:00');
+    const db = new Date(b + 'T12:00:00');
+    return Math.round((db.getTime() - da.getTime()) / 86400000);
+  }
+
+  function formatDate(dateStr: string, lang: string): string {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+  }
+
+  // =====================
+  // HebCal API helpers
+  // =====================
+  async function getHebrewDate(date: string): Promise<string> {
+    try {
+      const url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1&strict=1`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      return data.hebrew || '';
+    } catch { return ''; }
+  }
+
+  async function fetchHolidays(startDate: string, endDate: string, israel: boolean): Promise<any[]> {
+    try {
+      const i = israel ? 'on' : 'off';
+      const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=off&mod=off&nx=off&ss=off&mf=off&c=off&i=${i}&start=${startDate}&end=${endDate}`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      return data.items || [];
+    } catch { return []; }
+  }
+
+  // =====================
+  // Holiday grouping
+  // =====================
+  function groupHolidays(items: any[], israel: boolean): HolidayPeriod[] {
+    const groups: Record<string, { yomTov: string[]; cholHamoed: string[]; all: string[] }> = {};
+
+    for (const item of items) {
+      const title: string = item.title || '';
+      const date: string = item.date;
+      const isYomTov = item.yomtov === true;
+
+      let groupId: string | null = null;
+
+      if (title.includes('Pesach')) {
+        groupId = 'pesach';
+      } else if (title.includes('Shavuot')) {
+        groupId = 'shavuot';
+      } else if (title.includes('Sukkot')) {
+        groupId = 'sukkot';
+      } else if (title.includes('Shmini Atzeret') || title.includes('Simchat Torah')) {
+        groupId = 'shmini-atzeret';
+      } else if (title.includes('Rosh Hashana')) {
+        groupId = 'rosh-hashana';
+      } else if (title.includes('Yom Kippur')) {
+        groupId = 'yom-kippur';
+      }
+
+      if (!groupId) continue;
+      // Skip erev entries for grouping purposes
+      if (title.startsWith('Erev ')) continue;
+
+      if (!groups[groupId]) {
+        groups[groupId] = { yomTov: [], cholHamoed: [], all: [] };
+      }
+      groups[groupId].all.push(date);
+      if (isYomTov) {
+        groups[groupId].yomTov.push(date);
+      } else {
+        groups[groupId].cholHamoed.push(date);
+      }
+    }
+
+    const periods: HolidayPeriod[] = [];
+
+    for (const [id, g] of Object.entries(groups)) {
+      if (g.all.length === 0) continue;
+      g.all.sort();
+      g.yomTov.sort();
+      g.cholHamoed.sort();
+
+      const firstDay = g.all[0];
+      const lastDay = g.all[g.all.length - 1];
+      const erev = addDays(firstDay, -1);
+
+      // Shloshim equivalents when this holiday cancels shiva
+      let equiv = 0;
+      if (id === 'pesach') {
+        equiv = israel ? 7 : 8;
+      } else if (id === 'shavuot') {
+        // First day of Shavuot = 7 equivalent days; second day (diaspora) = 1 more
+        equiv = israel ? 7 : 8;
+      } else if (id === 'sukkot') {
+        equiv = 7; // Just Sukkot proper (7 days); Shmini Atzeret is separate
+      } else if (id === 'shmini-atzeret') {
+        // Shmini Atzeret = 7 equivalent days; Simchat Torah (diaspora) = 1 more
+        equiv = israel ? 7 : 8;
+      } else if (id === 'rosh-hashana') {
+        equiv = 2;
+      } else if (id === 'yom-kippur') {
+        equiv = 1;
+      }
+
+      const names = holidayNames[id] || { he: id, en: id };
+      periods.push({
+        id,
+        nameHe: names.he,
+        nameEn: names.en,
+        erev,
+        firstDay,
+        lastDay,
+        yomTovDays: g.yomTov,
+        cholHamoedDays: g.cholHamoed,
+        shloshimEquivalent: equiv,
+      });
+    }
+
+    // Sort by first day
+    periods.sort((a, b) => a.firstDay.localeCompare(b.firstDay));
+    return periods;
+  }
+
+  // Check if a date falls within a holiday period (yom tov or chol hamoed)
+  function findHolidayAtDate(date: string, holidays: HolidayPeriod[]): HolidayPeriod | null {
+    for (const h of holidays) {
+      if (date >= h.firstDay && date <= h.lastDay) return h;
+    }
+    return null;
+  }
+
+  // =====================
+  // Main mourning calculation
+  // =====================
+  function calculateMourning(
+    deathDate: string,
+    burialDate: string,
+    afterNightfall: boolean,
+    holidays: HolidayPeriod[],
+  ): MourningResult {
+    const notes: string[] = [];
+
+    // Effective burial date (halachic day)
+    let effectiveBurial = afterNightfall ? addDays(burialDate, 1) : burialDate;
+
+    // Check if burial occurred during a holiday/chol hamoed
+    const holidayAtBurial = findHolidayAtDate(effectiveBurial, holidays);
+    let day1: string;
+    let shivaDelayed = false;
+    let shivaDelayedUntilAfter: string | null = null;
+
+    if (holidayAtBurial) {
+      // Shiva begins after the holiday concludes
+      // The last day of the festival counts as day 1
+      day1 = holidayAtBurial.lastDay;
+      shivaDelayed = true;
+      shivaDelayedUntilAfter = holidayAtBurial.id;
+
+      const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
+      if (currentLang === 'he') {
+        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה ביום האחרון של החג.`);
+      } else {
+        notes.push(`Burial occurred during ${name}. Shiva begins on the last day of the holiday.`);
+      }
+
+      // But the holiday days still count toward shloshim
+      // Shloshim counting starts from the burial date even if shiva is delayed
+    } else {
+      day1 = effectiveBurial;
+    }
+
+    // Also check if death occurred during a holiday but burial after
+    // (If death was during holiday and mourner didn't know, shiva starts after holiday)
+    if (!holidayAtBurial && deathDate !== burialDate) {
+      const holidayAtDeath = findHolidayAtDate(deathDate, holidays);
+      if (holidayAtDeath && effectiveBurial > holidayAtDeath.lastDay) {
+        // Death was during holiday, burial after — shiva starts from burial as normal
+        // No special handling needed, but note it
+      }
+    }
+
+    // Naive end dates
+    let shivaEnd = addDays(day1, 6);
+    let shloshimEnd: string;
+
+    // For shloshim, counting starts from burial date (or effective burial) even if shiva was delayed
+    if (shivaDelayed && holidayAtBurial) {
+      // Holiday days count toward shloshim even though shiva hasn't started
+      shloshimEnd = addDays(effectiveBurial, 29);
+    } else {
+      shloshimEnd = addDays(day1, 29);
+    }
+
+    let shivaCancelled = false;
+    let shivaCancelledBy: string | null = null;
+    let shloshimCancelled = false;
+    let shloshimCancelledBy: string | null = null;
+
+    // Process holidays chronologically for cancellation
+    for (const holiday of holidays) {
+      // Skip the holiday that delayed shiva (already handled)
+      if (shivaDelayed && holiday.id === holidayAtBurial?.id) continue;
+
+      const holidayStart = holiday.erev; // Holiday begins at sunset of erev
+
+      // Did mourning begin before this holiday?
+      if (day1 <= holidayStart) {
+        if (!shivaCancelled && holidayStart < shivaEnd) {
+          // Holiday cancels remaining shiva
+          shivaCancelled = true;
+          shivaCancelledBy = holiday.id;
+          shivaEnd = holidayStart; // Shiva ends at onset of holiday
+
+          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
+          if (currentLang === 'he') {
+            notes.push(`${name} מבטל את יתרת השבעה.`);
+          } else {
+            notes.push(`${name} cancels the remainder of shiva.`);
+          }
+
+          // Calculate shloshim with holiday equivalents
+          const daysBeforeHoliday = daysBetween(day1, holidayStart);
+          const totalEquiv = daysBeforeHoliday + holiday.shloshimEquivalent;
+
+          if (totalEquiv >= 30) {
+            shloshimEnd = holiday.lastDay;
+            shloshimCancelled = true;
+            shloshimCancelledBy = holiday.id;
+            if (currentLang === 'he') {
+              notes.push(`${name} מבטל גם את יתרת השלושים.`);
+            } else {
+              notes.push(`${name} also cancels the remainder of shloshim.`);
+            }
+          } else {
+            const remaining = 30 - totalEquiv;
+            shloshimEnd = addDays(holiday.lastDay, remaining);
+          }
+        } else if (shivaCancelled && !shloshimCancelled && holidayStart <= shloshimEnd) {
+          // Shiva already done/cancelled; this holiday cancels remaining shloshim
+          shloshimCancelled = true;
+          shloshimCancelledBy = holiday.id;
+          shloshimEnd = holidayStart;
+
+          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
+          if (currentLang === 'he') {
+            notes.push(`${name} מבטל את יתרת השלושים.`);
+          } else {
+            notes.push(`${name} cancels the remainder of shloshim.`);
+          }
+        } else if (!shivaCancelled && !shloshimCancelled && holidayStart >= shivaEnd && holidayStart <= shloshimEnd) {
+          // Shiva completed normally before the holiday; holiday cancels shloshim
+          shloshimCancelled = true;
+          shloshimCancelledBy = holiday.id;
+          shloshimEnd = holidayStart;
+
+          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
+          if (currentLang === 'he') {
+            notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים.`);
+          } else {
+            notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim.`);
+          }
+        }
+      }
+    }
+
+    return {
+      day1,
+      shivaEnd,
+      shloshimEnd,
+      shivaCancelled,
+      shivaCancelledBy,
+      shloshimCancelled,
+      shloshimCancelledBy,
+      shivaDelayed,
+      shivaDelayedUntilAfter,
+      notes,
+    };
+  }
+
+  // =====================
+  // Form submission
+  // =====================
+  document.getElementById('calc-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const t = translations[currentLang];
+
+    const burialDate = (document.getElementById('burial-date') as HTMLInputElement).value;
+    if (!burialDate) return;
+
+    let deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
+    if (!deathDate) deathDate = burialDate;
+
+    const afterNightfall = (document.getElementById('after-nightfall') as HTMLInputElement).checked;
+
+    const calcBtn = document.getElementById('calc-btn') as HTMLButtonElement;
+    calcBtn.disabled = true;
+    document.getElementById('calc-btn-text')!.textContent = t['calculating'];
+
+    // Fetch holidays for the relevant range (death date through burial + 60 days)
+    const rangeStart = deathDate < burialDate ? deathDate : burialDate;
+    const rangeEnd = addDays(burialDate, 60);
+    const holidayItems = await fetchHolidays(rangeStart, rangeEnd, isIsrael);
+    const holidays = groupHolidays(holidayItems, isIsrael);
+
+    // Run calculation
+    const result = calculateMourning(deathDate, burialDate, afterNightfall, holidays);
+
+    // Display results
+    document.getElementById('shiva-start-value')!.textContent = formatDate(result.day1, currentLang);
+    document.getElementById('shiva-end-value')!.textContent = formatDate(result.shivaEnd, currentLang);
+    document.getElementById('shloshim-start-value')!.textContent = formatDate(result.day1, currentLang);
+    document.getElementById('shloshim-end-value')!.textContent = formatDate(result.shloshimEnd, currentLang);
+
+    // Badges
+    const shivaBadge = document.getElementById('shiva-badge')!;
+    const shloshimBadge = document.getElementById('shloshim-badge')!;
+
+    if (result.shivaCancelled) {
+      const name = currentLang === 'he'
+        ? holidayNames[result.shivaCancelledBy!]?.he
+        : holidayNames[result.shivaCancelledBy!]?.en;
+      shivaBadge.textContent = currentLang === 'he' ? `בוטל ע״י ${name}` : `Cancelled by ${name}`;
+      shivaBadge.className = 'badge cancelled-badge';
+    } else {
+      const numDays = daysBetween(result.day1, result.shivaEnd) + 1;
+      shivaBadge.textContent = `${numDays} ${t['days']}`;
+      shivaBadge.className = 'badge shiva-badge';
+    }
+
+    if (result.shloshimCancelled) {
+      const name = currentLang === 'he'
+        ? holidayNames[result.shloshimCancelledBy!]?.he
+        : holidayNames[result.shloshimCancelledBy!]?.en;
+      shloshimBadge.textContent = currentLang === 'he' ? `בוטל ע״י ${name}` : `Cancelled by ${name}`;
+      shloshimBadge.className = 'badge cancelled-badge';
+    } else {
+      shloshimBadge.textContent = `30 ${t['days']}`;
+      shloshimBadge.className = 'badge shloshim-badge';
+    }
+
+    // Shiva note
+    const shivaNote = document.getElementById('shiva-note')!;
+    if (result.shivaCancelled) {
+      shivaNote.textContent = currentLang === 'he'
+        ? `השבעה הסתיימה בערב החג (${formatDate(result.shivaEnd, currentLang)})`
+        : `Shiva ended at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`;
+    } else {
+      shivaNote.textContent = t['shiva-normal-note'];
+    }
+
+    // Shloshim note
+    const shloshimNote = document.getElementById('shloshim-note')!;
+    if (result.shloshimCancelled) {
+      shloshimNote.textContent = currentLang === 'he'
+        ? `השלושים הסתיימו בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
+        : `Shloshim ended at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`;
+    } else {
+      shloshimNote.textContent = t['shloshim-normal-note'];
+    }
+
+    // Cancelled notices
+    const shivaCancelledEl = document.getElementById('shiva-cancelled-notice')!;
+    const shloshimCancelledEl = document.getElementById('shloshim-cancelled-notice')!;
+    shivaCancelledEl.style.display = 'none';
+    shloshimCancelledEl.style.display = 'none';
+
+    // Holiday notice
+    const holidayNotice = document.getElementById('holiday-notice')!;
+    if (result.notes.length > 0) {
+      holidayNotice.innerHTML = result.notes.map(n => `<p>${n}</p>`).join('');
+      holidayNotice.style.display = '';
+    } else {
+      holidayNotice.style.display = 'none';
+    }
+
+    // Show results
+    document.getElementById('results')!.style.display = '';
+
+    // Fetch Hebrew dates
+    const [burialHeb, shivaHeb, shloshimHeb] = await Promise.all([
+      getHebrewDate(result.day1),
+      getHebrewDate(result.shivaEnd),
+      getHebrewDate(result.shloshimEnd),
+    ]);
+
+    document.getElementById('burial-heb-value')!.textContent = burialHeb;
+    document.getElementById('shiva-end-heb-value')!.textContent = shivaHeb;
+    document.getElementById('shloshim-end-heb-value')!.textContent = shloshimHeb;
+
+    calcBtn.disabled = false;
+    document.getElementById('calc-btn-text')!.textContent = t['calc-btn-text'];
+    document.getElementById('results')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+</script>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 3rem;
+    position: relative;
+  }
+
+  /* Language toggle */
+  .lang-toggle {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: #e8e0d0;
+    border: 1px solid #d4c5a9;
+    color: #6d5a43;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  [dir="ltr"] .lang-toggle {
+    left: auto;
+    right: 1.5rem;
+  }
+  .lang-toggle:hover {
+    background: #d4c5a9;
+    border-color: #8b7355;
+  }
+
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    text-align: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #6d5a43;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 400;
+    color: #2c2c2c;
+  }
+  .checkbox-label input[type="checkbox"] {
+    accent-color: #8b7355;
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+  }
+
+  .field-hint {
+    font-size: 0.8rem;
+    color: #999;
+  }
+
+  .zmanim-link {
+    font-size: 0.8rem;
+    color: #4a6fa5;
+    text-decoration: none;
+  }
+  .zmanim-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Toggle group (Israel/Diaspora) */
+  .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 2px solid #d4c5a9;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .toggle-btn {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    padding: 0.45rem 1.2rem;
+    background: #fff;
+    color: #6d5a43;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toggle-btn + .toggle-btn {
+    border-inline-start: 1px solid #d4c5a9;
+  }
+  .toggle-btn.active {
+    background: #8b7355;
+    color: #fff;
+    font-weight: 700;
+  }
+  .toggle-btn:hover:not(.active) {
+    background: #f0ebe0;
+  }
+
+  input[type="date"],
+  input[type="text"] {
+    font-family: 'Heebo', sans-serif;
+    font-size: 1.05rem;
+    padding: 0.65rem 0.75rem;
+    border: 2px solid #d4c5a9;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c2c2c;
+    outline: none;
+    transition: border-color 0.15s ease;
+    width: 100%;
+  }
+  input:focus {
+    border-color: #8b7355;
+  }
+
+
+  .btn-primary {
+    font-family: 'Heebo', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    background: #8b7355;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    margin-top: 0.5rem;
+  }
+  .btn-primary:hover { background: #6d5a43; }
+  .btn-primary:disabled { opacity: 0.7; cursor: wait; }
+
+  /* Results */
+  .results { margin-top: 2rem; }
+  .results h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.5rem;
+    color: #4a3c2c;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Holiday notice */
+  .holiday-notice {
+    background: #fef3cd;
+    border: 1px solid #e6c547;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .holiday-notice p {
+    font-size: 0.88rem;
+    color: #6d5a00;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .holiday-notice p + p {
+    margin-top: 0.3rem;
+  }
+
+  .result-card {
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: #f0ebe0;
+    border-bottom: 1px solid #e0d8c8;
+  }
+  .result-header h3 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.15rem;
+    color: #4a3c2c;
+    font-weight: 700;
+  }
+
+  .badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .shiva-badge { background: #8b7355; }
+  .shloshim-badge { background: #4a6fa5; }
+  .cancelled-badge { background: #b8860b; }
+
+  .result-body { padding: 1rem; }
+
+  .result-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.3rem 0;
+  }
+  .result-line + .result-line {
+    border-top: 1px solid #f0ebe0;
+  }
+
+  .result-key {
+    font-size: 0.9rem;
+    color: #888;
+    flex-shrink: 0;
+    margin-inline-end: 0.75rem;
+  }
+
+  .result-value {
+    font-size: 0.95rem;
+    color: #2c2c2c;
+    font-weight: 400;
+    text-align: end;
+  }
+  .result-value.highlight {
+    font-weight: 700;
+    color: #4a3c2c;
+    font-size: 1.05rem;
+  }
+
+  .result-note {
+    font-size: 0.82rem;
+    color: #999;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed #e0d8c8;
+  }
+
+  .cancelled-notice {
+    background: #fef3cd;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.82rem;
+    color: #6d5a00;
+  }
+
+  .dates-card .result-header {
+    background: #eef3f9;
+    border-bottom-color: #d4dfe8;
+  }
+  .dates-card { border-color: #d4dfe8; }
+  .dates-card .result-header h3 { color: #3a5a7c; }
+
+  .disclaimer {
+    font-size: 0.78rem;
+    color: #999;
+    text-align: center;
+    margin-top: 1.5rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 500px) {
+    .container { padding: 2rem 1rem 2rem; }
+    h1 { font-size: 1.6rem; }
+    .result-line {
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .result-value { text-align: start; }
+    .toggle-btn { padding: 0.45rem 0.8rem; font-size: 0.88rem; }
+  }
+</style>
+</body>
+</html>
