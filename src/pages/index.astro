@@ -180,19 +180,21 @@
         <h3 id="yahrzeit-label">יארצייט</h3>
       </div>
       <div class="result-body">
-        <div class="result-line">
-          <span id="yahrzeit-heb-date-label" class="result-key">תאריך עברי:</span>
-          <span id="yahrzeit-heb-date-value" class="result-value highlight"></span>
-        </div>
-        <div class="result-line">
-          <span id="yahrzeit-first-label" class="result-key">יארצייט ראשון:</span>
+        <div class="yahrzeit-entry">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-first-label" class="yahrzeit-title">יארצייט ראשון</span>
+            <span id="yahrzeit-first-basis" class="yahrzeit-basis">לפי תאריך הקבורה</span>
+          </div>
           <div class="result-dates">
             <span id="yahrzeit-first-heb" class="result-value highlight"></span>
             <span id="yahrzeit-first-value" class="result-greg-date"></span>
           </div>
         </div>
-        <div class="result-line">
-          <span id="yahrzeit-second-label" class="result-key">יארצייט שני:</span>
+        <div class="yahrzeit-entry">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-second-label" class="yahrzeit-title">יארצייט שני ואילך</span>
+            <span id="yahrzeit-second-basis" class="yahrzeit-basis">לפי תאריך הפטירה</span>
+          </div>
           <div class="result-dates">
             <span id="yahrzeit-second-heb" class="result-value highlight"></span>
             <span id="yahrzeit-second-value" class="result-greg-date"></span>
@@ -203,6 +205,8 @@
     </div>
 
     <p id="disclaimer" class="disclaimer"></p>
+    <p class="rules-link"><a href="/rules">כללי החישוב ←</a></p>
+    <p class="wip-notice">אתר זה עדיין בבנייה, אין לסמוך על התוצאות כלל וכלל.</p>
   </div>
 </div>
 
@@ -613,9 +617,10 @@
       'kaddish-end-label': 'סיום:',
       'kaddish-note': 'קדיש נאמר למשך 11 חודש מיום הפטירה',
       'yahrzeit-label': 'יארצייט',
-      'yahrzeit-heb-date-label': 'תאריך עברי:',
-      'yahrzeit-first-label': 'יארצייט ראשון:',
-      'yahrzeit-second-label': 'יארצייט שני:',
+      'yahrzeit-first-label': 'יארצייט ראשון',
+      'yahrzeit-first-basis': 'לפי תאריך הקבורה',
+      'yahrzeit-second-label': 'יארצייט שני ואילך',
+      'yahrzeit-second-basis': 'לפי תאריך הפטירה',
       'yahrzeit-note': '',
     },
     en: {
@@ -659,9 +664,10 @@
       'kaddish-end-label': 'Ends:',
       'kaddish-note': 'Kaddish is recited for 11 months from the date of passing',
       'yahrzeit-label': 'Yahrzeit',
-      'yahrzeit-heb-date-label': 'Hebrew date:',
-      'yahrzeit-first-label': 'First Yahrzeit:',
-      'yahrzeit-second-label': 'Second Yahrzeit:',
+      'yahrzeit-first-label': 'First Yahrzeit',
+      'yahrzeit-first-basis': 'Based on burial date',
+      'yahrzeit-second-label': 'Second Yahrzeit onward',
+      'yahrzeit-second-basis': 'Based on date of passing',
       'yahrzeit-note': '',
     },
   };
@@ -783,6 +789,11 @@
   // Kaddish & Yahrzeit helpers
   // =====================
 
+  /** Format a Date to YYYY-MM-DD without UTC conversion */
+  function toLocalDateStr(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
   /**
    * Calculate when Kaddish ends: 11 Hebrew months from date of passing.
    * Returns the Gregorian date string.
@@ -819,7 +830,7 @@
     const greg = toGregorianDate(targetJd);
 
     return {
-      gregDate: greg.toISOString().split('T')[0],
+      gregDate: toLocalDateStr(greg),
       jewishDate: targetJd,
     };
   }
@@ -857,7 +868,7 @@
     const greg = toGregorianDate(targetJd);
 
     return {
-      gregDate: greg.toISOString().split('T')[0],
+      gregDate: toLocalDateStr(greg),
       jewishDate: targetJd,
     };
   }
@@ -1237,26 +1248,19 @@
     document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishResult.gregDate, currentLang);
     document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishResult.gregDate);
 
-    // Yahrzeit (Hebrew date of death)
-    const deathHebDate = getJewishDate(new Date(deathDate + 'T12:00:00'));
-    const deathHebStr = currentLang === 'he'
-      ? formatJewishDateInHebrew(deathHebDate)
-      : formatJewishDate(deathHebDate);
-    document.getElementById('yahrzeit-heb-date-value')!.textContent = deathHebStr;
-
-    // First yahrzeit (1 year after death in Hebrew calendar)
-    const firstYahrzeit = calcYahrzeit(deathDate, 1);
+    // First yahrzeit goes by BURIAL date
+    const firstYahrzeit = calcYahrzeit(burialDate, 1);
     document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeit.gregDate, currentLang);
     document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeit.gregDate);
 
-    // Second yahrzeit (2 years after)
+    // Subsequent yahrzeits go by DEATH date
     const secondYahrzeit = calcYahrzeit(deathDate, 2);
     document.getElementById('yahrzeit-second-value')!.textContent = formatDate(secondYahrzeit.gregDate, currentLang);
     document.getElementById('yahrzeit-second-heb')!.textContent = formatHeb(secondYahrzeit.gregDate);
 
     // Yahrzeit note - show if Adar handling applies
     const yahrzeitNote = document.getElementById('yahrzeit-note')!;
-    const deathMonthName = deathHebDate.monthName;
+    const deathMonthName = getJewishDate(new Date(deathDate + 'T12:00:00')).monthName;
     if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
       yahrzeitNote.textContent = currentLang === 'he'
         ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
@@ -1540,6 +1544,32 @@
   .yahrzeit-card { border-color: #c8d8c8; }
   .yahrzeit-card .result-header h3 { color: #3a5a3a; }
 
+  .yahrzeit-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.6rem 0;
+  }
+  .yahrzeit-entry + .yahrzeit-entry {
+    border-top: 1px solid #f0ebe0;
+  }
+  .yahrzeit-entry-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex-shrink: 0;
+    margin-inline-end: 0.75rem;
+  }
+  .yahrzeit-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #4a3c2c;
+  }
+  .yahrzeit-basis {
+    font-size: 0.75rem;
+    color: #999;
+  }
+
   .result-body { padding: 1rem; }
 
   .result-line {
@@ -1599,6 +1629,30 @@
     color: #6d5a00;
   }
 
+
+  .rules-link {
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+  .rules-link a {
+    font-size: 0.85rem;
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .rules-link a:hover { text-decoration: underline; }
+
+  .wip-notice {
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    background: #fde8e8;
+    border: 1px solid #e0a0a0;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #933;
+    font-weight: 700;
+  }
 
   .disclaimer {
     font-size: 0.78rem;
