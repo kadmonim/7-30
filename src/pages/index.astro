@@ -18,7 +18,16 @@
   <button id="lang-toggle" class="lang-toggle" type="button">EN</button>
 
   <h1 id="title">חישוב שבעה ושלושים</h1>
-  <p id="subtitle" class="subtitle">הזן את תאריך הפטירה, הקבורה ומיקום כדי לחשב מתי נגמרים השבעה והשלושים</p>
+  <p id="subtitle" class="subtitle">הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים</p>
+
+  <!-- Israel/Diaspora banner -->
+  <div class="location-banner">
+    <span id="location-statement">חישוב לפי</span>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="toggle-israel" data-value="israel">ארץ ישראל</button>
+      <button type="button" class="toggle-btn" id="toggle-diaspora" data-value="diaspora">חו״ל</button>
+    </div>
+  </div>
 
   <form id="calc-form" autocomplete="off">
     <!-- Date of passing -->
@@ -59,6 +68,11 @@
         </div>
         <div class="heb-cal-weekdays" id="heb-cal-weekdays"></div>
         <div class="heb-cal-grid" id="heb-cal-grid"></div>
+        <div class="heb-cal-legend">
+          <span class="legend-item"><span class="legend-dot yom-tov-dot"></span><span class="legend-text" id="legend-yomtov">יו״ט</span></span>
+          <span class="legend-item"><span class="legend-dot chol-hamoed-dot"></span><span class="legend-text" id="legend-cholhamoed">חוה״מ</span></span>
+          <span class="legend-item"><span class="legend-dot shabat-dot"></span><span class="legend-text" id="legend-shabat">שבת</span></span>
+        </div>
         <div class="heb-cal-footer">
           <button type="button" id="heb-cal-today" class="heb-cal-today-btn">היום</button>
           <button type="button" id="heb-cal-close" class="heb-cal-close-btn">סגור</button>
@@ -74,15 +88,6 @@
       </label>
       <span id="after-nightfall-hint" class="field-hint">קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.</span>
       <a id="zmanim-link" class="zmanim-link" href="https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm" target="_blank" rel="noopener">לא בטוח? בדוק זמנים ב-Chabad.org</a>
-    </div>
-
-    <!-- Israel / Diaspora -->
-    <div class="field">
-      <label id="label-israel-diaspora">שמירת חגים</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" id="toggle-israel" data-value="israel">ישראל</button>
-        <button type="button" class="toggle-btn" id="toggle-diaspora" data-value="diaspora">חו״ל</button>
-      </div>
     </div>
 
 
@@ -106,11 +111,17 @@
       <div class="result-body">
         <div class="result-line">
           <span id="shiva-start-label" class="result-key">תחילה:</span>
-          <span id="shiva-start-value" class="result-value"></span>
+          <div class="result-dates">
+            <span id="shiva-start-value" class="result-value"></span>
+            <span id="shiva-start-heb" class="result-heb-date"></span>
+          </div>
         </div>
         <div class="result-line">
           <span id="shiva-end-label" class="result-key">סיום:</span>
-          <span id="shiva-end-value" class="result-value highlight"></span>
+          <div class="result-dates">
+            <span id="shiva-end-value" class="result-value highlight"></span>
+            <span id="shiva-end-heb" class="result-heb-date"></span>
+          </div>
         </div>
         <div id="shiva-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
         <p id="shiva-note" class="result-note"></p>
@@ -125,35 +136,66 @@
       <div class="result-body">
         <div class="result-line">
           <span id="shloshim-start-label" class="result-key">תחילה:</span>
-          <span id="shloshim-start-value" class="result-value"></span>
+          <div class="result-dates">
+            <span id="shloshim-start-value" class="result-value"></span>
+            <span id="shloshim-start-heb" class="result-heb-date"></span>
+          </div>
         </div>
         <div class="result-line">
           <span id="shloshim-end-label" class="result-key">סיום:</span>
-          <span id="shloshim-end-value" class="result-value highlight"></span>
+          <div class="result-dates">
+            <span id="shloshim-end-value" class="result-value highlight"></span>
+            <span id="shloshim-end-heb" class="result-heb-date"></span>
+          </div>
         </div>
         <div id="shloshim-cancelled-notice" class="cancelled-notice" style="display:none;"></div>
         <p id="shloshim-note" class="result-note"></p>
       </div>
     </div>
 
-    <!-- Hebrew dates section -->
-    <div class="result-card dates-card">
+    <!-- Kaddish -->
+    <div class="result-card kaddish-card">
       <div class="result-header">
-        <h3 id="hebrew-dates-label">תאריכים עבריים</h3>
+        <h3 id="kaddish-label">קדיש</h3>
+        <span class="badge kaddish-badge" id="kaddish-badge">11 חודשים</span>
       </div>
       <div class="result-body">
         <div class="result-line">
-          <span id="burial-heb-label" class="result-key">קבורה (יום א׳):</span>
-          <span id="burial-heb-value" class="result-value"></span>
+          <span id="kaddish-end-label" class="result-key">סיום:</span>
+          <div class="result-dates">
+            <span id="kaddish-end-value" class="result-value highlight"></span>
+            <span id="kaddish-end-heb" class="result-heb-date"></span>
+          </div>
+        </div>
+        <p id="kaddish-note" class="result-note">קדיש נאמר למשך 11 חודש מיום הפטירה</p>
+      </div>
+    </div>
+
+    <!-- Yahrzeit -->
+    <div class="result-card yahrzeit-card">
+      <div class="result-header">
+        <h3 id="yahrzeit-label">יארצייט</h3>
+      </div>
+      <div class="result-body">
+        <div class="result-line">
+          <span id="yahrzeit-heb-date-label" class="result-key">תאריך עברי:</span>
+          <span id="yahrzeit-heb-date-value" class="result-value highlight"></span>
         </div>
         <div class="result-line">
-          <span id="shiva-end-heb-label" class="result-key">סוף שבעה:</span>
-          <span id="shiva-end-heb-value" class="result-value"></span>
+          <span id="yahrzeit-first-label" class="result-key">יארצייט ראשון:</span>
+          <div class="result-dates">
+            <span id="yahrzeit-first-value" class="result-value highlight"></span>
+            <span id="yahrzeit-first-heb" class="result-heb-date"></span>
+          </div>
         </div>
         <div class="result-line">
-          <span id="shloshim-end-heb-label" class="result-key">סוף שלושים:</span>
-          <span id="shloshim-end-heb-value" class="result-value"></span>
+          <span id="yahrzeit-second-label" class="result-key">יארצייט שני:</span>
+          <div class="result-dates">
+            <span id="yahrzeit-second-value" class="result-value"></span>
+            <span id="yahrzeit-second-heb" class="result-heb-date"></span>
+          </div>
         </div>
+        <p id="yahrzeit-note" class="result-note"></p>
       </div>
     </div>
 
@@ -172,8 +214,9 @@
     getNextMonth,
     getHebWeekdays,
     getEngWeekdays,
+    getHolidays,
   } from 'jewish-dates-core';
-  import { formatJewishDateInHebrew, formatJewishDate, JewishMonth } from 'jewish-date';
+  import { formatJewishDateInHebrew, formatJewishDate, JewishMonth, toGregorianDate, toJewishDate, getJewishMonthsInOrder } from 'jewish-date';
 
   // =====================
   // Hebrew Calendar Picker
@@ -226,16 +269,46 @@
     const weekdays = isHeb ? getHebWeekdays() : getEngWeekdays();
     weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
 
+    // Build holiday lookup for coloring
+    // getHolidays returns strings like "1 Tishri", "15 Nisan", etc.
+    const yomTovList = getHolidays(isIsrael);
+    const yomTovSet = new Set(yomTovList);
+
+    // Chol HaMoed dates (not in yomTovList but part of the festival)
+    const cholHamoedDates: string[] = [];
+    // Pesach Chol HaMoed: 17-20 Nisan (Israel) or 17-20 Nisan (Diaspora)
+    for (let d = 17; d <= 20; d++) cholHamoedDates.push(`${d} Nisan`);
+    // Sukkot Chol HaMoed: 17-21 Tishri (Israel) or 17-21 Tishri (Diaspora)
+    for (let d = 17; d <= 21; d++) cholHamoedDates.push(`${d} Tishri`);
+    const cholHamoedSet = new Set(cholHamoedDates);
+
     // Day cells
     grid.innerHTML = calData.days.map(day => {
       const isCurrentMonth = day.isCurrentMonth;
-      const cls = isCurrentMonth ? 'heb-cal-day' : 'heb-cal-day other-month';
       const dateStr = day.dayjsDate.format('YYYY-MM-DD');
-      const dayLabel = isHeb ? day.jewishDateStr.split(' ')[0] : day.jewishDate.day;
-      // Show gematriya for Hebrew, number for English
       const hebStr = formatJewishDateInHebrew(day.jewishDate);
-      const dayNum = hebStr.split(' ')[0]; // just the day part
-      return `<button type="button" class="${cls}" data-date="${dateStr}" title="${isHeb ? hebStr : day.jewishDateStr}">${isHeb ? dayNum : day.jewishDate.day}</button>`;
+      const dayNum = hebStr.split(' ')[0];
+
+      // Determine special day classes
+      const classes = ['heb-cal-day'];
+      if (!isCurrentMonth) classes.push('other-month');
+
+      const jewishKey = `${day.jewishDate.day} ${day.jewishDate.monthName}`;
+      const isShabat = day.date.getDay() === 6;
+
+      if (isCurrentMonth) {
+        if (yomTovSet.has(jewishKey)) {
+          classes.push('yom-tov');
+        } else if (cholHamoedSet.has(jewishKey)) {
+          classes.push('chol-hamoed');
+        }
+        if (isShabat) {
+          classes.push('shabat');
+        }
+      }
+
+      const tooltip = isHeb ? hebStr : day.jewishDateStr;
+      return `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" title="${tooltip}">${isHeb ? dayNum : day.jewishDate.day}</button>`;
     }).join('');
   }
 
@@ -404,12 +477,8 @@
       'shiva-end-label': 'סיום:',
       'shloshim-start-label': 'תחילה:',
       'shloshim-end-label': 'סיום:',
-      'hebrew-dates-label': 'תאריכים עבריים',
-      'burial-heb-label': 'קבורה (יום א׳):',
-      'shiva-end-heb-label': 'סוף שבעה:',
-      'shloshim-end-heb-label': 'סוף שלושים:',
-      'label-israel-diaspora': 'שמירת חגים',
-      'toggle-israel': 'ישראל',
+      'location-statement': 'חישוב לפי',
+      'toggle-israel': 'ארץ ישראל',
       'toggle-diaspora': 'חו״ל',
       'label-after-nightfall': 'הקבורה היתה אחרי צאת הכוכבים',
       'after-nightfall-hint': 'קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.',
@@ -418,6 +487,9 @@
       'heb-cal-label': 'עברי',
       'heb-cal-today': 'היום',
       'heb-cal-close': 'סגור',
+      'legend-yomtov': 'יו״ט',
+      'legend-cholhamoed': 'חוה״מ',
+      'legend-shabat': 'שבת',
       calculating: 'מחשב...',
       'page-title': 'חישוב שבעה ושלושים',
       'lang-btn': 'EN',
@@ -425,6 +497,15 @@
       'cancelled': 'בוטל',
       'shiva-normal-note': 'השבעה מסתיימת בבוקר של היום השביעי, לאחר שחרית',
       'shloshim-normal-note': 'השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית',
+      'kaddish-label': 'קדיש',
+      'kaddish-badge': '11 חודשים',
+      'kaddish-end-label': 'סיום:',
+      'kaddish-note': 'קדיש נאמר למשך 11 חודש מיום הפטירה',
+      'yahrzeit-label': 'יארצייט',
+      'yahrzeit-heb-date-label': 'תאריך עברי:',
+      'yahrzeit-first-label': 'יארצייט ראשון:',
+      'yahrzeit-second-label': 'יארצייט שני:',
+      'yahrzeit-note': '',
     },
     en: {
       title: 'Shiva & Shloshim Calculator',
@@ -440,11 +521,7 @@
       'shiva-end-label': 'Ends:',
       'shloshim-start-label': 'Starts:',
       'shloshim-end-label': 'Ends:',
-      'hebrew-dates-label': 'Hebrew Dates',
-      'burial-heb-label': 'Burial (Day 1):',
-      'shiva-end-heb-label': 'End of Shiva:',
-      'shloshim-end-heb-label': 'End of Shloshim:',
-      'label-israel-diaspora': 'Holiday observance',
+      'location-statement': 'Calculating according to',
       'toggle-israel': 'Israel',
       'toggle-diaspora': 'Diaspora',
       'label-after-nightfall': 'The burial was after nightfall',
@@ -454,6 +531,9 @@
       'heb-cal-label': 'Hebrew',
       'heb-cal-today': 'Today',
       'heb-cal-close': 'Close',
+      'legend-yomtov': 'Yom Tov',
+      'legend-cholhamoed': "Chol HaMo'ed",
+      'legend-shabat': 'Shabbat',
       calculating: 'Calculating...',
       'page-title': 'Shiva & Shloshim Calculator',
       'lang-btn': 'עב',
@@ -461,6 +541,15 @@
       'cancelled': 'Cancelled',
       'shiva-normal-note': 'Shiva ends on the morning of the 7th day, after Shacharit',
       'shloshim-normal-note': 'Shloshim ends on the morning of the 30th day, after Shacharit',
+      'kaddish-label': 'Kaddish',
+      'kaddish-badge': '11 months',
+      'kaddish-end-label': 'Ends:',
+      'kaddish-note': 'Kaddish is recited for 11 months from the date of passing',
+      'yahrzeit-label': 'Yahrzeit',
+      'yahrzeit-heb-date-label': 'Hebrew date:',
+      'yahrzeit-first-label': 'First Yahrzeit:',
+      'yahrzeit-second-label': 'Second Yahrzeit:',
+      'yahrzeit-note': '',
     },
   };
 
@@ -475,12 +564,12 @@
   };
 
   let currentLang: 'he' | 'en' = 'he';
-  let isIsrael: boolean = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  let isIsrael: boolean = true; // Default to Israel
 
-  // Auto-detect language
-  if (navigator.language && !navigator.language.startsWith('he')) {
-    currentLang = 'en';
-  }
+  // Default is Hebrew; auto-detect disabled for now
+  // if (navigator.language && !navigator.language.startsWith('he')) {
+  //   currentLang = 'en';
+  // }
 
   // Set initial Israel/Diaspora toggle state
   function initToggle() {
@@ -581,17 +670,91 @@
   }
 
   // =====================
-  // HebCal API helpers
   // =====================
-  async function getHebrewDate(date: string): Promise<string> {
-    try {
-      const url = `https://www.hebcal.com/converter?cfg=json&date=${date}&g2h=1&strict=1`;
-      const resp = await fetch(url);
-      const data = await resp.json();
-      return data.hebrew || '';
-    } catch { return ''; }
+  // Kaddish & Yahrzeit helpers
+  // =====================
+
+  /**
+   * Calculate when Kaddish ends: 11 Hebrew months from date of passing.
+   * Returns the Gregorian date string.
+   */
+  function calcKaddishEnd(deathDateStr: string): { gregDate: string; jewishDate: any } {
+    const d = new Date(deathDateStr + 'T12:00:00');
+    const jd = toJewishDate(d);
+    const monthsInOrder = getJewishMonthsInOrder(jd.year);
+
+    let targetYear = jd.year;
+    let targetMonthName = jd.monthName;
+    let monthsToAdd = 11;
+
+    // Walk forward 11 months in the Hebrew calendar
+    const currentMonthsOrder = getJewishMonthsInOrder(targetYear);
+    let idx = currentMonthsOrder.indexOf(jd.monthName);
+
+    while (monthsToAdd > 0) {
+      idx++;
+      const yearMonths = getJewishMonthsInOrder(targetYear);
+      if (idx >= yearMonths.length) {
+        targetYear++;
+        idx = 1; // Skip JewishMonth.None at index 0
+      }
+      const newMonths = getJewishMonthsInOrder(targetYear);
+      targetMonthName = newMonths[idx];
+      monthsToAdd--;
+    }
+
+    // Use the same day, clamped to month length
+    let targetDay = jd.day;
+    // Try to create the date; if day is too high, the library will handle it
+    const targetJd = { day: targetDay, monthName: targetMonthName, year: targetYear };
+    const greg = toGregorianDate(targetJd);
+
+    return {
+      gregDate: greg.toISOString().split('T')[0],
+      jewishDate: targetJd,
+    };
   }
 
+  /**
+   * Calculate yahrzeit: the Hebrew date of death in future years.
+   * Returns Gregorian date for the given Hebrew year.
+   */
+  function calcYahrzeit(deathDateStr: string, yearOffset: number): { gregDate: string; jewishDate: any } {
+    const d = new Date(deathDateStr + 'T12:00:00');
+    const jd = toJewishDate(d);
+
+    const targetYear = jd.year + yearOffset;
+    let targetMonthName = jd.monthName;
+
+    // Handle Adar in leap/non-leap year transitions
+    const targetMonths = getJewishMonthsInOrder(targetYear);
+    const hasAdarI = targetMonths.includes(JewishMonth.AdarI);
+    const hasAdarII = targetMonths.includes(JewishMonth.AdarII);
+    const sourceMonths = getJewishMonthsInOrder(jd.year);
+    const sourceHasAdarI = sourceMonths.includes(JewishMonth.AdarI);
+
+    if (jd.monthName === JewishMonth.AdarI && !hasAdarI) {
+      // Death in Adar I of leap year, target is non-leap: use Adar
+      targetMonthName = JewishMonth.Adar;
+    } else if (jd.monthName === JewishMonth.AdarII && !hasAdarII) {
+      // Death in Adar II of leap year, target is non-leap: use Adar
+      targetMonthName = JewishMonth.Adar;
+    } else if (jd.monthName === JewishMonth.Adar && hasAdarII) {
+      // Death in Adar of non-leap year, target is leap: use Adar II
+      targetMonthName = JewishMonth.AdarII;
+    }
+
+    const targetJd = { day: jd.day, monthName: targetMonthName, year: targetYear };
+    const greg = toGregorianDate(targetJd);
+
+    return {
+      gregDate: greg.toISOString().split('T')[0],
+      jewishDate: targetJd,
+    };
+  }
+
+  // HebCal API helpers
+  // =====================
   async function fetchHolidays(startDate: string, endDate: string, israel: boolean): Promise<any[]> {
     try {
       const i = israel ? 'on' : 'off';
@@ -877,11 +1040,22 @@
     // Run calculation
     const result = calculateMourning(deathDate, burialDate, afterNightfall, holidays);
 
-    // Display results
+    // Display results with both Gregorian and Hebrew dates
     document.getElementById('shiva-start-value')!.textContent = formatDate(result.day1, currentLang);
     document.getElementById('shiva-end-value')!.textContent = formatDate(result.shivaEnd, currentLang);
     document.getElementById('shloshim-start-value')!.textContent = formatDate(result.day1, currentLang);
     document.getElementById('shloshim-end-value')!.textContent = formatDate(result.shloshimEnd, currentLang);
+
+    // Hebrew dates (using local library, no API needed)
+    const formatHeb = (dateStr: string) => {
+      const d = new Date(dateStr + 'T12:00:00');
+      const jd = getJewishDate(d);
+      return currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
+    };
+    document.getElementById('shiva-start-heb')!.textContent = formatHeb(result.day1);
+    document.getElementById('shiva-end-heb')!.textContent = formatHeb(result.shivaEnd);
+    document.getElementById('shloshim-start-heb')!.textContent = formatHeb(result.day1);
+    document.getElementById('shloshim-end-heb')!.textContent = formatHeb(result.shloshimEnd);
 
     // Badges
     const shivaBadge = document.getElementById('shiva-badge')!;
@@ -945,19 +1119,41 @@
       holidayNotice.style.display = 'none';
     }
 
+    // Kaddish end (11 Hebrew months from death)
+    const kaddishResult = calcKaddishEnd(deathDate);
+    document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishResult.gregDate, currentLang);
+    document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishResult.gregDate);
+
+    // Yahrzeit (Hebrew date of death)
+    const deathHebDate = getJewishDate(new Date(deathDate + 'T12:00:00'));
+    const deathHebStr = currentLang === 'he'
+      ? formatJewishDateInHebrew(deathHebDate)
+      : formatJewishDate(deathHebDate);
+    document.getElementById('yahrzeit-heb-date-value')!.textContent = deathHebStr;
+
+    // First yahrzeit (1 year after death in Hebrew calendar)
+    const firstYahrzeit = calcYahrzeit(deathDate, 1);
+    document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeit.gregDate, currentLang);
+    document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeit.gregDate);
+
+    // Second yahrzeit (2 years after)
+    const secondYahrzeit = calcYahrzeit(deathDate, 2);
+    document.getElementById('yahrzeit-second-value')!.textContent = formatDate(secondYahrzeit.gregDate, currentLang);
+    document.getElementById('yahrzeit-second-heb')!.textContent = formatHeb(secondYahrzeit.gregDate);
+
+    // Yahrzeit note - show if Adar handling applies
+    const yahrzeitNote = document.getElementById('yahrzeit-note')!;
+    const deathMonthName = deathHebDate.monthName;
+    if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
+      yahrzeitNote.textContent = currentLang === 'he'
+        ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
+        : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.';
+    } else {
+      yahrzeitNote.textContent = '';
+    }
+
     // Show results
     document.getElementById('results')!.style.display = '';
-
-    // Fetch Hebrew dates
-    const [burialHeb, shivaHeb, shloshimHeb] = await Promise.all([
-      getHebrewDate(result.day1),
-      getHebrewDate(result.shivaEnd),
-      getHebrewDate(result.shloshimEnd),
-    ]);
-
-    document.getElementById('burial-heb-value')!.textContent = burialHeb;
-    document.getElementById('shiva-end-heb-value')!.textContent = shivaHeb;
-    document.getElementById('shloshim-end-heb-value')!.textContent = shloshimHeb;
 
     calcBtn.disabled = false;
     document.getElementById('calc-btn-text')!.textContent = t['calc-btn-text'];
@@ -1025,7 +1221,25 @@
     text-align: center;
     color: #888;
     font-size: 0.95rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Israel/Diaspora banner */
+  .location-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    padding: 0.6rem 1rem;
+    background: #f0ebe0;
+    border: 1px solid #e0d8c8;
+    border-radius: 8px;
+  }
+  .location-banner span {
+    font-size: 0.9rem;
+    color: #6d5a43;
+    font-weight: 700;
   }
 
   form {
@@ -1203,6 +1417,15 @@
   .shiva-badge { background: #8b7355; }
   .shloshim-badge { background: #4a6fa5; }
   .cancelled-badge { background: #b8860b; }
+  .kaddish-badge { background: #6b5b95; }
+
+  .kaddish-card .result-header { background: #f0edf5; border-bottom-color: #d8d0e8; }
+  .kaddish-card { border-color: #d8d0e8; }
+  .kaddish-card .result-header h3 { color: #5a4a7a; }
+
+  .yahrzeit-card .result-header { background: #e8f0e8; border-bottom-color: #c8d8c8; }
+  .yahrzeit-card { border-color: #c8d8c8; }
+  .yahrzeit-card .result-header h3 { color: #3a5a3a; }
 
   .result-body { padding: 1rem; }
 
@@ -1235,6 +1458,18 @@
     font-size: 1.05rem;
   }
 
+  .result-dates {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+  }
+  .result-heb-date {
+    font-size: 0.82rem;
+    color: #8b7355;
+    font-weight: 700;
+  }
+
   .result-note {
     font-size: 0.82rem;
     color: #999;
@@ -1252,12 +1487,6 @@
     color: #6d5a00;
   }
 
-  .dates-card .result-header {
-    background: #eef3f9;
-    border-bottom-color: #d4dfe8;
-  }
-  .dates-card { border-color: #d4dfe8; }
-  .dates-card .result-header h3 { color: #3a5a7c; }
 
   .disclaimer {
     font-size: 0.78rem;
@@ -1415,6 +1644,68 @@
     background: #fff;
     border-color: transparent;
   }
+
+  /* Yom Tov - red/coral (cancels shiva/shloshim) */
+  .heb-cal-day.yom-tov {
+    background: #fde8e8;
+    color: #b33;
+    font-weight: 700;
+  }
+  .heb-cal-day.yom-tov:hover {
+    background: #f8cccc;
+    border-color: #b33;
+  }
+
+  /* Chol HaMoed - light orange (burial during = delays shiva) */
+  .heb-cal-day.chol-hamoed {
+    background: #fef3e0;
+    color: #a67c00;
+  }
+  .heb-cal-day.chol-hamoed:hover {
+    background: #fce4b8;
+    border-color: #a67c00;
+  }
+
+  /* Shabbat - light blue (counts but suspends public mourning) */
+  .heb-cal-day.shabat {
+    background: #eef3f9;
+    color: #3a5a7c;
+  }
+  .heb-cal-day.shabat:hover {
+    background: #d8e6f3;
+    border-color: #3a5a7c;
+  }
+
+  /* Yom Tov on Shabbat - Yom Tov takes precedence */
+  .heb-cal-day.yom-tov.shabat {
+    background: #fde8e8;
+    color: #b33;
+  }
+
+  /* Legend */
+  .heb-cal-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e0d8c8;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    color: #888;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+  .yom-tov-dot { background: #fde8e8; border: 1px solid #b33; }
+  .chol-hamoed-dot { background: #fef3e0; border: 1px solid #a67c00; }
+  .shabat-dot { background: #eef3f9; border: 1px solid #3a5a7c; }
 
   .heb-cal-footer {
     display: flex;
