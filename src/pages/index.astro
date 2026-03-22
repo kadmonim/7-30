@@ -864,7 +864,19 @@
       targetMonthName = JewishMonth.AdarII;
     }
 
-    const targetJd = { day: jd.day, monthName: targetMonthName, year: targetYear };
+    // Handle 30 Cheshvan / 30 Kislev: if target year's month is short (29 days), use 29
+    let targetDay = jd.day;
+    if (targetDay === 30 && (targetMonthName === JewishMonth.Cheshvan || targetMonthName === JewishMonth.Kislev)) {
+      // Check if the month has 30 days by seeing if 30th converts correctly
+      const test = toGregorianDate({ day: 30, monthName: targetMonthName, year: targetYear });
+      const testBack = toJewishDate(test);
+      if (testBack.monthName !== targetMonthName || testBack.day !== 30) {
+        // Month is short — clamp to 29
+        targetDay = 29;
+      }
+    }
+
+    const targetJd = { day: targetDay, monthName: targetMonthName, year: targetYear };
     const greg = toGregorianDate(targetJd);
 
     return {
