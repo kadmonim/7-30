@@ -232,6 +232,14 @@
     </div>
 
     <p id="disclaimer" class="disclaimer"></p>
+
+    <div class="share-bar">
+      <button type="button" id="share-btn" class="share-btn">
+        <span id="share-btn-text">שיתוף תוצאות</span>
+      </button>
+      <span id="share-status" class="share-status"></span>
+    </div>
+
     <p class="rules-link"><a href="/rules">כללי החישוב ←</a></p>
     <p class="wip-notice">אתר זה עדיין בבנייה, אין לסמוך על התוצאות כלל וכלל.</p>
   </div>
@@ -1444,10 +1452,110 @@
     // Show results
     document.getElementById('results')!.style.display = '';
 
+    // Update share button text
+    document.getElementById('share-btn-text')!.textContent = currentLang === 'he' ? 'שיתוף תוצאות' : 'Share Results';
+    document.getElementById('share-status')!.textContent = '';
+
     calcBtn.disabled = false;
     document.getElementById('calc-btn-text')!.textContent = t['calc-btn-text'];
     document.getElementById('results')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+
+  // =====================
+  // Share functionality
+  // =====================
+  document.getElementById('share-btn')?.addEventListener('click', async () => {
+    const shareBtn = document.getElementById('share-btn') as HTMLButtonElement;
+    const shareStatus = document.getElementById('share-status')!;
+    shareBtn.disabled = true;
+    shareStatus.textContent = currentLang === 'he' ? 'יוצר קישור...' : 'Creating link...';
+
+    try {
+      const deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
+      const burialDate = (document.getElementById('burial-date') as HTMLInputElement).value;
+      const afterNightfall = (document.getElementById('after-nightfall') as HTMLInputElement).checked;
+
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deathDate: deathDate || burialDate,
+          burialDate,
+          afterNightfall,
+          isIsrael,
+          lang: currentLang,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed');
+      const { code } = await res.json();
+      const url = `${window.location.origin}/?s=${code}`;
+
+      await navigator.clipboard.writeText(url);
+      shareStatus.textContent = currentLang === 'he' ? 'הקישור הועתק!' : 'Link copied!';
+      shareStatus.className = 'share-status copied';
+    } catch {
+      shareStatus.textContent = currentLang === 'he' ? 'שגיאה ביצירת הקישור' : 'Error creating link';
+      shareStatus.className = 'share-status error';
+    } finally {
+      shareBtn.disabled = false;
+      setTimeout(() => {
+        shareStatus.textContent = '';
+        shareStatus.className = 'share-status';
+      }, 4000);
+    }
+  });
+
+  // =====================
+  // Auto-load shared results
+  // =====================
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const shareCode = params.get('s');
+    if (!shareCode) return;
+
+    try {
+      const res = await fetch(`/api/share/${encodeURIComponent(shareCode)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // Set language
+      if (data.lang && data.lang !== currentLang) {
+        currentLang = data.lang;
+        applyLang();
+      }
+
+      // Set Israel/Diaspora
+      if (data.isIsrael !== undefined) {
+        isIsrael = data.isIsrael;
+        if (isIsrael) {
+          document.getElementById('toggle-israel')!.classList.add('active');
+          document.getElementById('toggle-diaspora')!.classList.remove('active');
+        } else {
+          document.getElementById('toggle-diaspora')!.classList.add('active');
+          document.getElementById('toggle-israel')!.classList.remove('active');
+        }
+      }
+
+      // Set form inputs
+      if (data.burialDate) {
+        (document.getElementById('burial-date') as HTMLInputElement).value = data.burialDate;
+      }
+      if (data.deathDate && data.deathDate !== data.burialDate) {
+        (document.getElementById('death-date') as HTMLInputElement).value = data.deathDate;
+      }
+      if (data.afterNightfall) {
+        (document.getElementById('after-nightfall') as HTMLInputElement).checked = true;
+      }
+
+      // Trigger calculation
+      setTimeout(() => {
+        document.getElementById('calc-form')?.dispatchEvent(new Event('submit'));
+      }, 100);
+    } catch {
+      // Silently fail — user can still use the calculator normally
+    }
+  })();
 </script>
 
 <style is:global>
@@ -1807,6 +1915,34 @@
     color: #6d5a00;
   }
 
+
+  .share-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .share-btn {
+    background: #4a6fa5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .share-btn:hover { background: #3a5a8a; }
+  .share-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .share-status {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .share-status.copied { color: #2a8a2a; font-weight: 700; }
+  .share-status.error { color: #c44; }
 
   .rules-link {
     text-align: center;

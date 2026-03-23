@@ -23,5 +23,8 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# netlify build output
+.netlify/
+
 # fetched reference data
 _data/
