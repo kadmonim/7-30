@@ -1595,13 +1595,13 @@
       }
 
       // Set form inputs and update their visual displays
+      if (data.deathDate) {
+        (document.getElementById('death-date') as HTMLInputElement).value = data.deathDate;
+        updateDateDisplay('death-date');
+      }
       if (data.burialDate) {
         (document.getElementById('burial-date') as HTMLInputElement).value = data.burialDate;
         updateDateDisplay('burial-date');
-      }
-      if (data.deathDate && data.deathDate !== data.burialDate) {
-        (document.getElementById('death-date') as HTMLInputElement).value = data.deathDate;
-        updateDateDisplay('death-date');
       }
       if (data.afterNightfall) {
         (document.getElementById('after-nightfall') as HTMLInputElement).checked = true;
