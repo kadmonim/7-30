@@ -1721,6 +1721,7 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 0.6rem 0;
+    gap: 0.5rem;
   }
   .yahrzeit-entry + .yahrzeit-entry {
     border-top: 1px solid #f0ebe0;
@@ -1729,8 +1730,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+    margin-inline-end: 0.5rem;
+  }
+  .yahrzeit-entry .result-dates {
     flex-shrink: 0;
-    margin-inline-end: 0.75rem;
   }
   .yahrzeit-title {
     font-size: 0.9rem;
@@ -1740,6 +1745,7 @@
   .yahrzeit-basis {
     font-size: 0.75rem;
     color: #999;
+    line-height: 1.4;
   }
 
   .result-body { padding: 1rem; }
