@@ -113,7 +113,7 @@
       </div>
       <div class="result-body">
         <div class="result-line">
-          <span id="shiva-start-label" class="result-key">תחילה:</span>
+          <span id="shiva-start-label" class="result-key">התחלה:</span>
           <div class="result-dates">
             <span id="shiva-start-heb" class="result-value highlight"></span>
             <span id="shiva-start-value" class="result-greg-date"></span>
@@ -138,7 +138,7 @@
       </div>
       <div class="result-body">
         <div class="result-line">
-          <span id="shloshim-start-label" class="result-key">תחילה:</span>
+          <span id="shloshim-start-label" class="result-key">התחלה:</span>
           <div class="result-dates">
             <span id="shloshim-start-heb" class="result-value highlight"></span>
             <span id="shloshim-start-value" class="result-greg-date"></span>
@@ -626,9 +626,9 @@
       'results-title': 'תוצאות',
       'shiva-label': 'שבעה',
       'shloshim-label': 'שלושים',
-      'shiva-start-label': 'תחילה:',
+      'shiva-start-label': 'התחלה:',
       'shiva-end-label': 'סיום:',
-      'shloshim-start-label': 'תחילה:',
+      'shloshim-start-label': 'התחלה:',
       'shloshim-end-label': 'סיום:',
       'location-statement': 'חישוב לפי',
       'toggle-israel': 'ארץ ישראל',
@@ -1474,8 +1474,8 @@
         ? 'יארצייט (דעה שניה)'
         : 'Yahrzeit (alternate opinion)';
       document.getElementById('yahrzeit-adar-alt-basis')!.textContent = currentLang === 'he'
-        ? 'באדר א׳ — לפי המחבר/שו״ע'
-        : 'In Adar I — per Mechaber/Shulchan Aruch';
+        ? 'באדר א׳ — לפי המחבר/שו״ע ומנהג חב״ד (המדריך להלכות אבילות פ״ז:ג)'
+        : 'In Adar I — per Mechaber/Shulchan Aruch & Chabad custom (HaMadrich L\'Hilchos Aveilus 7:3)';
     } else {
       adarAltEntry.style.display = 'none';
     }
@@ -1496,13 +1496,34 @@
     if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
       if (adarAlt) {
         noteLines.push(currentLang === 'he'
-          ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע פוסק באדר א׳. יש המחמירים בשניהם. יש לבדוק לכל שנה.'
-          : 'Rama rules Adar II; Mechaber/Shulchan Aruch rules Adar I. Some observe both stringently. Verify each year.');
+          ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע ומנהג חב״ד פוסקים באדר א׳, ואומרים קדיש גם באדר ב׳ (המדריך פ״ז:ג). יש המחמירים בשניהם. יש לבדוק לכל שנה.'
+          : 'Rama rules Adar II; Mechaber/Shulchan Aruch & Chabad rule Adar I, with Kaddish also in Adar II (HaMadrich 7:3). Some observe both stringently. Verify each year.');
       } else {
         noteLines.push(currentLang === 'he'
           ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
           : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.');
       }
+    }
+
+    // 30 Cheshvan/Kislev note
+    if (deathMonthName === JewishMonth.Cheshvan || deathMonthName === JewishMonth.Kislev) {
+      const deathJd = getJewishDate(new Date(deathDate + 'T12:00:00'));
+      if (deathJd.day === 30) {
+        noteLines.push(currentLang === 'he'
+          ? 'הפטירה היתה בל׳ בחודש. לפי מנהג חב״ד (המדריך פ״ז:ב): אם בשנה הראשונה ר״ח הוא יום אחד — היארצייט לעולם בכ״ט. אם ר״ח שני ימים — היארצייט לעולם בר״ח. יש לבדוק את השנה הראשונה.'
+          : 'Death was on the 30th of the month. Per Chabad custom (HaMadrich 7:2): if in the first year Rosh Chodesh is 1 day — yahrzeit is always on the 29th. If Rosh Chodesh is 2 days — yahrzeit is always on Rosh Chodesh. Check the first year to determine.');
+      }
+    }
+
+    // Leap year — month 13 note
+    const deathJdForLeap = getJewishDate(new Date(deathDate + 'T12:00:00'));
+    const firstYahrzeitYear = deathJdForLeap.year + 1;
+    const firstYahrzeitMonths = getJewishMonthsInOrder(firstYahrzeitYear);
+    if (firstYahrzeitMonths.includes(JewishMonth.AdarI)) {
+      // First yahrzeit year is a leap year — 13 months
+      noteLines.push(currentLang === 'he'
+        ? 'שנה ראשונה מעוברת: דיני אבלות של י״ב חודש מסתיימים לאחר 12 חודש. חודש הי״ג אינו נוהג בו אבלות (המדריך פ״ו:ח-ט).'
+        : 'First year is a leap year: 12-month mourning restrictions end after 12 months. Month 13 is free of mourning restrictions (HaMadrich 6:8-9).');
     }
 
     yahrzeitNote.textContent = noteLines.join(' ');
