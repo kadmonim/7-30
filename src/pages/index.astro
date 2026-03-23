@@ -190,6 +190,16 @@
             <span id="yahrzeit-first-value" class="result-greg-date"></span>
           </div>
         </div>
+        <div class="yahrzeit-entry" id="yahrzeit-first-alt-entry" style="display:none">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-first-alt-label" class="yahrzeit-title">יארצייט ראשון</span>
+            <span id="yahrzeit-first-alt-basis" class="yahrzeit-basis">לפי תאריך הפטירה</span>
+          </div>
+          <div class="result-dates">
+            <span id="yahrzeit-first-alt-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-first-alt-value" class="result-greg-date"></span>
+          </div>
+        </div>
         <div class="yahrzeit-entry">
           <div class="yahrzeit-entry-label">
             <span id="yahrzeit-second-label" class="yahrzeit-title">יארצייט שני ואילך</span>
@@ -198,6 +208,16 @@
           <div class="result-dates">
             <span id="yahrzeit-second-heb" class="result-value highlight"></span>
             <span id="yahrzeit-second-value" class="result-greg-date"></span>
+          </div>
+        </div>
+        <div class="yahrzeit-entry" id="yahrzeit-adar-alt-entry" style="display:none">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-adar-alt-label" class="yahrzeit-title"></span>
+            <span id="yahrzeit-adar-alt-basis" class="yahrzeit-basis"></span>
+          </div>
+          <div class="result-dates">
+            <span id="yahrzeit-adar-alt-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-adar-alt-value" class="result-greg-date"></span>
           </div>
         </div>
         <p id="yahrzeit-note" class="result-note"></p>
@@ -839,12 +859,16 @@
    * Calculate yahrzeit: the Hebrew date of death in future years.
    * Returns Gregorian date for the given Hebrew year.
    */
-  function calcYahrzeit(deathDateStr: string, yearOffset: number): { gregDate: string; jewishDate: any } {
+  function calcYahrzeit(deathDateStr: string, yearOffset: number): {
+    gregDate: string; jewishDate: any;
+    adarAlternate?: { gregDate: string; jewishDate: any; opinion: string };
+  } {
     const d = new Date(deathDateStr + 'T12:00:00');
     const jd = toJewishDate(d);
 
     const targetYear = jd.year + yearOffset;
     let targetMonthName = jd.monthName;
+    let adarAlternate: { gregDate: string; jewishDate: any; opinion: string } | undefined;
 
     // Handle Adar in leap/non-leap year transitions
     const targetMonths = getJewishMonthsInOrder(targetYear);
@@ -860,8 +884,17 @@
       // Death in Adar II of leap year, target is non-leap: use Adar
       targetMonthName = JewishMonth.Adar;
     } else if (jd.monthName === JewishMonth.Adar && hasAdarII) {
-      // Death in Adar of non-leap year, target is leap: use Adar II
+      // Death in Adar of non-leap year, target is leap year:
+      // Primary: Adar II (Rama). Alternate: Adar I (Mechaber/Shulchan Aruch).
       targetMonthName = JewishMonth.AdarII;
+      const altDay = jd.day;
+      const altJd = { day: altDay, monthName: JewishMonth.AdarI, year: targetYear };
+      const altGreg = toGregorianDate(altJd);
+      adarAlternate = {
+        gregDate: toLocalDateStr(altGreg),
+        jewishDate: altJd,
+        opinion: 'mechaber', // Mechaber/Shulchan Aruch holds Adar I
+      };
     }
 
     // Handle 30 Cheshvan / 30 Kislev: if target year's month is short (29 days), use 29
@@ -882,6 +915,7 @@
     return {
       gregDate: toLocalDateStr(greg),
       jewishDate: targetJd,
+      adarAlternate,
     };
   }
 
@@ -1314,23 +1348,66 @@
     document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishResult.gregDate, currentLang);
     document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishResult.gregDate);
 
-    // First yahrzeit goes by BURIAL date
-    const firstYahrzeit = calcYahrzeit(burialDate, 1);
-    document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeit.gregDate, currentLang);
-    document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeit.gregDate);
+    // First yahrzeit — two customs when death ≠ burial
+    const firstYahrzeitBurial = calcYahrzeit(burialDate, 1);
+    const firstYahrzeitDeath = calcYahrzeit(deathDate, 1);
+    const firstYahrzeitDiffers = deathDate !== burialDate && firstYahrzeitBurial.gregDate !== firstYahrzeitDeath.gregDate;
 
-    // Subsequent yahrzeits go by DEATH date
+    document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeitBurial.gregDate, currentLang);
+    document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeitBurial.gregDate);
+    document.getElementById('yahrzeit-first-basis')!.textContent = currentLang === 'he'
+      ? (firstYahrzeitDiffers ? 'לפי תאריך הקבורה (יש פוסקים)' : 'לפי תאריך הקבורה')
+      : (firstYahrzeitDiffers ? 'Based on burial date (some Poskim)' : 'Based on burial date');
+
+    const altEntry = document.getElementById('yahrzeit-first-alt-entry')!;
+    if (firstYahrzeitDiffers) {
+      altEntry.style.display = '';
+      document.getElementById('yahrzeit-first-alt-value')!.textContent = formatDate(firstYahrzeitDeath.gregDate, currentLang);
+      document.getElementById('yahrzeit-first-alt-heb')!.textContent = formatHeb(firstYahrzeitDeath.gregDate);
+      document.getElementById('yahrzeit-first-alt-label')!.textContent = currentLang === 'he' ? 'יארצייט ראשון' : 'First Yahrzeit';
+      document.getElementById('yahrzeit-first-alt-basis')!.textContent = currentLang === 'he'
+        ? 'לפי תאריך הפטירה (מנהג חב״ד ועוד)'
+        : 'Based on date of passing (Chabad custom & others)';
+    } else {
+      altEntry.style.display = 'none';
+    }
+
+    // Subsequent yahrzeits go by DEATH date (all agree)
     const secondYahrzeit = calcYahrzeit(deathDate, 2);
     document.getElementById('yahrzeit-second-value')!.textContent = formatDate(secondYahrzeit.gregDate, currentLang);
     document.getElementById('yahrzeit-second-heb')!.textContent = formatHeb(secondYahrzeit.gregDate);
+
+    // Adar alternate opinion — show when applicable
+    const adarAltEntry = document.getElementById('yahrzeit-adar-alt-entry')!;
+    // Check both first (death-based) and second yahrzeit for Adar alternate
+    const adarAlt = firstYahrzeitDeath.adarAlternate || secondYahrzeit.adarAlternate;
+    if (adarAlt) {
+      adarAltEntry.style.display = '';
+      document.getElementById('yahrzeit-adar-alt-value')!.textContent = formatDate(adarAlt.gregDate, currentLang);
+      document.getElementById('yahrzeit-adar-alt-heb')!.textContent = formatHeb(adarAlt.gregDate);
+      document.getElementById('yahrzeit-adar-alt-label')!.textContent = currentLang === 'he'
+        ? 'יארצייט (דעה שניה)'
+        : 'Yahrzeit (alternate opinion)';
+      document.getElementById('yahrzeit-adar-alt-basis')!.textContent = currentLang === 'he'
+        ? 'באדר א׳ — לפי המחבר/שו״ע'
+        : 'In Adar I — per Mechaber/Shulchan Aruch';
+    } else {
+      adarAltEntry.style.display = 'none';
+    }
 
     // Yahrzeit note - show if Adar handling applies
     const yahrzeitNote = document.getElementById('yahrzeit-note')!;
     const deathMonthName = getJewishDate(new Date(deathDate + 'T12:00:00')).monthName;
     if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
-      yahrzeitNote.textContent = currentLang === 'he'
-        ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
-        : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.';
+      if (adarAlt) {
+        yahrzeitNote.textContent = currentLang === 'he'
+          ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע פוסק באדר א׳. יש המחמירים בשניהם. יש לבדוק לכל שנה.'
+          : 'Rama rules Adar II; Mechaber/Shulchan Aruch rules Adar I. Some observe both stringently. Verify each year.';
+      } else {
+        yahrzeitNote.textContent = currentLang === 'he'
+          ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
+          : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.';
+      }
     } else {
       yahrzeitNote.textContent = '';
     }
