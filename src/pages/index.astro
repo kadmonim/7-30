@@ -773,6 +773,11 @@
   document.getElementById('lang-toggle')?.addEventListener('click', () => {
     currentLang = currentLang === 'he' ? 'en' : 'he';
     applyLang();
+    // Re-run calculation if results are visible, so all computed strings update
+    const results = document.getElementById('results');
+    if (results && results.style.display !== 'none') {
+      document.getElementById('calc-form')?.dispatchEvent(new Event('submit'));
+    }
   });
 
   // Update Chabad zmanim link when burial date changes
