@@ -1,0 +1,95 @@
+---
+// When is it permitted/forbidden to visit the grave?
+import HamburgerMenu from '../components/HamburgerMenu.astro';
+---
+
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>עלייה לקבר — מתי קמים?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container">
+  <HamburgerMenu currentPage="/kever" />
+
+  <h1>מתי מותר/אסור לעלות לקבר?</h1>
+  <p class="subtitle">זמנים שבהם נוהגים לעלות או להימנע מעלייה לבית הקברות</p>
+
+  <section class="rule-section">
+    <div class="rule-card">
+      <p class="placeholder-text">תוכן בקרוב...</p>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+    position: relative;
+  }
+
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .rule-section {
+    margin-bottom: 2rem;
+  }
+
+  .rule-card {
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .placeholder-text {
+    text-align: center;
+    color: #999;
+    font-size: 0.95rem;
+    padding: 2rem 0;
+  }
+
+  @media (max-width: 500px) {
+    .container { padding: 1.5rem 1rem 2rem; }
+    h1 { font-size: 1.6rem; }
+  }
+</style>
+</body>
+</html>

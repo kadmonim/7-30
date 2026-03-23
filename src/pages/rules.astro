@@ -1,5 +1,6 @@
 ---
 // Halachic Rules Documentation
+import HamburgerMenu from '../components/HamburgerMenu.astro';
 ---
 
 <html lang="he" dir="rtl">
@@ -15,7 +16,7 @@
 <body>
 
 <div class="container">
-  <a href="/" class="back-link">← חזרה למחשבון</a>
+  <HamburgerMenu currentPage="/rules" />
 
   <h1>כללי החישוב</h1>
   <p class="subtitle">הכללים ההלכתיים שעליהם מבוסס המחשבון</p>
@@ -368,6 +369,7 @@
     max-width: 720px;
     margin: 0 auto;
     padding: 2rem 2rem 3rem;
+    position: relative;
   }
 
   .back-link {
@@ -386,6 +388,7 @@
     font-weight: 700;
     color: #4a3c2c;
     text-align: center;
+    margin-top: 2rem;
     margin-bottom: 0.3rem;
   }
 

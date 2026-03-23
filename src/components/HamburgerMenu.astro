@@ -1,0 +1,117 @@
+---
+interface Props {
+  currentPage: string;
+}
+const { currentPage } = Astro.props;
+---
+
+<div class="hamburger-wrapper">
+  <button class="hamburger-btn" id="hamburger-btn" aria-label="תפריט" aria-expanded="false">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+  <nav class="hamburger-dropdown" id="hamburger-dropdown" aria-hidden="true">
+    <a href="/" class:list={[{ active: currentPage === '/' }]}>מחשבון</a>
+    <a href="/rules" class:list={[{ active: currentPage === '/rules' }]}>כללי החישוב</a>
+    <a href="/kever" class:list={[{ active: currentPage === '/kever' }]}>עלייה לקבר</a>
+  </nav>
+</div>
+
+<style is:global>
+  .hamburger-wrapper {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+  }
+  [dir="ltr"] .hamburger-wrapper {
+    right: auto;
+    left: 1.5rem;
+  }
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    background: #e8e0d0;
+    border: 1px solid #d4c5a9;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger-btn:hover {
+    background: #ddd5c3;
+  }
+  .hamburger-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #8b7355;
+    border-radius: 1px;
+  }
+  .hamburger-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    max-width: calc(100vw - 3rem);
+    overflow: hidden;
+  }
+  [dir="ltr"] .hamburger-dropdown {
+    right: auto;
+    left: 0;
+  }
+  .hamburger-dropdown.open {
+    display: block;
+  }
+  .hamburger-dropdown a {
+    display: block;
+    padding: 0.65rem 1rem;
+    color: #4a3c2c;
+    text-decoration: none;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+  }
+  .hamburger-dropdown a:hover {
+    background: #f0ebe0;
+  }
+  .hamburger-dropdown a + a {
+    border-top: 1px solid #f0ebe0;
+  }
+  .hamburger-dropdown a.active {
+    font-weight: 700;
+    color: #8b7355;
+    background: #faf5ee;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('hamburger-btn')!;
+  const dropdown = document.getElementById('hamburger-dropdown')!;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(isOpen));
+    dropdown.setAttribute('aria-hidden', String(!isOpen));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.classList.contains('open')) return;
+    if (!(e.target as Element).closest('.hamburger-wrapper')) {
+      dropdown.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      dropdown.setAttribute('aria-hidden', 'true');
+    }
+  });
+</script>

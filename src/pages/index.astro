@@ -1,5 +1,6 @@
 ---
 // Shiva & Shloshim Calculator
+import HamburgerMenu from '../components/HamburgerMenu.astro';
 ---
 
 <html lang="he" dir="rtl" data-lang="he">
@@ -15,6 +16,7 @@
 <body>
 
 <div class="container">
+  <HamburgerMenu currentPage="/" />
   <button id="lang-toggle" class="lang-toggle" type="button">EN</button>
 
   <h1 id="title">מתי קמים?</h1>
@@ -1046,6 +1048,13 @@
     return Math.round((db.getTime() - da.getTime()) / 86400000);
   }
 
+  function isPast(dateStr: string): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(dateStr + 'T00:00:00');
+    return d < today;
+  }
+
   function formatDate(dateStr: string, lang: string): string {
     const d = new Date(dateStr + 'T12:00:00');
     return d.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
@@ -1645,36 +1654,57 @@
 
     // Shiva note
     const shivaNote = document.getElementById('shiva-note')!;
+    const shivaPast = isPast(result.shivaEnd);
     if (result.shivaCancelled) {
       if (result.shivaCancelledBy === 'pesach') {
         shivaNote.textContent = currentLang === 'he'
-          ? `קבורה לפני חצות — השבעה מסתיימת בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה מסתיימת בכניסת החג (מחבר או״ח תקמ״ח:יב).`
-          : `Burial before midday — shiva ends at midday (chatzos) on Erev Pesach. Burial after midday — shiva ends at onset of Pesach (Michaber O.C. 548:12).`;
+          ? (shivaPast
+            ? `קבורה לפני חצות — השבעה הסתיימה בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה הסתיימה בכניסת החג (מחבר או״ח תקמ״ח:יב).`
+            : `קבורה לפני חצות — השבעה מסתיימת בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה מסתיימת בכניסת החג (מחבר או״ח תקמ״ח:יב).`)
+          : (shivaPast
+            ? `Burial before midday — shiva ended at midday (chatzos) on Erev Pesach. Burial after midday — shiva ended at onset of Pesach (Michaber O.C. 548:12).`
+            : `Burial before midday — shiva ends at midday (chatzos) on Erev Pesach. Burial after midday — shiva ends at onset of Pesach (Michaber O.C. 548:12).`);
       } else {
         shivaNote.textContent = currentLang === 'he'
-          ? `השבעה מסתיימת בערב החג (${formatDate(result.shivaEnd, currentLang)})`
-          : `Shiva ends at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`;
+          ? (shivaPast
+            ? `השבעה הסתיימה בערב החג (${formatDate(result.shivaEnd, currentLang)})`
+            : `השבעה מסתיימת בערב החג (${formatDate(result.shivaEnd, currentLang)})`)
+          : (shivaPast
+            ? `Shiva ended at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`
+            : `Shiva ends at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`);
       }
     } else {
-      shivaNote.textContent = t['shiva-normal-note'];
+      shivaNote.textContent = currentLang === 'he'
+        ? (shivaPast ? 'השבעה הסתיימה בבוקר של היום השביעי, לאחר שחרית' : t['shiva-normal-note'])
+        : (shivaPast ? 'Shiva ended on the morning of the 7th day, after Shacharit' : t['shiva-normal-note']);
     }
 
     // Shloshim note
     const shloshimNote = document.getElementById('shloshim-note')!;
+    const shloshimPast = isPast(result.shloshimEnd);
     if (result.shloshimCancelled) {
       shloshimNote.textContent = currentLang === 'he'
-        ? `השלושים מסתיימים בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
-        : `Shloshim ends at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`;
+        ? (shloshimPast
+          ? `השלושים הסתיימו בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
+          : `השלושים מסתיימים בערב החג (${formatDate(result.shloshimEnd, currentLang)})`)
+        : (shloshimPast
+          ? `Shloshim ended at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`
+          : `Shloshim ends at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`);
     } else if (result.shivaCancelled && result.shivaCancelledBy) {
-      // Shiva was cancelled by a holiday — the holiday days count toward 30 but customs are suspended
       const name = currentLang === 'he'
         ? holidayNames[result.shivaCancelledBy]?.he
         : holidayNames[result.shivaCancelledBy]?.en;
       shloshimNote.textContent = currentLang === 'he'
-        ? `ימי ${name} נספרים למנין השלושים, אך דיני השלושים אינם נוהגים בחג עצמו. השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית.`
-        : `The days of ${name} count toward the 30-day total, but shloshim restrictions are suspended during the holiday itself. Shloshim ends on the morning of the 30th day, after Shacharit.`;
+        ? (shloshimPast
+          ? `ימי ${name} נספרו למנין השלושים, אך דיני השלושים לא נהגו בחג עצמו. השלושים הסתיימו בבוקר של היום השלושים, לאחר שחרית.`
+          : `ימי ${name} נספרים למנין השלושים, אך דיני השלושים אינם נוהגים בחג עצמו. השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית.`)
+        : (shloshimPast
+          ? `The days of ${name} counted toward the 30-day total, but shloshim restrictions were suspended during the holiday itself. Shloshim ended on the morning of the 30th day, after Shacharit.`
+          : `The days of ${name} count toward the 30-day total, but shloshim restrictions are suspended during the holiday itself. Shloshim ends on the morning of the 30th day, after Shacharit.`);
     } else {
-      shloshimNote.textContent = t['shloshim-normal-note'];
+      shloshimNote.textContent = currentLang === 'he'
+        ? (shloshimPast ? 'השלושים הסתיימו בבוקר של היום השלושים, לאחר שחרית' : t['shloshim-normal-note'])
+        : (shloshimPast ? 'Shloshim ended on the morning of the 30th day, after Shacharit' : t['shloshim-normal-note']);
     }
 
     // Cancelled notices
@@ -1715,9 +1745,14 @@
     const breakStartHeb = formatHeb(breakStart);
     const breakEndHeb = formatHeb(breakEnd);
 
+    const kaddishPast = isPast(kaddishSefardi.gregDate);
     document.getElementById('kaddish-note')!.textContent = currentLang === 'he'
-      ? `הקדיש האחרון נאמר במנחה של התאריך המצוין. מנהג אשכנז: 11 חודש. עדות המזרח: 12 חודש, עם הפסקה מ-${breakStartHeb} (${breakStartFmt}) עד ${breakEndHeb} (${breakEndFmt}) — קיצור ילקוט יוסף סי׳ ל:ה.`
-      : `The last Kaddish is said at Mincha of the date shown. Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartHeb} / ${breakStartFmt} to ${breakEndHeb} / ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`;
+      ? (kaddishPast
+        ? `הקדיש האחרון נאמר במנחה של התאריך המצוין. מנהג אשכנז: 11 חודש. עדות המזרח: 12 חודש, עם הפסקה מ-${breakStartHeb} (${breakStartFmt}) עד ${breakEndHeb} (${breakEndFmt}) — קיצור ילקוט יוסף סי׳ ל:ה.`
+        : `הקדיש האחרון ייאמר במנחה של התאריך המצוין. מנהג אשכנז: 11 חודש. עדות המזרח: 12 חודש, עם הפסקה מ-${breakStartHeb} (${breakStartFmt}) עד ${breakEndHeb} (${breakEndFmt}) — קיצור ילקוט יוסף סי׳ ל:ה.`)
+      : (kaddishPast
+        ? `The last Kaddish was said at Mincha of the date shown. Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartHeb} / ${breakStartFmt} to ${breakEndHeb} / ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`
+        : `The last Kaddish is said at Mincha of the date shown. Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartHeb} / ${breakStartFmt} to ${breakEndHeb} / ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`);
 
     // First yahrzeit — two customs when death ≠ burial
     const firstYahrzeitBurial = calcYahrzeit(burialDate, 1);
@@ -1726,9 +1761,11 @@
 
     document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeitBurial.gregDate, currentLang);
     document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeitBurial.gregDate);
-    document.getElementById('yahrzeit-first-basis')!.textContent = currentLang === 'he'
-      ? (firstYahrzeitDiffers ? 'לפי תאריך הקבורה (ש״ך יו״ד תב:י; ערוה״ש תב:ט)' : 'לפי תאריך הקבורה')
-      : (firstYahrzeitDiffers ? 'Based on burial date (Shach YD 402:10; Aruch HaShulchan 402:9)' : 'Based on burial date');
+    const sameDate = effectiveDeathDate === burialDate || (!deathAfterNightfall && !deathBeinHashmashot && deathDate === burialDate);
+    document.getElementById('yahrzeit-first-basis')!.textContent = sameDate ? ''
+      : (currentLang === 'he'
+        ? (firstYahrzeitDiffers ? 'לפי תאריך הקבורה (ש״ך יו״ד תב:י; ערוה״ש תב:ט)' : 'לפי תאריך הקבורה')
+        : (firstYahrzeitDiffers ? 'Based on burial date (Shach YD 402:10; Aruch HaShulchan 402:9)' : 'Based on burial date'));
 
     const altEntry = document.getElementById('yahrzeit-first-alt-entry')!;
     if (firstYahrzeitDiffers) {
@@ -1747,6 +1784,9 @@
     const secondYahrzeit = calcYahrzeit(deathDate, 2);
     document.getElementById('yahrzeit-second-value')!.textContent = formatDate(secondYahrzeit.gregDate, currentLang);
     document.getElementById('yahrzeit-second-heb')!.textContent = formatHeb(secondYahrzeit.gregDate);
+    if (sameDate) {
+      document.getElementById('yahrzeit-second-basis')!.textContent = '';
+    }
 
     // Bein hashmashot — show alternative yahrzeit (next day) when death was during twilight
     const bhAltEntry = document.getElementById('yahrzeit-bh-alt-entry')!;
@@ -2002,7 +2042,7 @@
   .lang-toggle {
     position: absolute;
     top: 1.5rem;
-    left: 1.5rem;
+    left: 4.5rem;
     background: #e8e0d0;
     border: 1px solid #d4c5a9;
     color: #6d5a43;
@@ -2016,7 +2056,7 @@
   }
   [dir="ltr"] .lang-toggle {
     left: auto;
-    right: 1.5rem;
+    right: 4.5rem;
   }
   .lang-toggle:hover {
     background: #d4c5a9;
