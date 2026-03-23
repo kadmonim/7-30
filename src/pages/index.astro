@@ -929,15 +929,53 @@
       };
     }
 
-    // Handle 30 Cheshvan / 30 Kislev: if target year's month is short (29 days), use 29
+    // Handle 30 Cheshvan / 30 Kislev
+    // Per Chabad custom (HaMadrich 7:2; KSA 221:4): first yahrzeit year determines pattern forever
+    // Case 1: First year's month has 29 days → always 29th
+    // Case 2: First year's month has 30 days → always Rosh Chodesh
+    //   (30th when month is long = 1st day of 2-day RC; 1st of next month when short = 1-day RC)
     let targetDay = jd.day;
     if (targetDay === 30 && (targetMonthName === JewishMonth.Cheshvan || targetMonthName === JewishMonth.Kislev)) {
-      // Check if the month has 30 days by seeing if 30th converts correctly
-      const test = toGregorianDate({ day: 30, monthName: targetMonthName, year: targetYear });
-      const testBack = toJewishDate(test);
-      if (testBack.monthName !== targetMonthName || testBack.day !== 30) {
-        // Month is short — clamp to 29
+      // Check the FIRST yahrzeit year to determine the pattern
+      const firstYahrzeitYear = jd.year + 1;
+      const firstYearTest = toGregorianDate({ day: 30, monthName: targetMonthName, year: firstYahrzeitYear });
+      const firstYearBack = toJewishDate(firstYearTest);
+      const firstYearHas30 = firstYearBack.monthName === targetMonthName && firstYearBack.day === 30;
+
+      if (!firstYearHas30) {
+        // Case 1: first year is short → always 29th
         targetDay = 29;
+      } else {
+        // Case 2: first year is long → always Rosh Chodesh
+        // Check if THIS target year's month has 30 days
+        const thisYearTest = toGregorianDate({ day: 30, monthName: targetMonthName, year: targetYear });
+        const thisYearBack = toJewishDate(thisYearTest);
+        const thisYearHas30 = thisYearBack.monthName === targetMonthName && thisYearBack.day === 30;
+
+        if (thisYearHas30) {
+          // Long month: 30th = 1st day of 2-day Rosh Chodesh
+          targetDay = 30;
+        } else {
+          // Short month: Rosh Chodesh is 1st of next month
+          // Use the next month's 1st day
+          const nextMonthIdx = getJewishMonthsInOrder(targetYear).indexOf(targetMonthName) + 1;
+          const yearMonths = getJewishMonthsInOrder(targetYear);
+          let nextMonth: string;
+          let nextYear = targetYear;
+          if (nextMonthIdx >= yearMonths.length) {
+            nextYear++;
+            nextMonth = getJewishMonthsInOrder(nextYear)[1]; // first real month
+          } else {
+            nextMonth = yearMonths[nextMonthIdx];
+          }
+          const rcJd = { day: 1, monthName: nextMonth, year: nextYear };
+          const rcGreg = toGregorianDate(rcJd);
+          return {
+            gregDate: toLocalDateStr(rcGreg),
+            jewishDate: rcJd,
+            adarAlternate,
+          };
+        }
       }
     }
 
@@ -1505,13 +1543,22 @@
       }
     }
 
-    // 30 Cheshvan/Kislev note
+    // 30 Cheshvan/Kislev note — show which pattern was determined
     if (deathMonthName === JewishMonth.Cheshvan || deathMonthName === JewishMonth.Kislev) {
       const deathJd = getJewishDate(new Date(deathDate + 'T12:00:00'));
       if (deathJd.day === 30) {
-        noteLines.push(currentLang === 'he'
-          ? 'הפטירה היתה בל׳ בחודש. לפי מנהג חב״ד (המדריך פ״ז:ב): אם בשנה הראשונה ר״ח הוא יום אחד — היארצייט לעולם בכ״ט. אם ר״ח שני ימים — היארצייט לעולם בר״ח. יש לבדוק את השנה הראשונה.'
-          : 'Death was on the 30th of the month. Per Chabad custom (HaMadrich 7:2): if in the first year Rosh Chodesh is 1 day — yahrzeit is always on the 29th. If Rosh Chodesh is 2 days — yahrzeit is always on Rosh Chodesh. Check the first year to determine.');
+        const firstYrTest = toGregorianDate({ day: 30, monthName: deathMonthName, year: deathJd.year + 1 });
+        const firstYrBack = toJewishDate(firstYrTest);
+        const firstYrHas30 = firstYrBack.monthName === deathMonthName && firstYrBack.day === 30;
+        if (firstYrHas30) {
+          noteLines.push(currentLang === 'he'
+            ? `הפטירה היתה בל׳ בחודש. בשנה הראשונה ר״ח הוא שני ימים — לכן היארצייט לעולם בר״ח (המדריך פ״ז:ב).`
+            : `Death was on the 30th. In the first year Rosh Chodesh is 2 days — so yahrzeit is always on Rosh Chodesh (HaMadrich 7:2).`);
+        } else {
+          noteLines.push(currentLang === 'he'
+            ? `הפטירה היתה בל׳ בחודש. בשנה הראשונה ר״ח הוא יום אחד — לכן היארצייט לעולם בכ״ט (המדריך פ״ז:ב).`
+            : `Death was on the 30th. In the first year Rosh Chodesh is 1 day — so yahrzeit is always on the 29th (HaMadrich 7:2).`);
+        }
       }
     }
 
