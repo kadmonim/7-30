@@ -1361,8 +1361,16 @@
     const shloshimNote = document.getElementById('shloshim-note')!;
     if (result.shloshimCancelled) {
       shloshimNote.textContent = currentLang === 'he'
-        ? `השלושים מסתיימת בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
-        : `Shloshim ended at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`;
+        ? `השלושים מסתיימים בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
+        : `Shloshim ends at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`;
+    } else if (result.shivaCancelled && result.shivaCancelledBy) {
+      // Shiva was cancelled by a holiday — the holiday days count toward 30 but customs are suspended
+      const name = currentLang === 'he'
+        ? holidayNames[result.shivaCancelledBy]?.he
+        : holidayNames[result.shivaCancelledBy]?.en;
+      shloshimNote.textContent = currentLang === 'he'
+        ? `ימי ${name} נספרים למנין השלושים, אך דיני השלושים אינם נוהגים בחג עצמו. השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית.`
+        : `The days of ${name} count toward the 30-day total, but shloshim restrictions are suspended during the holiday itself. Shloshim ends on the morning of the 30th day, after Shacharit.`;
     } else {
       shloshimNote.textContent = t['shloshim-normal-note'];
     }
