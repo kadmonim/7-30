@@ -1375,8 +1375,8 @@
     document.getElementById('yahrzeit-first-value')!.textContent = formatDate(firstYahrzeitBurial.gregDate, currentLang);
     document.getElementById('yahrzeit-first-heb')!.textContent = formatHeb(firstYahrzeitBurial.gregDate);
     document.getElementById('yahrzeit-first-basis')!.textContent = currentLang === 'he'
-      ? (firstYahrzeitDiffers ? 'לפי תאריך הקבורה (יש פוסקים)' : 'לפי תאריך הקבורה')
-      : (firstYahrzeitDiffers ? 'Based on burial date (some Poskim)' : 'Based on burial date');
+      ? (firstYahrzeitDiffers ? 'לפי תאריך הקבורה (ש״ך יו״ד תב:י; ערוה״ש תב:ט)' : 'לפי תאריך הקבורה')
+      : (firstYahrzeitDiffers ? 'Based on burial date (Shach YD 402:10; Aruch HaShulchan 402:9)' : 'Based on burial date');
 
     const altEntry = document.getElementById('yahrzeit-first-alt-entry')!;
     if (firstYahrzeitDiffers) {
@@ -1385,8 +1385,8 @@
       document.getElementById('yahrzeit-first-alt-heb')!.textContent = formatHeb(firstYahrzeitDeath.gregDate);
       document.getElementById('yahrzeit-first-alt-label')!.textContent = currentLang === 'he' ? 'יארצייט ראשון' : 'First Yahrzeit';
       document.getElementById('yahrzeit-first-alt-basis')!.textContent = currentLang === 'he'
-        ? 'לפי תאריך הפטירה (מנהג חב״ד ועוד)'
-        : 'Based on date of passing (Chabad custom & others)';
+        ? 'לפי תאריך הפטירה (ט״ז תב:ט; מנהג חב״ד — אגרות קודש ד:קז; קיצור ילקוט יוסף סי׳ מ:ד — לענין אזכרה וקדיש)'
+        : 'Based on date of passing (Taz 402:9; Chabad — Igros Kodesh 4:107; Kitzur Yalkut Yosef 40:4 — for azkara/kaddish)';
     } else {
       altEntry.style.display = 'none';
     }
@@ -1414,22 +1414,32 @@
       adarAltEntry.style.display = 'none';
     }
 
-    // Yahrzeit note - show if Adar handling applies
+    // Yahrzeit note
     const yahrzeitNote = document.getElementById('yahrzeit-note')!;
     const deathMonthName = getJewishDate(new Date(deathDate + 'T12:00:00')).monthName;
+    const noteLines: string[] = [];
+
+    // YY hybrid note when dates differ
+    if (firstYahrzeitDiffers) {
+      noteLines.push(currentLang === 'he'
+        ? 'לפי קיצור ילקוט יוסף (סי׳ מ:ד): אזכרה, קדיש וביקור קבר — לפי יום הפטירה. אך דיני אבלות של י״ב חודש (תספורת, שמחה) — עד יום הקבורה.'
+        : 'Per Kitzur Yalkut Yosef (40:4): Azkara, kaddish & cemetery visit follow date of death. But 12-month mourning restrictions (haircuts, simcha) are counted until the burial date.');
+    }
+
+    // Adar note
     if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
       if (adarAlt) {
-        yahrzeitNote.textContent = currentLang === 'he'
+        noteLines.push(currentLang === 'he'
           ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע פוסק באדר א׳. יש המחמירים בשניהם. יש לבדוק לכל שנה.'
-          : 'Rama rules Adar II; Mechaber/Shulchan Aruch rules Adar I. Some observe both stringently. Verify each year.';
+          : 'Rama rules Adar II; Mechaber/Shulchan Aruch rules Adar I. Some observe both stringently. Verify each year.');
       } else {
-        yahrzeitNote.textContent = currentLang === 'he'
+        noteLines.push(currentLang === 'he'
           ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'
-          : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.';
+          : 'Note: Yahrzeit date may differ in leap/non-leap years. Verify for each year.');
       }
-    } else {
-      yahrzeitNote.textContent = '';
     }
+
+    yahrzeitNote.textContent = noteLines.join(' ');
 
     // Show results
     document.getElementById('results')!.style.display = '';
