@@ -1378,9 +1378,18 @@
     document.getElementById('kaddish-sefardi-heb')!.textContent = formatHeb(kaddishSefardi.gregDate);
     document.getElementById('kaddish-sefardi-label')!.textContent = currentLang === 'he' ? 'סיום (מנהג ספרד):' : 'Ends (Sefardi):';
 
+    // Compute Sefardi break dates: first week of month 12
+    const kaddishMonth11End = calcKaddishEnd(deathDate, 11);
+    const breakStart = addDays(kaddishMonth11End.gregDate, 1);
+    const breakEnd = addDays(breakStart, 6);
+    const breakStartFmt = formatDate(breakStart, currentLang);
+    const breakEndFmt = formatDate(breakEnd, currentLang);
+    const breakStartHeb = formatHeb(breakStart);
+    const breakEndHeb = formatHeb(breakEnd);
+
     document.getElementById('kaddish-note')!.textContent = currentLang === 'he'
-      ? 'מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש עם הפסקה של כשבוע בתחילת חודש י״ב (קיצור ילקוט יוסף סי׳ ל:ה).'
-      : 'Ashkenazi: 11 months. Sefardi: 12 months with ~1 week break at start of month 12 (Kitzur Yalkut Yosef 30:5).';
+      ? `מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש, עם הפסקה מ-${breakStartHeb} עד ${breakEndHeb} (קיצור ילקוט יוסף סי׳ ל:ה).`
+      : `Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartFmt} to ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`;
 
     // First yahrzeit — two customs when death ≠ burial
     const firstYahrzeitBurial = calcYahrzeit(burialDate, 1);
