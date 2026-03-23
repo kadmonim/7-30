@@ -791,16 +791,18 @@
   });
 
   // Israel/Diaspora toggle
-  document.getElementById('toggle-israel')?.addEventListener('click', () => {
-    isIsrael = true;
-    document.getElementById('toggle-israel')!.classList.add('active');
-    document.getElementById('toggle-diaspora')!.classList.remove('active');
-  });
-  document.getElementById('toggle-diaspora')?.addEventListener('click', () => {
-    isIsrael = false;
-    document.getElementById('toggle-diaspora')!.classList.add('active');
-    document.getElementById('toggle-israel')!.classList.remove('active');
-  });
+  function setIsrael(val: boolean) {
+    isIsrael = val;
+    document.getElementById('toggle-israel')!.classList.toggle('active', val);
+    document.getElementById('toggle-diaspora')!.classList.toggle('active', !val);
+    // Re-run calculation if results are visible
+    const results = document.getElementById('results');
+    if (results && results.style.display !== 'none') {
+      document.getElementById('calc-form')?.dispatchEvent(new Event('submit'));
+    }
+  }
+  document.getElementById('toggle-israel')?.addEventListener('click', () => setIsrael(true));
+  document.getElementById('toggle-diaspora')?.addEventListener('click', () => setIsrael(false));
 
   // =====================
   // Date helpers
