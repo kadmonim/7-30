@@ -246,7 +246,7 @@
 </div>
 
 <footer class="site-footer">
-  <p class="footer-project">A project of <strong>Shluchim AI</strong></p>
+  <p class="footer-project" id="footer-project">פרויקט של <strong>Shluchim AI</strong></p>
   <p class="footer-dedication">לעילוי נשמת השליח הרה״ת ר׳ יוסף יצחק בן אריה ליב</p>
 </footer>
 
@@ -766,6 +766,11 @@
     if (todayBtn) todayBtn.textContent = t['heb-cal-today'];
     const closeBtn = document.getElementById('heb-cal-close');
     if (closeBtn) closeBtn.textContent = t['heb-cal-close'];
+
+    const footerProject = document.getElementById('footer-project');
+    if (footerProject) footerProject.innerHTML = currentLang === 'he'
+      ? 'פרויקט של <strong>Shluchim AI</strong>'
+      : 'A project of <strong>Shluchim AI</strong>';
 
     // Update date displays
     updateDateDisplay('death-date');
