@@ -2057,7 +2057,8 @@
   }
   .result-greg-date {
     font-size: 0.8rem;
-    color: #999;
+    color: #4a3c2c;
+    text-align: end;
   }
 
   .result-note {
@@ -2416,6 +2417,31 @@
     color: #4a3c2c;
     font-family: 'Frank Ruhl Libre', serif;
     margin-top: 0.3rem;
+  }
+
+  @media (max-width: 400px) {
+    .yahrzeit-entry {
+      display: grid;
+      grid-template-areas:
+        "title"
+        "dates"
+        "basis";
+      gap: 0.1rem;
+    }
+    .yahrzeit-entry .yahrzeit-title {
+      grid-area: title;
+    }
+    .yahrzeit-entry .result-dates {
+      grid-area: dates;
+      align-items: flex-start;
+    }
+    .yahrzeit-entry .yahrzeit-basis {
+      grid-area: basis;
+    }
+    .yahrzeit-entry-label {
+      display: contents;
+      margin-inline-end: 0;
+    }
   }
 
   @media (max-width: 315px) {
