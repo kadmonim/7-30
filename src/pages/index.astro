@@ -37,6 +37,18 @@
       <button type="button" class="date-picker-trigger" data-target="death-date">
         <span class="date-picker-display" id="death-date-display">בחר תאריך...</span>
       </button>
+      <div class="nightfall-options" id="death-nightfall-row" style="display:none">
+        <label class="checkbox-label nightfall-checkbox">
+          <input type="checkbox" id="death-bein-hashmashot" />
+          <span id="label-death-bein-hashmashot">הפטירה היתה בבין השמשות</span>
+          <a href="#" id="death-info-link" class="info-icon" aria-label="מידע נוסף"><svg viewBox="0 0 416.979 416.979" xmlns="http://www.w3.org/2000/svg"><path d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"/></svg></a>
+        </label>
+        <label class="checkbox-label nightfall-checkbox">
+          <input type="checkbox" id="death-after-nightfall" />
+          <span id="label-death-after-nightfall">הפטירה היתה אחרי צאת הכוכבים</span>
+          <span id="death-effective-date" class="effective-date"></span>
+        </label>
+      </div>
       <span id="death-date-error" class="field-error" style="display:none"></span>
     </div>
 
@@ -47,6 +59,12 @@
       <button type="button" class="date-picker-trigger" data-target="burial-date">
         <span class="date-picker-display" id="burial-date-display">בחר תאריך...</span>
       </button>
+      <label class="checkbox-label nightfall-checkbox" id="burial-nightfall-row" style="display:none">
+        <input type="checkbox" id="after-nightfall" />
+        <span id="label-after-nightfall">הקבורה היתה אחרי צאת הכוכבים</span>
+        <span id="burial-effective-date" class="effective-date"></span>
+        <a href="#" id="burial-info-link" class="info-icon" aria-label="מידע נוסף"><svg viewBox="0 0 416.979 416.979" xmlns="http://www.w3.org/2000/svg"><path d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"/></svg></a>
+      </label>
       <span id="burial-date-error" class="field-error" style="display:none"></span>
     </div>
 
@@ -84,14 +102,38 @@
       </div>
     </div>
 
-    <!-- After nightfall -->
-    <div class="field">
-      <label class="checkbox-label">
-        <input type="checkbox" id="after-nightfall" />
-        <span id="label-after-nightfall">הקבורה היתה אחרי צאת הכוכבים</span>
-      </label>
-      <span id="after-nightfall-hint" class="field-hint">קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.</span>
-      <a id="zmanim-link" class="zmanim-link" href="https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm" target="_blank" rel="noopener">לא בטוח? בדוק זמנים ב-Chabad.org</a>
+
+    <!-- Death nightfall info modal -->
+    <div id="death-modal" class="info-modal-overlay" style="display:none;">
+      <div class="info-modal">
+        <div class="info-modal-header">
+          <h3 id="death-modal-title">בין השמשות</h3>
+          <button type="button" class="info-modal-close" data-modal="death-modal">✕</button>
+        </div>
+        <div class="info-modal-body" id="death-modal-body">
+          <p><strong>מה זה "בין השמשות"?</strong><br/>הזמן שבין שקיעת החמה לצאת הכוכבים. זמן זה הוא ספק — יתכן שעדיין יום, יתכן שכבר לילה.</p>
+          <p><strong>מתי לסמן "בין השמשות"?</strong><br/>כשהפטירה אירעה בפרק הזמן הזה. המחשבון יציג שני תאריכים אפשריים ליארצייט.</p>
+          <p><strong>מתי לסמן "אחרי צאת הכוכבים"?</strong><br/>כשהפטירה היתה אחרי צאת הכוכבים ודאי. התאריך ההלכתי הוא למחרת.</p>
+          <p><strong>לא בטוח?</strong><br/>אפשר <a id="zmanim-link" class="zmanim-link" href="https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm" target="_blank" rel="noopener">לבדוק את זמני השקיעה וצאת הכוכבים ב-Chabad.org</a>, אם הסתבכת עם הזמנים התייעץ עם רב.</p>
+          <p class="info-modal-note">מקורות: המדריך פ״ד:ד (ד״ח קסב; נ״ג פקל״ג סי״ג); המדריך פ״ז:ד (גשה״ח פל״ב סי״ב); קיצור ש״ע ילקוט יוסף סי׳ טו:ב (יביע אומר ח״ח חיו״ד סי׳ לד).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Burial nightfall info modal -->
+    <div id="burial-modal" class="info-modal-overlay" style="display:none;">
+      <div class="info-modal">
+        <div class="info-modal-header">
+          <h3 id="burial-modal-title">קבורה אחרי צאת הכוכבים</h3>
+          <button type="button" class="info-modal-close" data-modal="burial-modal">✕</button>
+        </div>
+        <div class="info-modal-body" id="burial-modal-body">
+          <p>סמן אם הקבורה הסתיימה <strong>אחרי צאת הכוכבים</strong>. במקרה זה, היום ההלכתי הראשון לאבלות הוא למחרת.</p>
+          <p>קבורה <strong>בבין השמשות</strong> (בין השקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום — אין צורך לסמן.</p>
+          <p><strong>לא בטוח?</strong><br/>אפשר <a class="zmanim-link" href="https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm" target="_blank" rel="noopener">לבדוק את זמני השקיעה וצאת הכוכבים ב-Chabad.org</a>, אם הסתבכת עם הזמנים התייעץ עם רב.</p>
+          <p class="info-modal-note">מקורות: המדריך פ״ד:ד (ד״ח קסב, קנו); קיצור ש״ע ילקוט יוסף סי׳ טו:ב (יביע אומר ח״ח חיו״ד סי׳ לד).</p>
+        </div>
+      </div>
     </div>
 
 
@@ -218,6 +260,17 @@
             <span id="yahrzeit-second-value" class="result-greg-date"></span>
           </div>
         </div>
+        <div class="yahrzeit-entry" id="yahrzeit-bh-alt-entry" style="display:none">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-bh-alt-label" class="yahrzeit-title">יארצייט שני (תאריך נוסף)</span>
+            <span id="yahrzeit-bh-alt-basis" class="yahrzeit-basis">ספק בין השמשות — יום המאוחר</span>
+          </div>
+          <div class="result-dates">
+            <span id="yahrzeit-bh-alt-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-bh-alt-value" class="result-greg-date"></span>
+          </div>
+        </div>
+        <div id="yahrzeit-bh-notice" class="cancelled-notice" style="display:none"></div>
         <div class="yahrzeit-entry" id="yahrzeit-adar-alt-entry" style="display:none">
           <div class="yahrzeit-entry-label">
             <span id="yahrzeit-adar-alt-label" class="yahrzeit-title"></span>
@@ -462,7 +515,54 @@
     const gregStr = formatDate(input.value, currentLang);
     display.textContent = `${hebStr}  •  ${gregStr}`;
     display.classList.remove('placeholder');
+    updateNightfallRow(inputId);
   }
+
+  function updateNightfallRow(inputId: string) {
+    const input = document.getElementById(inputId) as HTMLInputElement;
+    const isDeathDate = inputId === 'death-date';
+    const rowId = isDeathDate ? 'death-nightfall-row' : 'burial-nightfall-row';
+    const row = document.getElementById(rowId)!;
+
+    if (!input.value) {
+      row.style.display = 'none';
+      return;
+    }
+    row.style.display = '';
+
+    // Show effective date for "after tzeit" checkboxes
+    const afterTzeitId = isDeathDate ? 'death-after-nightfall' : 'after-nightfall';
+    const effectiveDateId = isDeathDate ? 'death-effective-date' : 'burial-effective-date';
+    const afterTzeit = document.getElementById(afterTzeitId) as HTMLInputElement;
+    const effectiveEl = document.getElementById(effectiveDateId)!;
+
+    if (afterTzeit.checked) {
+      const nextDay = addDays(input.value, 1);
+      const d = new Date(nextDay + 'T12:00:00');
+      const jd = getJewishDate(d);
+      const hebStr = currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
+      effectiveEl.textContent = `(${hebStr})`;
+    } else {
+      effectiveEl.textContent = '';
+    }
+  }
+
+  // Death date: bein hashmashot and after tzeit are mutually exclusive
+  document.getElementById('death-bein-hashmashot')?.addEventListener('change', () => {
+    const bh = document.getElementById('death-bein-hashmashot') as HTMLInputElement;
+    if (bh.checked) {
+      (document.getElementById('death-after-nightfall') as HTMLInputElement).checked = false;
+    }
+    updateNightfallRow('death-date');
+  });
+  document.getElementById('death-after-nightfall')?.addEventListener('change', () => {
+    const at = document.getElementById('death-after-nightfall') as HTMLInputElement;
+    if (at.checked) {
+      (document.getElementById('death-bein-hashmashot') as HTMLInputElement).checked = false;
+    }
+    updateNightfallRow('death-date');
+  });
+  document.getElementById('after-nightfall')?.addEventListener('change', () => updateNightfallRow('burial-date'));
 
   function openCal(targetId: string) {
     calTarget = targetId;
@@ -634,9 +734,10 @@
       'location-statement': 'חישוב לפי',
       'toggle-israel': 'ארץ ישראל',
       'toggle-diaspora': 'חו״ל',
+      'label-death-bein-hashmashot': 'הפטירה היתה בבין השמשות',
+      'label-death-after-nightfall': 'הפטירה היתה אחרי צאת הכוכבים',
       'label-after-nightfall': 'הקבורה היתה אחרי צאת הכוכבים',
-      'after-nightfall-hint': 'קבורה בבין השמשות (בין שקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום. רק אחרי צאת הכוכבים היום ההלכתי הראשון הוא למחרת.',
-      'zmanim-link': 'לא בטוח? בדוק זמנים ב-Chabad.org',
+      'zmanim-link': 'בדוק זמני צאת הכוכבים ב-Chabad.org',
       disclaimer: '* יש לוודא את החישוב עם פוסק הלכה, במיוחד במקרים מורכבים.',
       'tab-jewish': 'עברי',
       'tab-civil': 'לועזי',
@@ -681,9 +782,10 @@
       'location-statement': 'Calculating according to',
       'toggle-israel': 'Israel',
       'toggle-diaspora': 'Diaspora',
+      'label-death-bein-hashmashot': 'The passing was during twilight (bein hashmashot)',
+      'label-death-after-nightfall': 'The passing was after nightfall',
       'label-after-nightfall': 'The burial was after nightfall',
-      'after-nightfall-hint': 'Burial during twilight (bein hashemashot) still counts as that day. Only after nightfall (tzeis hakochavim) does the first halachic day shift to the next day.',
-      'zmanim-link': 'Not sure? Check Zmanim at Chabad.org',
+      'zmanim-link': 'Check nightfall times on Chabad.org',
       disclaimer: '* Please verify this calculation with a posek, especially in complex cases.',
       'tab-jewish': 'Jewish',
       'tab-civil': 'Civil',
@@ -773,6 +875,53 @@
       ? 'פרויקט של <strong>Shluchim AI</strong>'
       : 'A project of <strong>Shluchim AI</strong>';
 
+    // Update modal content for language
+    const zmanimHref = document.getElementById('zmanim-link')?.getAttribute('href') || 'https://www.chabad.org/calendar/zmanim_cdo/locationid/689/locationtype/1/jewish/Halachic-Times.htm';
+
+    // Death modal
+    const deathModalTitle = document.getElementById('death-modal-title');
+    const deathModalBody = document.getElementById('death-modal-body');
+    if (deathModalTitle && deathModalBody) {
+      if (currentLang === 'he') {
+        deathModalTitle.textContent = 'בין השמשות';
+        deathModalBody.innerHTML = `
+          <p><strong>מה זה "בין השמשות"?</strong><br/>הזמן שבין שקיעת החמה לצאת הכוכבים. זמן זה הוא ספק — יתכן שעדיין יום, יתכן שכבר לילה.</p>
+          <p><strong>מתי לסמן "בין השמשות"?</strong><br/>כשהפטירה אירעה בפרק הזמן הזה. המחשבון יציג שני תאריכים אפשריים ליארצייט.</p>
+          <p><strong>מתי לסמן "אחרי צאת הכוכבים"?</strong><br/>כשהפטירה היתה אחרי צאת הכוכבים ודאי. התאריך ההלכתי הוא למחרת.</p>
+          <p><strong>לא בטוח?</strong><br/>אפשר <a class="zmanim-link" href="${zmanimHref}" target="_blank" rel="noopener">לבדוק את זמני השקיעה וצאת הכוכבים ב-Chabad.org</a>, אם הסתבכת עם הזמנים התייעץ עם רב.</p>
+          <p class="info-modal-note">מקורות: המדריך פ״ד:ד (ד״ח קסב; נ״ג פקל״ג סי״ג); המדריך פ״ז:ד (גשה״ח פל״ב סי״ב); קיצור ש״ע ילקוט יוסף סי׳ טו:ב (יביע אומר ח״ח חיו״ד סי׳ לד).</p>`;
+      } else {
+        deathModalTitle.textContent = 'Twilight (Bein Hashmashot)';
+        deathModalBody.innerHTML = `
+          <p><strong>What is "twilight" (bein hashmashot)?</strong><br/>The time between sunset and nightfall. This period is halachically uncertain — it may still be day, or already night.</p>
+          <p><strong>When to check "twilight"?</strong><br/>When the passing occurred during this window. The calculator will show two possible yahrzeit dates.</p>
+          <p><strong>When to check "after nightfall"?</strong><br/>When the passing was definitely after nightfall (tzeis hakochavim). The halachic date shifts to the next day.</p>
+          <p><strong>Not sure?</strong><br/>You can <a class="zmanim-link" href="${zmanimHref}" target="_blank" rel="noopener">check sunset and nightfall times on Chabad.org</a>. If you're unsure about the times, consult with a rabbi.</p>
+          <p class="info-modal-note">Sources: HaMadrich 4:4 (D"Ch 162; N"G 133:13); HaMadrich 7:4 (Gesher HaChaim 32:12); Yalkut Yosef Aveilus 15:2 (Yabi'a Omer 8 YD 34).</p>`;
+      }
+    }
+
+    // Burial modal
+    const burialModalTitle = document.getElementById('burial-modal-title');
+    const burialModalBody = document.getElementById('burial-modal-body');
+    if (burialModalTitle && burialModalBody) {
+      if (currentLang === 'he') {
+        burialModalTitle.textContent = 'קבורה אחרי צאת הכוכבים';
+        burialModalBody.innerHTML = `
+          <p>סמן אם הקבורה הסתיימה <strong>אחרי צאת הכוכבים</strong>. במקרה זה, היום ההלכתי הראשון לאבלות הוא למחרת.</p>
+          <p>קבורה <strong>בבין השמשות</strong> (בין השקיעה לצאת הכוכבים) עדיין נחשבת לאותו יום — אין צורך לסמן.</p>
+          <p><strong>לא בטוח?</strong><br/>אפשר <a class="zmanim-link" href="${zmanimHref}" target="_blank" rel="noopener">לבדוק את זמני השקיעה וצאת הכוכבים ב-Chabad.org</a>, אם הסתבכת עם הזמנים התייעץ עם רב.</p>
+          <p class="info-modal-note">מקורות: המדריך פ״ד:ד (ד״ח קסב, קנו); קיצור ש״ע ילקוט יוסף סי׳ טו:ב (יביע אומר ח״ח חיו״ד סי׳ לד).</p>`;
+      } else {
+        burialModalTitle.textContent = 'Burial after nightfall';
+        burialModalBody.innerHTML = `
+          <p>Check this if the burial was completed <strong>after nightfall</strong> (tzeis hakochavim). The first halachic day of mourning will be the next day.</p>
+          <p>Burial during <strong>twilight</strong> (bein hashmashot, between sunset and nightfall) still counts as the same day — no need to check.</p>
+          <p><strong>Not sure?</strong><br/>You can <a class="zmanim-link" href="${zmanimHref}" target="_blank" rel="noopener">check sunset and nightfall times on Chabad.org</a>. If you're unsure about the times, consult with a rabbi.</p>
+          <p class="info-modal-note">Sources: HaMadrich 4:4 (D"Ch 162, 156); Yalkut Yosef Aveilus 15:2 (Yabi'a Omer 8 YD 34).</p>`;
+      }
+    }
+
     // Update date displays
     updateDateDisplay('death-date');
     updateDateDisplay('burial-date');
@@ -790,6 +939,23 @@
       document.getElementById('calc-form')?.dispatchEvent(new Event('submit'));
     }
   });
+
+  // Info modals
+  function setupModal(linkId: string, modalId: string) {
+    const modal = document.getElementById(modalId)!;
+    document.getElementById(linkId)?.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = '';
+    });
+    modal.querySelector('.info-modal-close')?.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+  setupModal('death-info-link', 'death-modal');
+  setupModal('burial-info-link', 'burial-modal');
 
   // Update Chabad zmanim link when burial date changes
   document.getElementById('burial-date')?.addEventListener('change', () => {
@@ -1113,11 +1279,13 @@
     deathDate: string,
     burialDate: string,
     afterNightfall: boolean,
+    deathAfterNightfall: boolean,
     holidays: HolidayPeriod[],
   ): MourningResult {
     const notes: string[] = [];
 
-    // Effective burial date (halachic day)
+    // Effective dates (halachic day)
+    const effectiveDeath = deathAfterNightfall ? addDays(deathDate, 1) : deathDate;
     let effectiveBurial = afterNightfall ? addDays(burialDate, 1) : burialDate;
 
     // Check if burial occurred during a holiday/chol hamoed
@@ -1356,6 +1524,8 @@
     }
 
     const afterNightfall = (document.getElementById('after-nightfall') as HTMLInputElement).checked;
+    const deathAfterNightfall = (document.getElementById('death-after-nightfall') as HTMLInputElement).checked;
+    const deathBeinHashmashot = (document.getElementById('death-bein-hashmashot') as HTMLInputElement).checked;
 
     const calcBtn = document.getElementById('calc-btn') as HTMLButtonElement;
     calcBtn.disabled = true;
@@ -1369,8 +1539,11 @@
     const holidayItems = await fetchHolidays(rangeStart, rangeEnd, isIsrael);
     const holidays = groupHolidays(holidayItems, isIsrael);
 
+    // Use effective halachic dates
+    const effectiveDeathDate = deathAfterNightfall ? addDays(deathDate, 1) : deathDate;
+
     // Run calculation
-    const result = calculateMourning(deathDate, burialDate, afterNightfall, holidays);
+    const result = calculateMourning(effectiveDeathDate, burialDate, afterNightfall, deathAfterNightfall, holidays);
 
     // Display results with both Gregorian and Hebrew dates
     document.getElementById('shiva-start-value')!.textContent = formatDate(result.day1, currentLang);
@@ -1525,6 +1698,31 @@
     document.getElementById('yahrzeit-second-value')!.textContent = formatDate(secondYahrzeit.gregDate, currentLang);
     document.getElementById('yahrzeit-second-heb')!.textContent = formatHeb(secondYahrzeit.gregDate);
 
+    // Bein hashmashot — show alternative yahrzeit (next day) when death was during twilight
+    const bhAltEntry = document.getElementById('yahrzeit-bh-alt-entry')!;
+    const bhNotice = document.getElementById('yahrzeit-bh-notice')!;
+    if (deathBeinHashmashot) {
+      // Calculate yahrzeit for the next day (the later possible date)
+      const laterDeathDate = addDays(effectiveDeathDate, 1);
+      const laterYahrzeit = calcYahrzeit(laterDeathDate, 2);
+      bhAltEntry.style.display = '';
+      document.getElementById('yahrzeit-bh-alt-value')!.textContent = formatDate(laterYahrzeit.gregDate, currentLang);
+      document.getElementById('yahrzeit-bh-alt-heb')!.textContent = formatHeb(laterYahrzeit.gregDate);
+      document.getElementById('yahrzeit-bh-alt-label')!.textContent = currentLang === 'he'
+        ? 'יארצייט שני (תאריך נוסף)'
+        : 'Yahrzeit (alternate date)';
+      document.getElementById('yahrzeit-bh-alt-basis')!.textContent = currentLang === 'he'
+        ? 'ספק בין השמשות — יום המאוחר'
+        : 'Twilight uncertainty — later day';
+      bhNotice.style.display = '';
+      bhNotice.textContent = currentLang === 'he'
+        ? 'הפטירה היתה בבין השמשות — ספק לאיזה יום שייכת. אם אין אבלים אחרים, יאמר קדיש בשני הימים. אם יש אבלים אחרים, יחזיק ביום המוקדם (המדריך פ״ז:ד).'
+        : 'Death was during twilight — uncertain which day applies. If no other mourners, say Kaddish on both days. If others are present, observe the earlier day (HaMadrich 7:4).';
+    } else {
+      bhAltEntry.style.display = 'none';
+      bhNotice.style.display = 'none';
+    }
+
     // Adar alternate opinion — show when applicable
     const adarAltEntry = document.getElementById('yahrzeit-adar-alt-entry')!;
     // Check both first (death-based) and second yahrzeit for Adar alternate
@@ -1625,14 +1823,18 @@
       const deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
       const burialDate = (document.getElementById('burial-date') as HTMLInputElement).value;
       const afterNightfall = (document.getElementById('after-nightfall') as HTMLInputElement).checked;
+      const deathAfterNightfall = (document.getElementById('death-after-nightfall') as HTMLInputElement).checked;
+      const deathBeinHashmashot = (document.getElementById('death-bein-hashmashot') as HTMLInputElement).checked;
 
       const res = await fetch('/api/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          deathDate: deathDate || burialDate,
+          deathDate,
           burialDate,
           afterNightfall,
+          deathAfterNightfall,
+          deathBeinHashmashot,
           isIsrael,
           lang: currentLang,
         }),
@@ -1697,8 +1899,16 @@
         (document.getElementById('burial-date') as HTMLInputElement).value = data.burialDate;
         updateDateDisplay('burial-date');
       }
+      if (data.deathBeinHashmashot) {
+        (document.getElementById('death-bein-hashmashot') as HTMLInputElement).checked = true;
+        updateNightfallRow('death-date');
+      } else if (data.deathAfterNightfall) {
+        (document.getElementById('death-after-nightfall') as HTMLInputElement).checked = true;
+        updateNightfallRow('death-date');
+      }
       if (data.afterNightfall) {
         (document.getElementById('after-nightfall') as HTMLInputElement).checked = true;
+        updateNightfallRow('burial-date');
       }
 
       // Trigger calculation
@@ -1828,6 +2038,89 @@
   .field-hint {
     font-size: 0.8rem;
     color: #999;
+  }
+  .nightfall-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+  .nightfall-checkbox {
+    margin-top: 0.15rem;
+  }
+  .effective-date {
+    font-weight: 700;
+    margin-inline-start: -0.2rem;
+  }
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-start: -0.35rem;
+    cursor: pointer;
+  }
+  .info-icon svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: #8b7355;
+  }
+  .info-icon:hover svg {
+    fill: #6d5a43;
+  }
+
+  .info-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .info-modal {
+    background: #faf9f6;
+    border: 1px solid #d4c5a9;
+    border-radius: 12px;
+    width: 420px;
+    max-width: 92vw;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .info-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e0d8c8;
+  }
+  .info-modal-header h3 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.1rem;
+    color: #4a3c2c;
+    font-weight: 700;
+  }
+  .info-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+  .info-modal-close:hover { color: #4a3c2c; }
+  .info-modal-body {
+    padding: 1rem;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: #4a3c2c;
+  }
+  .info-modal-body p + p {
+    margin-top: 0.6rem;
+  }
+  .info-modal-note {
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed #e0d8c8;
+    font-size: 0.82rem;
+    color: #888;
   }
   .field-error {
     font-size: 0.8rem;
