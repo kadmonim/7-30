@@ -37,7 +37,7 @@
       <button type="button" class="date-picker-trigger" data-target="death-date">
         <span class="date-picker-display" id="death-date-display">בחר תאריך...</span>
       </button>
-      <span id="death-date-hint" class="field-hint">השאר ריק אם זהה לתאריך הקבורה</span>
+      <span id="death-date-error" class="field-error" style="display:none"></span>
     </div>
 
     <!-- Burial date -->
@@ -47,6 +47,7 @@
       <button type="button" class="date-picker-trigger" data-target="burial-date">
         <span class="date-picker-display" id="burial-date-display">בחר תאריך...</span>
       </button>
+      <span id="burial-date-error" class="field-error" style="display:none"></span>
     </div>
 
     <!-- Unified calendar picker modal -->
@@ -620,7 +621,7 @@
       title: 'מתי קמים?',
       subtitle: 'הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים',
       'label-death-date': 'תאריך הפטירה',
-      'death-date-hint': 'השאר ריק אם זהה לתאריך הקבורה',
+      'death-date-hint': '',
       'label-date': 'תאריך הקבורה',
       'calc-btn-text': 'חשב',
       'results-title': 'תוצאות',
@@ -667,7 +668,7 @@
       title: 'Shiva & Shloshim Calculator',
       subtitle: 'Enter the date of passing and burial to calculate when shiva and shloshim end',
       'label-death-date': 'Date of Passing',
-      'death-date-hint': 'Leave blank if same as burial date',
+      'death-date-hint': '',
       'label-date': 'Burial Date',
       'calc-btn-text': 'Calculate',
       'results-title': 'Results',
@@ -1318,15 +1319,39 @@
     const t = translations[currentLang];
 
     const burialDate = (document.getElementById('burial-date') as HTMLInputElement).value;
-    if (!burialDate) return;
+    const deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
 
-    let deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
-    if (!deathDate) deathDate = burialDate;
+    // Clear previous errors
+    const deathErr = document.getElementById('death-date-error')!;
+    const burialErr = document.getElementById('burial-date-error')!;
+    const deathTrigger = document.querySelector('[data-target="death-date"]')!;
+    const burialTrigger = document.querySelector('[data-target="burial-date"]')!;
+    deathErr.style.display = 'none';
+    burialErr.style.display = 'none';
+    deathTrigger.classList.remove('has-error');
+    burialTrigger.classList.remove('has-error');
+
+    let hasError = false;
+    if (!deathDate) {
+      deathErr.textContent = currentLang === 'he' ? 'יש לבחור תאריך פטירה' : 'Please select a date of death';
+      deathErr.style.display = 'block';
+      deathTrigger.classList.add('has-error');
+      hasError = true;
+    }
+    if (!burialDate) {
+      burialErr.textContent = currentLang === 'he' ? 'יש לבחור תאריך קבורה' : 'Please select a burial date';
+      burialErr.style.display = 'block';
+      burialTrigger.classList.add('has-error');
+      hasError = true;
+    }
+    if (hasError) return;
 
     if (burialDate < deathDate) {
-      alert(currentLang === 'he'
-        ? 'תאריך הקבורה לא יכול להיות לפני תאריך הפטירה.'
-        : 'Burial date cannot be before the date of death.');
+      burialErr.textContent = currentLang === 'he'
+        ? 'תאריך הקבורה לא יכול להיות לפני תאריך הפטירה'
+        : 'Burial date cannot be before the date of death';
+      burialErr.style.display = 'block';
+      burialTrigger.classList.add('has-error');
       return;
     }
 
@@ -1803,6 +1828,15 @@
   .field-hint {
     font-size: 0.8rem;
     color: #999;
+  }
+  .field-error {
+    font-size: 0.8rem;
+    color: #c44;
+    font-weight: 700;
+    margin-top: 0.25rem;
+  }
+  .date-picker-trigger.has-error {
+    border-color: #c44;
   }
 
   .zmanim-link {
@@ -2384,7 +2418,7 @@
     margin-top: 0.3rem;
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: 315px) {
     .container { padding: 2rem 1rem 2rem; }
     h1 { font-size: 1.6rem; }
     .result-card { margin-bottom: 0.65rem; }
