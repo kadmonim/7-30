@@ -1277,9 +1277,11 @@
     calcBtn.disabled = true;
     document.getElementById('calc-btn-text')!.textContent = t['calculating'];
 
-    // Fetch holidays for the relevant range (death date through burial + 60 days)
-    const rangeStart = deathDate < burialDate ? deathDate : burialDate;
-    const rangeEnd = addDays(burialDate, 60);
+    // Fetch holidays for the relevant range
+    // Start 30 days before death to catch holidays that began before burial (e.g. burial during Chol Hamoed)
+    const earliest = deathDate < burialDate ? deathDate : burialDate;
+    const rangeStart = addDays(earliest, -30);
+    const rangeEnd = addDays(burialDate, 400);
     const holidayItems = await fetchHolidays(rangeStart, rangeEnd, isIsrael);
     const holidays = groupHolidays(holidayItems, isIsrael);
 
