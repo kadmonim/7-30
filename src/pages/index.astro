@@ -1260,6 +1260,13 @@
     let deathDate = (document.getElementById('death-date') as HTMLInputElement).value;
     if (!deathDate) deathDate = burialDate;
 
+    if (burialDate < deathDate) {
+      alert(currentLang === 'he'
+        ? 'תאריך הקבורה לא יכול להיות לפני תאריך הפטירה.'
+        : 'Burial date cannot be before the date of death.');
+      return;
+    }
+
     const afterNightfall = (document.getElementById('after-nightfall') as HTMLInputElement).checked;
 
     const calcBtn = document.getElementById('calc-btn') as HTMLButtonElement;
