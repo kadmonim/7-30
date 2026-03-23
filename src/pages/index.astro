@@ -1076,26 +1076,24 @@
     let day1: string;
     let shivaDelayed = false;
     let shivaDelayedUntilAfter: string | null = null;
+    let shivaDelayedDiasporaDayOff = false;
 
     if (holidayAtBurial) {
-      // Shiva begins after the holiday concludes
-      // Israel: day after the last day of the holiday (can't sit shiva on Yom Tov)
-      // Diaspora: last day of Yom Tov counts as day 1 (special rule, even though not actively sitting)
-      day1 = isIsrael ? addDays(holidayAtBurial.lastDay, 1) : holidayAtBurial.lastDay;
+      // Shiva customs begin the day after the holiday ends (for both Israel and Diaspora)
+      // For calculation: Israel gets 7 full days, Diaspora gets 6 (last day of holiday counted toward 7)
+      day1 = addDays(holidayAtBurial.lastDay, 1); // Display: actual first day of sitting
       shivaDelayed = true;
       shivaDelayedUntilAfter = holidayAtBurial.id;
+      // Diaspora: last day of YT counts toward the 7, so only 6 more days of actual sitting
+      shivaDelayedDiasporaDayOff = !isIsrael;
 
       const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
       if (currentLang === 'he') {
-        const startNote = isIsrael
-          ? `השבעה מתחילה למחרת החג.`
-          : `היום האחרון של החג נחשב ליום הראשון של השבעה.`;
-        notes.push(`הקבורה חלה בתוך ${name}. ${startNote} ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
+        const diasporaNote = !isIsrael ? ` היום האחרון של החג נספר למנין שבעה, ולכן יושבים עוד 6 ימים בלבד.` : '';
+        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה למחרת החג.${diasporaNote} ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
       } else {
-        const startNote = isIsrael
-          ? `Shiva begins the day after the holiday.`
-          : `The last day of the holiday counts as the first day of shiva.`;
-        notes.push(`Burial occurred during ${name}. ${startNote} The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
+        const diasporaNote = !isIsrael ? ` The last day of the holiday counts toward the 7 days, so only 6 additional days of shiva are observed.` : '';
+        notes.push(`Burial occurred during ${name}. Shiva begins the day after the holiday.${diasporaNote} The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
       }
     } else {
       day1 = effectiveBurial;
@@ -1112,7 +1110,8 @@
     }
 
     // Naive end dates
-    let shivaEnd = addDays(day1, 6);
+    // Diaspora Chol Hamoed burial: last day of holiday counted toward 7, so 6 days from day1
+    let shivaEnd = addDays(day1, shivaDelayedDiasporaDayOff ? 5 : 6);
     let shloshimEnd: string;
 
     // For shloshim, counting starts from burial date (or effective burial) even if shiva was delayed
