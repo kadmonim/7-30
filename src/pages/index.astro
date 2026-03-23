@@ -1419,8 +1419,8 @@
     const breakEndHeb = formatHeb(breakEnd);
 
     document.getElementById('kaddish-note')!.textContent = currentLang === 'he'
-      ? `מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש, עם הפסקה מ-${breakStartHeb} (${breakStartFmt}) עד ${breakEndHeb} (${breakEndFmt}) — קיצור ילקוט יוסף סי׳ ל:ה.`
-      : `Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartHeb} / ${breakStartFmt} to ${breakEndHeb} / ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`;
+      ? `הקדיש האחרון נאמר במנחה של התאריך המצוין. מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש, עם הפסקה מ-${breakStartHeb} (${breakStartFmt}) עד ${breakEndHeb} (${breakEndFmt}) — קיצור ילקוט יוסף סי׳ ל:ה.`
+      : `The last Kaddish is said at Mincha of the date shown. Ashkenazi: 11 months. Sefardi: 12 months, with break from ${breakStartHeb} / ${breakStartFmt} to ${breakEndHeb} / ${breakEndFmt} (Kitzur Yalkut Yosef 30:5).`;
 
     // First yahrzeit — two customs when death ≠ burial
     const firstYahrzeitBurial = calcYahrzeit(burialDate, 1);
