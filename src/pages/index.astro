@@ -1081,13 +1081,10 @@
 
       const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
       if (currentLang === 'he') {
-        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה ביום האחרון של החג.`);
+        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה ביום האחרון של החג. ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
       } else {
-        notes.push(`Burial occurred during ${name}. Shiva begins on the last day of the holiday.`);
+        notes.push(`Burial occurred during ${name}. Shiva begins on the last day of the holiday. The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
       }
-
-      // But the holiday days still count toward shloshim
-      // Shloshim counting starts from the burial date even if shiva is delayed
     } else {
       day1 = effectiveBurial;
     }
