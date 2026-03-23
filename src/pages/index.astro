@@ -170,6 +170,13 @@
             <span id="kaddish-end-value" class="result-greg-date"></span>
           </div>
         </div>
+        <div class="result-line" id="kaddish-sefardi-line" style="display:none">
+          <span id="kaddish-sefardi-label" class="result-key">סיום (מנהג ספרד):</span>
+          <div class="result-dates">
+            <span id="kaddish-sefardi-heb" class="result-value highlight"></span>
+            <span id="kaddish-sefardi-value" class="result-greg-date"></span>
+          </div>
+        </div>
         <p id="kaddish-note" class="result-note">קדיש נאמר למשך 11 חודש מיום הפטירה</p>
       </div>
     </div>
@@ -633,9 +640,9 @@
       'shiva-normal-note': 'השבעה מסתיימת בבוקר של היום השביעי, לאחר שחרית',
       'shloshim-normal-note': 'השלושים מסתיימים בבוקר של היום השלושים, לאחר שחרית',
       'kaddish-label': 'קדיש',
-      'kaddish-badge': '11 חודשים',
-      'kaddish-end-label': 'סיום:',
-      'kaddish-note': 'קדיש נאמר למשך 11 חודש מיום הפטירה',
+      'kaddish-badge': '11/12 חודשים',
+      'kaddish-end-label': 'סיום (מנהג אשכנז):',
+      'kaddish-note': 'מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש עם הפסקה של כשבוע בתחילת חודש י״ב.',
       'yahrzeit-label': 'יארצייט',
       'yahrzeit-first-label': 'יארצייט ראשון',
       'yahrzeit-first-basis': 'לפי תאריך הקבורה',
@@ -680,9 +687,9 @@
       'shiva-normal-note': 'Shiva ends on the morning of the 7th day, after Shacharit',
       'shloshim-normal-note': 'Shloshim ends on the morning of the 30th day, after Shacharit',
       'kaddish-label': 'Kaddish',
-      'kaddish-badge': '11 months',
-      'kaddish-end-label': 'Ends:',
-      'kaddish-note': 'Kaddish is recited for 11 months from the date of passing',
+      'kaddish-badge': '11/12 months',
+      'kaddish-end-label': 'Ends (Ashkenazi):',
+      'kaddish-note': 'Ashkenazi: 11 months. Sefardi: 12 months with ~1 week break at start of month 12.',
       'yahrzeit-label': 'Yahrzeit',
       'yahrzeit-first-label': 'First Yahrzeit',
       'yahrzeit-first-basis': 'Based on burial date',
@@ -815,19 +822,19 @@
   }
 
   /**
-   * Calculate when Kaddish ends: 11 Hebrew months from date of passing.
-   * Returns the Gregorian date string.
+   * Calculate when Kaddish ends.
+   * Ashkenazi: 11 Hebrew months from date of passing.
+   * Sefardi: 12 Hebrew months (with ~1 week break at start of month 12).
    */
-  function calcKaddishEnd(deathDateStr: string): { gregDate: string; jewishDate: any } {
+  function calcKaddishEnd(deathDateStr: string, months: number = 11): { gregDate: string; jewishDate: any } {
     const d = new Date(deathDateStr + 'T12:00:00');
     const jd = toJewishDate(d);
-    const monthsInOrder = getJewishMonthsInOrder(jd.year);
 
     let targetYear = jd.year;
     let targetMonthName = jd.monthName;
-    let monthsToAdd = 11;
+    let monthsToAdd = months;
 
-    // Walk forward 11 months in the Hebrew calendar
+    // Walk forward N months in the Hebrew calendar
     const currentMonthsOrder = getJewishMonthsInOrder(targetYear);
     let idx = currentMonthsOrder.indexOf(jd.monthName);
 
@@ -1104,15 +1111,15 @@
 
       // Chol Hamoed Sukkot burial: Shmini Atzeret is part of the same holiday complex
       // Shiva doesn't begin until after the entire period (including SA/Simchas Torah)
-      // SA counts as only 1 actual day toward shloshim, not 7 equivalent (Chapter 27 Halacha 4)
+      // Dispute: SA counts as 1 actual day (some Poskim) or 7 equivalent (Kitzur Yalkut Yosef 42:21)
       if (shivaDelayed && shivaDelayedUntilAfter === 'sukkot' && holiday.id === 'shmini-atzeret') {
         day1 = holiday.lastDay;
         shivaEnd = addDays(day1, 6);
         const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
         if (currentLang === 'he') {
-          notes.push(`השבעה מתחילה לאחר ${name}. ${name} נספר כיום אחד בלבד לענין השלושים.`);
+          notes.push(`השבעה מתחילה לאחר ${name}. שתי דעות: ${name} נספר כיום אחד בלבד (יש פוסקים), או כ-7 ימים שווי ערך (קיצור ילקוט יוסף סי׳ מב:כא — הלכה כדברי המיקל באבל).`);
         } else {
-          notes.push(`Shiva begins after ${name}. ${name} counts as only ${daysBetween(holiday.firstDay, holiday.lastDay) + 1} actual day(s) toward shloshim.`);
+          notes.push(`Shiva begins after ${name}. Two opinions: ${name} counts as only ${daysBetween(holiday.firstDay, holiday.lastDay) + 1} actual day(s) (some Poskim), or as 7 equivalent days (Kitzur Yalkut Yosef 42:21 — rule leniently in mourning).`);
         }
         continue;
       }
@@ -1203,13 +1210,13 @@
           const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
           if (holiday.id === 'pesach') {
             if (currentLang === 'he') {
-              notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח.`);
+              notes.push(`השבעה מסתיימת לפני ${name}. ${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח.`);
             } else {
               notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim. Shloshim ends at midday on Erev Pesach.`);
             }
           } else {
             if (currentLang === 'he') {
-              notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים.`);
+              notes.push(`השבעה מסתיימת לפני ${name}. ${name} מבטל את יתרת השלושים.`);
             } else {
               notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim.`);
             }
@@ -1312,7 +1319,7 @@
     const shivaNote = document.getElementById('shiva-note')!;
     if (result.shivaCancelled) {
       shivaNote.textContent = currentLang === 'he'
-        ? `השבעה הסתיימה בערב החג (${formatDate(result.shivaEnd, currentLang)})`
+        ? `השבעה מסתיימת בערב החג (${formatDate(result.shivaEnd, currentLang)})`
         : `Shiva ended at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`;
     } else {
       shivaNote.textContent = t['shiva-normal-note'];
@@ -1322,7 +1329,7 @@
     const shloshimNote = document.getElementById('shloshim-note')!;
     if (result.shloshimCancelled) {
       shloshimNote.textContent = currentLang === 'he'
-        ? `השלושים הסתיימו בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
+        ? `השלושים מסתיימת בערב החג (${formatDate(result.shloshimEnd, currentLang)})`
         : `Shloshim ended at the onset of the holiday (${formatDate(result.shloshimEnd, currentLang)})`;
     } else {
       shloshimNote.textContent = t['shloshim-normal-note'];
@@ -1343,10 +1350,22 @@
       holidayNotice.style.display = 'none';
     }
 
-    // Kaddish end (11 Hebrew months from death)
-    const kaddishResult = calcKaddishEnd(deathDate);
+    // Kaddish end — Ashkenazi: 11 months; Sefardi: 12 months (Kitzur Yalkut Yosef, Siman 30:5)
+    const kaddishResult = calcKaddishEnd(deathDate, 11);
     document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishResult.gregDate, currentLang);
     document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishResult.gregDate);
+    document.getElementById('kaddish-end-label')!.textContent = currentLang === 'he' ? 'סיום (מנהג אשכנז):' : 'Ends (Ashkenazi):';
+
+    const kaddishSefardi = calcKaddishEnd(deathDate, 12);
+    const sefLine = document.getElementById('kaddish-sefardi-line')!;
+    sefLine.style.display = '';
+    document.getElementById('kaddish-sefardi-value')!.textContent = formatDate(kaddishSefardi.gregDate, currentLang);
+    document.getElementById('kaddish-sefardi-heb')!.textContent = formatHeb(kaddishSefardi.gregDate);
+    document.getElementById('kaddish-sefardi-label')!.textContent = currentLang === 'he' ? 'סיום (מנהג ספרד):' : 'Ends (Sefardi):';
+
+    document.getElementById('kaddish-note')!.textContent = currentLang === 'he'
+      ? 'מנהג אשכנז: 11 חודש. מנהג ספרד: 12 חודש עם הפסקה של כשבוע בתחילת חודש י״ב (קיצור ילקוט יוסף סי׳ ל:ה).'
+      : 'Ashkenazi: 11 months. Sefardi: 12 months with ~1 week break at start of month 12 (Kitzur Yalkut Yosef 30:5).';
 
     // First yahrzeit — two customs when death ≠ burial
     const firstYahrzeitBurial = calcYahrzeit(burialDate, 1);
