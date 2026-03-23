@@ -1068,6 +1068,21 @@
       // Skip the holiday that delayed shiva (already handled)
       if (shivaDelayed && holiday.id === holidayAtBurial?.id) continue;
 
+      // Chol Hamoed Sukkot burial: Shmini Atzeret is part of the same holiday complex
+      // Shiva doesn't begin until after the entire period (including SA/Simchas Torah)
+      // SA counts as only 1 actual day toward shloshim, not 7 equivalent (Chapter 27 Halacha 4)
+      if (shivaDelayed && shivaDelayedUntilAfter === 'sukkot' && holiday.id === 'shmini-atzeret') {
+        day1 = holiday.lastDay;
+        shivaEnd = addDays(day1, 6);
+        const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
+        if (currentLang === 'he') {
+          notes.push(`השבעה מתחילה לאחר ${name}. ${name} נספר כיום אחד בלבד לענין השלושים.`);
+        } else {
+          notes.push(`Shiva begins after ${name}. ${name} counts as only ${daysBetween(holiday.firstDay, holiday.lastDay) + 1} actual day(s) toward shloshim.`);
+        }
+        continue;
+      }
+
       const holidayStart = holiday.erev; // Holiday begins at sunset of erev
 
       // Did mourning begin before this holiday?
@@ -1079,15 +1094,24 @@
           shivaEnd = holidayStart; // Shiva ends at onset of holiday
 
           const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-          if (currentLang === 'he') {
-            notes.push(`${name} מבטל את יתרת השבעה.`);
+          if (holiday.id === 'pesach') {
+            // Erev Pesach: shiva cancelled at midday (chatzos), not sunset (Michaber O.C. 548:12, Y.D. 399:7)
+            if (currentLang === 'he') {
+              notes.push(`${name} מבטל את יתרת השבעה. השבעה מסתיימת בחצות היום של ערב פסח (מחבר או״ח תקמ״ח:יב).`);
+            } else {
+              notes.push(`${name} cancels the remainder of shiva. Shiva ends at midday (chatzos) on Erev Pesach (Michaber O.C. 548:12).`);
+            }
           } else {
-            notes.push(`${name} cancels the remainder of shiva.`);
+            if (currentLang === 'he') {
+              notes.push(`${name} מבטל את יתרת השבעה.`);
+            } else {
+              notes.push(`${name} cancels the remainder of shiva.`);
+            }
           }
 
           // Calculate shloshim with holiday equivalents
-          const daysBeforeHoliday = daysBetween(day1, holidayStart);
-          const totalEquiv = daysBeforeHoliday + holiday.shloshimEquivalent;
+          // Cancelled shiva counts as full 7 days toward shloshim (YD 399)
+          const totalEquiv = 7 + holiday.shloshimEquivalent;
 
           if (totalEquiv >= 30) {
             shloshimEnd = holiday.lastDay;
@@ -1103,16 +1127,38 @@
             shloshimEnd = addDays(holiday.lastDay, remaining);
           }
         } else if (shivaCancelled && !shloshimCancelled && holidayStart <= shloshimEnd) {
-          // Shiva already done/cancelled; this holiday cancels remaining shloshim
-          shloshimCancelled = true;
-          shloshimCancelledBy = holiday.id;
-          shloshimEnd = holidayStart;
-
           const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-          if (currentLang === 'he') {
-            notes.push(`${name} מבטל את יתרת השלושים.`);
+
+          // Shmini Atzeres after Sukkos cancelled shiva does NOT nullify shloshim
+          // because no recognizable mourning was practiced during Chol Hamoed (Taz 399:6)
+          // Instead, it counts equivalent days toward the remaining shloshim
+          if (shivaCancelledBy === 'sukkot' && holiday.id === 'shmini-atzeret') {
+            const actualDays = daysBetween(holiday.firstDay, holiday.lastDay) + 1;
+            const bonus = holiday.shloshimEquivalent - actualDays;
+            shloshimEnd = addDays(shloshimEnd, -bonus);
+            if (currentLang === 'he') {
+              notes.push(`${name} נחשב כ-${holiday.shloshimEquivalent} ימים לענין השלושים, אך אינו מבטל את השלושים (ט״ז שצ״ט:ו).`);
+            } else {
+              notes.push(`${name} counts as ${holiday.shloshimEquivalent} days toward shloshim but does not cancel it (Taz 399:6).`);
+            }
           } else {
-            notes.push(`${name} cancels the remainder of shloshim.`);
+            // Standard: holiday cancels remaining shloshim
+            shloshimCancelled = true;
+            shloshimCancelledBy = holiday.id;
+            shloshimEnd = holidayStart;
+            if (holiday.id === 'pesach') {
+              if (currentLang === 'he') {
+                notes.push(`${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח (מחבר יו״ד שצ״ט:ז).`);
+              } else {
+                notes.push(`${name} cancels the remainder of shloshim. Shloshim ends at midday (chatzos) on Erev Pesach (Michaber Y.D. 399:7).`);
+              }
+            } else {
+              if (currentLang === 'he') {
+                notes.push(`${name} מבטל את יתרת השלושים.`);
+              } else {
+                notes.push(`${name} cancels the remainder of shloshim.`);
+              }
+            }
           }
         } else if (!shivaCancelled && !shloshimCancelled && holidayStart >= shivaEnd && holidayStart <= shloshimEnd) {
           // Shiva completed normally before the holiday; holiday cancels shloshim
@@ -1121,10 +1167,18 @@
           shloshimEnd = holidayStart;
 
           const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-          if (currentLang === 'he') {
-            notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים.`);
+          if (holiday.id === 'pesach') {
+            if (currentLang === 'he') {
+              notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח.`);
+            } else {
+              notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim. Shloshim ends at midday on Erev Pesach.`);
+            }
           } else {
-            notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim.`);
+            if (currentLang === 'he') {
+              notes.push(`השבעה הסתיימה לפני ${name}. ${name} מבטל את יתרת השלושים.`);
+            } else {
+              notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim.`);
+            }
           }
         }
       }
