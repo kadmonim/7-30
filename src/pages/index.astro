@@ -1350,9 +1350,15 @@
     // Shiva note
     const shivaNote = document.getElementById('shiva-note')!;
     if (result.shivaCancelled) {
-      shivaNote.textContent = currentLang === 'he'
-        ? `השבעה מסתיימת בערב החג (${formatDate(result.shivaEnd, currentLang)})`
-        : `Shiva ends at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`;
+      if (result.shivaCancelledBy === 'pesach') {
+        shivaNote.textContent = currentLang === 'he'
+          ? `קבורה לפני חצות — השבעה מסתיימת בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה מסתיימת בכניסת החג (מחבר או״ח תקמ״ח:יב).`
+          : `Burial before midday — shiva ends at midday (chatzos) on Erev Pesach. Burial after midday — shiva ends at onset of Pesach (Michaber O.C. 548:12).`;
+      } else {
+        shivaNote.textContent = currentLang === 'he'
+          ? `השבעה מסתיימת בערב החג (${formatDate(result.shivaEnd, currentLang)})`
+          : `Shiva ends at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`;
+      }
     } else {
       shivaNote.textContent = t['shiva-normal-note'];
     }
@@ -1578,12 +1584,14 @@
         }
       }
 
-      // Set form inputs
+      // Set form inputs and update their visual displays
       if (data.burialDate) {
         (document.getElementById('burial-date') as HTMLInputElement).value = data.burialDate;
+        updateDateDisplay('burial-date');
       }
       if (data.deathDate && data.deathDate !== data.burialDate) {
         (document.getElementById('death-date') as HTMLInputElement).value = data.deathDate;
+        updateDateDisplay('death-date');
       }
       if (data.afterNightfall) {
         (document.getElementById('after-nightfall') as HTMLInputElement).checked = true;
