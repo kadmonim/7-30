@@ -1846,6 +1846,11 @@
         : 'First year is a leap year: 12-month mourning restrictions end after 12 months. Month 13 is free of mourning restrictions (HaMadrich 6:8-9).');
     }
 
+    // Sefardi kaddish before yahrzeit note (relevant from second year onward)
+    noteLines.push(currentLang === 'he'
+      ? 'מנהג עדות המזרח: לומר קדיש מליל שבת שלפני יום הפטירה עד יום הפטירה, ועד בכלל (חזון עובדיה אבלות ח״ג עמ׳ קצה).'
+      : 'Sefardi custom: Kaddish is said from the Shabbat night before the yahrzeit until the yahrzeit day inclusive (Chazon Ovadia Aveilus vol. 3 p. 195).');
+
     yahrzeitNote.textContent = noteLines.join(' ');
 
     // Show results
