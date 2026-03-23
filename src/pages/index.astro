@@ -964,25 +964,29 @@
       const date: string = item.date;
       const isYomTov = item.yomtov === true;
 
-      let groupId: string | null = null;
+      let holidayType: string | null = null;
 
       if (title.includes('Pesach')) {
-        groupId = 'pesach';
+        holidayType = 'pesach';
       } else if (title.includes('Shavuot')) {
-        groupId = 'shavuot';
+        holidayType = 'shavuot';
       } else if (title.includes('Sukkot')) {
-        groupId = 'sukkot';
+        holidayType = 'sukkot';
       } else if (title.includes('Shmini Atzeret') || title.includes('Simchat Torah')) {
-        groupId = 'shmini-atzeret';
+        holidayType = 'shmini-atzeret';
       } else if (title.includes('Rosh Hashana')) {
-        groupId = 'rosh-hashana';
+        holidayType = 'rosh-hashana';
       } else if (title.includes('Yom Kippur')) {
-        groupId = 'yom-kippur';
+        holidayType = 'yom-kippur';
       }
 
-      if (!groupId) continue;
+      if (!holidayType) continue;
       // Skip erev entries for grouping purposes
       if (title.startsWith('Erev ')) continue;
+
+      // Include year in group key so holidays from different years stay separate
+      const year = date.substring(0, 4);
+      const groupId = `${holidayType}:${year}`;
 
       if (!groups[groupId]) {
         groups[groupId] = { yomTov: [], cholHamoed: [], all: [] };
@@ -997,12 +1001,13 @@
 
     const periods: HolidayPeriod[] = [];
 
-    for (const [id, g] of Object.entries(groups)) {
+    for (const [groupId, g] of Object.entries(groups)) {
       if (g.all.length === 0) continue;
       g.all.sort();
       g.yomTov.sort();
       g.cholHamoed.sort();
 
+      const id = groupId.split(':')[0]; // Strip year suffix
       const firstDay = g.all[0];
       const lastDay = g.all[g.all.length - 1];
       const erev = addDays(firstDay, -1);
