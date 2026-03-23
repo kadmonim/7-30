@@ -301,7 +301,7 @@
 
 <footer class="site-footer">
   <p class="footer-project" id="footer-project">פרויקט של <strong>Shluchim AI</strong></p>
-  <p class="footer-dedication">לעילוי נשמת השליח הרה״ת ר׳ יוסף יצחק בן אריה ליב ע״ה</p>
+  <p class="footer-dedication">לעילוי נשמת השליח הרה״ת ר׳ יוסף בן ארי׳ ליב ע״ה</p>
 </footer>
 
 <script>
@@ -324,6 +324,45 @@
   // =====================
   let calTarget: string | null = null;
   let calMode: 'jewish' | 'civil' = 'jewish'; // default tab
+
+  // Convert number to Hebrew gematria (for years)
+  function numToHebrew(n: number): string {
+    const ones = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'];
+    const tens = ['', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ'];
+    const hundreds = ['', 'ק', 'ר', 'ש', 'ת'];
+    let s = '';
+    const h = Math.floor(n / 100);
+    if (h <= 4) {
+      s += hundreds[h];
+    } else {
+      // 500+ = ת + remainder
+      const full400s = Math.floor(h / 4);
+      for (let i = 0; i < full400s; i++) s += 'ת';
+      s += hundreds[h % 4];
+    }
+    const t = Math.floor((n % 100) / 10);
+    const o = n % 10;
+    // Special cases: 15 = ט״ו, 16 = ט״ז
+    if (t === 1 && o === 5) {
+      s += 'טו';
+    } else if (t === 1 && o === 6) {
+      s += 'טז';
+    } else {
+      s += tens[t] + ones[o];
+    }
+    // Add gershayim before last letter
+    if (s.length > 1) {
+      s = s.slice(0, -1) + '״' + s.slice(-1);
+    } else if (s.length === 1) {
+      s += '׳';
+    }
+    return s;
+  }
+
+  function jewishYearToHebrew(year: number): string {
+    // Drop thousands (e.g., 5786 → 786)
+    return numToHebrew(year % 1000);
+  }
 
   // Jewish calendar state
   let jewishState = { year: 0, month: '' as string };
@@ -384,7 +423,7 @@
     const currentJewishYear = getJewishDate(new Date()).year;
     const years = getJewishYears(jewishState.year).filter(y => y >= 5700 && y <= currentJewishYear);
     yearSelect.innerHTML = years.map(y =>
-      `<option value="${y}" ${y === jewishState.year ? 'selected' : ''}>${y}</option>`
+      `<option value="${y}" ${y === jewishState.year ? 'selected' : ''}>${isHeb ? jewishYearToHebrew(y) : y}</option>`
     ).join('');
 
     const gregDate = getGregDate({
@@ -584,6 +623,17 @@
     input.value = dateStr;
     input.dispatchEvent(new Event('change', { bubbles: true }));
     updateDateDisplay(calTarget);
+
+    // When setting death date, prefill burial date if empty
+    if (calTarget === 'death-date') {
+      const burialInput = document.getElementById('burial-date') as HTMLInputElement;
+      if (!burialInput.value) {
+        burialInput.value = dateStr;
+        burialInput.dispatchEvent(new Event('change', { bubbles: true }));
+        updateDateDisplay('burial-date');
+      }
+    }
+
     closeCal();
   }
 
