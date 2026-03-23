@@ -1079,16 +1079,23 @@
 
     if (holidayAtBurial) {
       // Shiva begins after the holiday concludes
-      // The last day of the festival counts as day 1
-      day1 = holidayAtBurial.lastDay;
+      // Israel: day after the last day of the holiday (can't sit shiva on Yom Tov)
+      // Diaspora: last day of Yom Tov counts as day 1 (special rule, even though not actively sitting)
+      day1 = isIsrael ? addDays(holidayAtBurial.lastDay, 1) : holidayAtBurial.lastDay;
       shivaDelayed = true;
       shivaDelayedUntilAfter = holidayAtBurial.id;
 
       const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
       if (currentLang === 'he') {
-        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה ביום האחרון של החג. ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
+        const startNote = isIsrael
+          ? `השבעה מתחילה למחרת החג.`
+          : `היום האחרון של החג נחשב ליום הראשון של השבעה.`;
+        notes.push(`הקבורה חלה בתוך ${name}. ${startNote} ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
       } else {
-        notes.push(`Burial occurred during ${name}. Shiva begins on the last day of the holiday. The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
+        const startNote = isIsrael
+          ? `Shiva begins the day after the holiday.`
+          : `The last day of the holiday counts as the first day of shiva.`;
+        notes.push(`Burial occurred during ${name}. ${startNote} The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
       }
     } else {
       day1 = effectiveBurial;
