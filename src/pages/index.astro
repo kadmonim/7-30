@@ -1406,12 +1406,14 @@
       holidayNotice.style.display = 'none';
     }
 
-    // Kaddish end — Ashkenazi: 11 months; Sefardi: 12 months (Kitzur Yalkut Yosef, Siman 30:5)
-    const kaddishResult = calcKaddishEnd(deathDate, 11);
-    document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishResult.gregDate, currentLang);
-    document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishResult.gregDate);
+    // Kaddish end — Ashkenazi: last kaddish is 1 day before the 11-month mark (Sefer HaMinhagim p.78)
+    const kaddish11Month = calcKaddishEnd(deathDate, 11);
+    const kaddishAshkEnd = addDays(kaddish11Month.gregDate, -1);
+    document.getElementById('kaddish-end-value')!.textContent = formatDate(kaddishAshkEnd, currentLang);
+    document.getElementById('kaddish-end-heb')!.textContent = formatHeb(kaddishAshkEnd);
     document.getElementById('kaddish-end-label')!.textContent = currentLang === 'he' ? 'סיום (מנהג אשכנז):' : 'Ends (Ashkenazi):';
 
+    // Sefardi: 12 months (Kitzur Yalkut Yosef, Siman 30:5)
     const kaddishSefardi = calcKaddishEnd(deathDate, 12);
     const sefLine = document.getElementById('kaddish-sefardi-line')!;
     sefLine.style.display = '';
@@ -1420,8 +1422,7 @@
     document.getElementById('kaddish-sefardi-label')!.textContent = currentLang === 'he' ? 'סיום (מנהג ספרד):' : 'Ends (Sefardi):';
 
     // Compute Sefardi break dates: first week of month 12
-    const kaddishMonth11End = calcKaddishEnd(deathDate, 11);
-    const breakStart = addDays(kaddishMonth11End.gregDate, 1);
+    const breakStart = kaddish11Month.gregDate;
     const breakEnd = addDays(breakStart, 6);
     const breakStartFmt = formatDate(breakStart, currentLang);
     const breakEndFmt = formatDate(breakEnd, currentLang);
