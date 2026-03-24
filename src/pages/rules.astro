@@ -16,6 +16,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
 <body>
 
 <div class="container">
+  <span class="bsd">בס״ד</span>
   <HamburgerMenu currentPage="/rules" />
 
   <h1>כללי החישוב</h1>
@@ -370,6 +371,15 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     margin: 0 auto;
     padding: 2rem 2rem 3rem;
     position: relative;
+  }
+  .bsd {
+    display: block;
+    text-align: center;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 0.75rem;
+    color: #c4b89a;
+    user-select: none;
+    margin-bottom: -0.5rem;
   }
 
   .back-link {
