@@ -1674,9 +1674,22 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
             : `Shiva ends at the onset of the holiday (${formatDate(result.shivaEnd, currentLang)})`);
       }
     } else {
-      shivaNote.textContent = currentLang === 'he'
-        ? (shivaPast ? 'השבעה הסתיימה בבוקר של היום השביעי, לאחר שחרית' : t['shiva-normal-note'])
-        : (shivaPast ? 'Shiva ended on the morning of the 7th day, after Shacharit' : t['shiva-normal-note']);
+      // Check if shiva ends on Shabbos
+      const shivaEndDate = new Date(result.shivaEnd + 'T12:00:00');
+      const shivaEndsOnShabbos = shivaEndDate.getDay() === 6;
+      if (shivaEndsOnShabbos) {
+        shivaNote.textContent = currentLang === 'he'
+          ? (shivaPast
+            ? 'היום השביעי חל בשבת — השבעה הסתיימה לאחר שחרית של שבת. האבל אינו עולה לתורה בשחרית (רק במנחה).'
+            : 'היום השביעי חל בשבת — השבעה מסתיימת לאחר שחרית של שבת. האבל אינו עולה לתורה בשחרית (רק במנחה).')
+          : (shivaPast
+            ? 'The 7th day fell on Shabbat — shiva ended after Shacharit on Shabbat. The avel should not receive an aliyah at Shacharit (only at Mincha).'
+            : 'The 7th day falls on Shabbat — shiva ends after Shacharit on Shabbat. The avel should not receive an aliyah at Shacharit (only at Mincha).');
+      } else {
+        shivaNote.textContent = currentLang === 'he'
+          ? (shivaPast ? 'השבעה הסתיימה בבוקר של היום השביעי, לאחר שחרית' : t['shiva-normal-note'])
+          : (shivaPast ? 'Shiva ended on the morning of the 7th day, after Shacharit' : t['shiva-normal-note']);
+      }
     }
 
     // Shloshim note
