@@ -21,11 +21,155 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
   <h1>מתי מותר/אסור לעלות לקבר?</h1>
   <p class="subtitle">זמנים שבהם נוהגים לעלות או להימנע מעלייה לבית הקברות</p>
 
+  <!-- When to visit -->
   <section class="rule-section">
+    <h2>מתי עולים לקבר?</h2>
+
     <div class="rule-card">
-      <p class="placeholder-text">תוכן בקרוב...</p>
+      <h3>תאריכים מקובלים לעלייה לקבר</h3>
+      <ul>
+        <li><strong>יום השביעי (סיום השבעה)</strong> — נוהגים לעלות לקבר בבוקר לאחר שחרית, עם סיום האבלות. אם חל בשבת או בראש חודש — דוחים ליום ראשון. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ)</span></li>
+        <li><strong>הקמת מצבה</strong> — מנהג חב״ד: ביום השמיני לאחר הקבורה. <span class="source">(ספר המנהגים — חב״ד)</span></li>
+        <li><strong>יום השלושים</strong> — יש הנוהגים לעלות ביום השלושים. אם חל בשבת או ראש חודש — מתאימים בהתאם. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ; טור שמד)</span></li>
+        <li><strong>יום היארצייט</strong> — המנהג העיקרי והמבוסס ביותר. אם אין אפשרות לעלות ביום עצמו, ניתן לעלות בטווח של שלושה ימים לפני או אחרי. <span class="source">(רש״י יבמות קכב ע״א; קב הישר עא; נטעי גבריאל עו:א, עו:יח)</span></li>
+        <li><strong>ערב ראש השנה</strong> — נוהגים לעלות לקברי קרובים וצדיקים. <span class="source">(מחבר או״ח תקפא:ד; רמ״א שם)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>שנה ראשונה — הגבלות</h3>
+      <ul>
+        <li>בשנה הראשונה לאחר הפטירה, פוסקים רבים ממליצים <strong>לא לעלות לקבר</strong> מחוץ לתאריכים הנ״ל (יום 7, 30, יארצייט). <span class="source">(טור שמד בשם כל בו; מהר״ם בריסק ב:כט)</span></li>
+        <li>הטעם: שלא לצער את הנשמה בתקופה רגישה זו.</li>
+        <li>יש המקילים ומתירים ביקורים נוספים, בפרט בקברי אישים חשובים.</li>
+        <li><strong>אין עולים לקבר בתוך ימי השבעה</strong> (מלבד קבורה עצמה). <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>עלייה לקבר בתוך י״ב חודש</h3>
+      <ul>
+        <li>יש הנמנעים מלעלות לקבר בתוך י״ב חודש (מלבד התאריכים הנ״ל), מכיוון שהנפטר נידון תוך י״ב חודשים, ולכן אין לבקש ממנו להליץ טוב בעד החיים. אולם מותר לעלות ולומר תהלים, וכן להתפלל על הקבר לעילוי נשמתו. <span class="source">(נטעי גבריאל אבלות ב פא:ה; שו״ת שרגא המאיר ו:ח אות ד; הליכות שלמה א יח הערה 74)</span></li>
+        <li><strong>מנהג חב״ד:</strong> לא נוהגים לעלות לקבר בסיום הי״א חודש. <span class="source">(המדריך פ״ו:ז)</span></li>
+        <li><strong>מנהג עדות המזרח:</strong> נוהגים לעלות לקבר גם בסיום הי״א חודש.</li>
+      </ul>
     </div>
   </section>
+
+  <!-- When NOT to visit -->
+  <section class="rule-section">
+    <h2>מתי לא עולים לקבר?</h2>
+
+    <div class="rule-card">
+      <h3>ימים שאין עולים בהם</h3>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>יום</th>
+            <th>דין</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>שבת ויום טוב</strong></td><td>אסור</td></tr>
+          <tr><td><strong>חול המועד</strong></td><td>אין ראוי לעלות לקבר קרובים — מגיעים לידי צער ובכי. יש לעלות לפני או אחרי החג. <strong>אבל לקברי צדיקים — מותר.</strong> <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ה)</span></td></tr>
+          <tr><td><strong>פורים</strong></td><td>אין עולים. יש לעלות בערב פורים. <span class="source">(גשר החיים א עמ׳ רנט; מ״א תרצו:ה)</span></td></tr>
+          <tr><td><strong>חנוכה</strong></td><td>יש הנמנעים. מנהג מקילים מתיר. יש לעלות בערב חנוכה. <span class="source">(בן איש חי וישב כב; כף החיים תר״ע:כג)</span></td></tr>
+          <tr><td><strong>ראש חודש</strong></td><td>שתי דעות — יש הנמנעים, יש המתירים. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ו)</span></td></tr>
+          <tr><td><strong>חודש ניסן</strong></td><td>יש הנמנעים מלעלות כל חודש ניסן (שאין אומרים תחנון). אחרים מתירים, שהרי מותר להתענות תענית יארצייט בניסן. <span class="source">(נטעי גבריאל פסח ג:ח, אבלות עו:יז; קיצור ש״ע ילקוט יוסף סי׳ מג:ג)</span></td></tr>
+        </tbody>
+      </table>
+      <p class="rule-note">אם היארצייט חל באחד מהימים הנ״ל — יש לעלות בערב אותו יום (מחצות ואילך), או לאחריו.</p>
+    </div>
+  </section>
+
+  <!-- Yahrzeit on special days -->
+  <section class="rule-section">
+    <h2>יארצייט שחל בימים מיוחדים</h2>
+
+    <div class="rule-card">
+      <h3>מה עושים כשאי אפשר לעלות ביום היארצייט?</h3>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>מצב</th>
+            <th>פתרון</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>חל בשבת/יו״ט</td><td>עולים לפני או אחרי</td></tr>
+          <tr><td>חל בחול המועד</td><td>עולים בערב יו״ט <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ה; נטעי גבריאל עו:יד-טו)</span></td></tr>
+          <tr><td>חל בראש חודש</td><td>עולים בערב ר״ח, ואם א״א — למחרת <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ו; עיקרי הדעת לו:לה; כף החיים תקסח:צד)</span></td></tr>
+          <tr><td>חל בחנוכה</td><td>עולים בערב חנוכה (יש מקילים) <span class="source">(בן איש חי וישב כב; כף החיים תר״ע:כג; נטעי גבריאל עו:טז)</span></td></tr>
+          <tr><td>חל בפורים</td><td>עולים בערב פורים <span class="source">(גשר החיים א עמ׳ רנט; מ״א תרצו:ה)</span></td></tr>
+          <tr><td>חל בניסן</td><td>לנמנעים — עולים בערב ר״ח ניסן. למתירים — עולים ביום היארצייט עצמו. <span class="source">(נטעי גבריאל פסח ג:ח, אבלות עו:יז)</span></td></tr>
+          <tr><td>אי אפשר כלל</td><td>ניתן לשלוח שליח, או לעלות לבית קברות אחר ולהתפלל שם לעילוי הנשמה <span class="source">(נטעי גבריאל עו:ה)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Kohanim -->
+  <section class="rule-section">
+    <h2>כהנים</h2>
+
+    <div class="rule-card">
+      <h3>כהנים ובית הקברות</h3>
+      <ul>
+        <li>כהנים נוהגים לעלות לבית הקברות ביום השבעה, יום השלושים, ויום היארצייט. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ד; נטעי גבריאל עו:יא)</span></li>
+        <li><strong>אסור להם להיכנס לבית הקברות ממש</strong> — עומדים ליד הגדר, בריחוק יותר מד׳ אמות מהקברים.</li>
+        <li>יש להיזהר שלא ללכת תחת אילן שמאהיל על הקברים. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ד)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- What to do at the grave -->
+  <section class="rule-section">
+    <h2>מה עושים בבית הקברות?</h2>
+
+    <div class="rule-card">
+      <h3>הכנות</h3>
+      <ul>
+        <li>יש הנמנעים מאכילה לפני העלייה (שתייה מותרת ואף רצויה).</li>
+        <li>מי שלא ביקר בבית הקברות 30 יום — מברך ברכת ״אשר יצר אתכם בדין״. <span class="source">(שו״ע או״ח רכד:יב)</span></li>
+        <li>נותנים צדקה ליד הקבר לפני התפילה.</li>
+        <li>מכניסים את הציציות לתוך הכיסים. <span class="source">(שו״ע או״ח כג:א)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>ליד הקבר</h3>
+      <ul>
+        <li>אומרים מזמורי תהלים — מזמור קי״ט לפי אותיות שם הנפטר, ואותיות ״נשמה״.</li>
+        <li>יש המוסיפים פרקי משניות לפי שם הנפטר.</li>
+        <li>יש הנוהגים להקיף את הקבר פעם אחת לפני היציאה.</li>
+        <li>מניחים את יד שמאל על הקבר בעת התפילה.</li>
+        <li>אם נמצאים עשרה אנשים — אומרים קדיש. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג)</span></li>
+        <li>יש הנוהגים להניח אבן על הקבר לפני היציאה.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>ביציאה מבית הקברות</h3>
+      <ul>
+        <li>נוטלים ידיים שלוש פעמים.</li>
+        <li>נוטלים ידיים לפני כניסה לבית.</li>
+        <li>יש הנוהגים לתלוש עשב ולזרוק מאחוריהם.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section class="rule-section">
+    <div class="rule-card disclaimer-card">
+      <h3>הערה חשובה</h3>
+      <p>המידע בדף זה מבוסס על מקורות הלכתיים מוסמכים, אך <strong>אינו מהווה פסק הלכה</strong>. מנהגים משתנים בין עדות וקהילות. במקרה של ספק — יש לפנות לרב.</p>
+    </div>
+  </section>
+
+  <div class="sources">
+    <h3>מקורות</h3>
+    <p>שו״ע יו״ד סי׳ שמד; מחבר או״ח תקפא; טור שמד; קיצור ש״ע ילקוט יוסף סי׳ לה, סי׳ מג; המדריך להלכות אבילות פ״ו:ז; גשר החיים; נטעי גבריאל הלכות אבלות; כף החיים; בן איש חי.</p>
+  </div>
 </div>
 
 <style is:global>
@@ -71,6 +215,15 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     margin-bottom: 2rem;
   }
 
+  .rule-section h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.4rem;
+    color: #4a3c2c;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #e0d8c8;
+  }
+
   .rule-card {
     background: #fff;
     border: 1px solid #e0d8c8;
@@ -79,16 +232,95 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     margin-bottom: 0.75rem;
   }
 
-  .placeholder-text {
-    text-align: center;
+  .rule-card h3 {
+    font-family: 'Heebo', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #6d5a43;
+    margin-bottom: 0.5rem;
+  }
+
+  .rule-card ul {
+    padding-inline-start: 1.25rem;
+    margin: 0;
+  }
+  .rule-card li {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: #3c3c3c;
+  }
+  .rule-card li strong {
+    color: #4a3c2c;
+  }
+
+  .rule-card p {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    margin-bottom: 0.4rem;
+  }
+
+  .rule-note {
+    font-size: 0.82rem !important;
+    color: #999 !important;
+    margin-top: 0.5rem !important;
+    font-style: italic;
+  }
+
+  .source {
+    font-size: 0.8em;
     color: #999;
-    font-size: 0.95rem;
-    padding: 2rem 0;
+  }
+
+  .disclaimer-card {
+    background: #fef9ee;
+    border-color: #e6c547;
+  }
+  .disclaimer-card h3 {
+    color: #8a6d00;
+  }
+
+  .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.88rem;
+  }
+  .rules-table th,
+  .rules-table td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e0d8c8;
+    text-align: start;
+  }
+  .rules-table th {
+    background: #f0ebe0;
+    font-weight: 700;
+    color: #6d5a43;
+  }
+  .rules-table td {
+    background: #fff;
+  }
+
+  .sources {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f0ebe0;
+    border-radius: 8px;
+  }
+  .sources h3 {
+    font-size: 0.9rem;
+    color: #6d5a43;
+    margin-bottom: 0.3rem;
+  }
+  .sources p {
+    font-size: 0.82rem;
+    color: #666;
   }
 
   @media (max-width: 500px) {
     .container { padding: 1.5rem 1rem 2rem; }
     h1 { font-size: 1.6rem; }
+    .rules-table { font-size: 0.8rem; }
+    .rules-table th, .rules-table td { padding: 0.3rem 0.4rem; }
   }
 </style>
 </body>

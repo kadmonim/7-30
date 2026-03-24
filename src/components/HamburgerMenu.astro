@@ -12,9 +12,9 @@ const { currentPage } = Astro.props;
     <span class="hamburger-line"></span>
   </button>
   <nav class="hamburger-dropdown" id="hamburger-dropdown" aria-hidden="true">
-    <a href="/" class:list={[{ active: currentPage === '/' }]}>מחשבון</a>
-    <a href="/rules" class:list={[{ active: currentPage === '/rules' }]}>כללי החישוב</a>
-    <a href="/kever" class:list={[{ active: currentPage === '/kever' }]}>עלייה לקבר</a>
+    <a href="/" class:list={[{ active: currentPage === '/' }]} id="nav-calculator" data-he="מחשבון" data-en="Calculator">מחשבון</a>
+    <a href="/rules" class:list={[{ active: currentPage === '/rules' }]} id="nav-rules" data-he="כללי החישוב" data-en="Calculation Rules">כללי החישוב</a>
+    <a href="/kever" class:list={[{ active: currentPage === '/kever' }]} id="nav-kever" data-he="עלייה לקבר" data-en="Visiting the Grave">עלייה לקבר</a>
   </nav>
 </div>
 
@@ -98,6 +98,18 @@ const { currentPage } = Astro.props;
 <script>
   const btn = document.getElementById('hamburger-btn')!;
   const dropdown = document.getElementById('hamburger-dropdown')!;
+
+  // Update nav text based on language
+  function updateNavLang() {
+    const lang = document.documentElement.lang === 'he' ? 'he' : 'en';
+    dropdown.querySelectorAll('a[data-he][data-en]').forEach((a) => {
+      const el = a as HTMLElement;
+      el.textContent = el.dataset[lang] || el.textContent;
+    });
+  }
+  // Watch for lang changes
+  new MutationObserver(updateNavLang).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  updateNavLang();
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
