@@ -1,0 +1,991 @@
+---
+// When is it permitted/forbidden to visit the grave?
+import HamburgerMenu from '../components/HamburgerMenu.astro';
+---
+
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>עלייה לקבר — מתי קמים?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container">
+  <HamburgerMenu currentPage="/visit" />
+
+  <h1>מתי מותר/אסור לעלות לקבר?</h1>
+  <p class="subtitle">זמנים שבהם נוהגים לעלות או להימנע מעלייה לבית הקברות</p>
+
+  <!-- Today checker -->
+  <section class="rule-section">
+    <h2>האם מותר לעלות לקבר היום?</h2>
+
+    <div class="location-banner">
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" id="toggle-israel" data-value="israel">ארץ ישראל</button>
+        <button type="button" class="toggle-btn" id="toggle-diaspora" data-value="diaspora">חו״ל</button>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <input type="hidden" id="date-input" />
+      <button type="button" class="date-picker-trigger" id="open-cal-btn">
+        <span class="date-picker-display" id="date-display">היום</span>
+      </button>
+
+      <!-- Calendar picker modal -->
+      <div id="cal-overlay" class="heb-cal-overlay" style="display:none;">
+        <div class="heb-cal-modal">
+          <div class="cal-tabs">
+            <button type="button" class="cal-tab active" id="tab-jewish">עברי</button>
+            <button type="button" class="cal-tab" id="tab-civil">לועזי</button>
+          </div>
+          <div class="heb-cal-header">
+            <button type="button" id="heb-cal-prev" class="heb-cal-nav">‹</button>
+            <div class="heb-cal-selects" id="cal-selects-jewish">
+              <select id="heb-cal-month"></select>
+              <select id="heb-cal-year"></select>
+            </div>
+            <div class="heb-cal-selects" id="cal-selects-civil" style="display:none;">
+              <select id="civil-cal-month"></select>
+              <select id="civil-cal-year"></select>
+            </div>
+            <button type="button" id="heb-cal-next" class="heb-cal-nav">›</button>
+          </div>
+          <div class="heb-cal-weekdays" id="heb-cal-weekdays"></div>
+          <div class="heb-cal-grid" id="heb-cal-grid"></div>
+          <div class="heb-cal-legend">
+            <span class="legend-item"><span class="legend-dot yom-tov-dot"></span><span class="legend-text">יו״ט</span></span>
+            <span class="legend-item"><span class="legend-dot chol-hamoed-dot"></span><span class="legend-text">חוה״מ</span></span>
+            <span class="legend-item"><span class="legend-dot shabat-dot"></span><span class="legend-text">שבת</span></span>
+          </div>
+          <div class="heb-cal-footer">
+            <button type="button" id="heb-cal-today" class="heb-cal-today-btn">היום</button>
+            <button type="button" id="heb-cal-close" class="heb-cal-close-btn">סגור</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="kever-status" class="kever-status"></div>
+    </div>
+  </section>
+
+  <!-- When to visit -->
+  <section class="rule-section">
+    <h2>מתי עולים לקבר?</h2>
+
+    <div class="rule-card">
+      <h3>תאריכים מקובלים לעלייה לקבר</h3>
+      <ul>
+        <li><strong>יום השביעי (סיום השבעה)</strong> — נוהגים לעלות לקבר בבוקר לאחר שחרית, עם סיום האבלות. אם חל בשבת או בראש חודש — דוחים ליום ראשון. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ)</span></li>
+        <li><strong>הקמת מצבה</strong> — מנהג חב״ד: ביום השמיני לאחר הקבורה. <span class="source">(ספר המנהגים — חב״ד)</span></li>
+        <li><strong>יום השלושים</strong> — יש הנוהגים לעלות ביום השלושים. אם חל בשבת או ראש חודש — מתאימים בהתאם. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ; טור שמד)</span></li>
+        <li><strong>יום היארצייט</strong> — המנהג העיקרי והמבוסס ביותר. אם אין אפשרות לעלות ביום עצמו, ניתן לעלות בטווח של שלושה ימים לפני או אחרי. <span class="source">(רש״י יבמות קכב ע״א; קב הישר עא; נטעי גבריאל עו:א, עו:יח)</span></li>
+        <li><strong>ערב ראש השנה</strong> — נוהגים לעלות לקברי קרובים וצדיקים. <span class="source">(מחבר או״ח תקפא:ד; רמ״א שם)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>שנה ראשונה — הגבלות</h3>
+      <ul>
+        <li>בשנה הראשונה לאחר הפטירה, פוסקים רבים ממליצים <strong>לא לעלות לקבר</strong> מחוץ לתאריכים הנ״ל (יום 7, 30, יארצייט). <span class="source">(טור שמד בשם כל בו; מהר״ם בריסק ב:כט)</span></li>
+        <li>הטעם: שלא לצער את הנשמה בתקופה רגישה זו.</li>
+        <li>יש המקילים ומתירים ביקורים נוספים, בפרט בקברי אישים חשובים.</li>
+        <li><strong>אין עולים לקבר בתוך ימי השבעה</strong> (מלבד קבורה עצמה). <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>עלייה לקבר בתוך י״ב חודש</h3>
+      <ul>
+        <li>יש הנמנעים מלעלות לקבר בתוך י״ב חודש (מלבד התאריכים הנ״ל), מכיוון שהנפטר נידון תוך י״ב חודשים, ולכן אין לבקש ממנו להליץ טוב בעד החיים. אולם מותר לעלות ולומר תהלים, וכן להתפלל על הקבר לעילוי נשמתו. <span class="source">(נטעי גבריאל אבלות ב פא:ה; שו״ת שרגא המאיר ו:ח אות ד; הליכות שלמה א יח הערה 74)</span></li>
+        <li><strong>מנהג חב״ד:</strong> לא נוהגים לעלות לקבר בסיום הי״א חודש. <span class="source">(המדריך פ״ו:ז)</span></li>
+        <li><strong>מנהג עדות המזרח:</strong> נוהגים לעלות לקבר גם בסיום הי״א חודש.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- When NOT to visit -->
+  <section class="rule-section">
+    <h2>מתי לא עולים לקבר?</h2>
+
+    <div class="rule-card">
+      <h3>ימים שאין עולים בהם</h3>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>יום</th>
+            <th>דין</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>שבת ויום טוב</strong></td><td>אסור</td></tr>
+          <tr><td><strong>חול המועד</strong></td><td>לא ראוי לעלות לקבר קרובים — מגיעים לידי צער ובכי. יש לעלות לפני או אחרי החג. <strong>אבל לקברי צדיקים — מותר.</strong> <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ה)</span></td></tr>
+          <tr><td><strong>פורים</strong></td><td>אין עולים. יש לעלות בערב פורים. <span class="source">(גשר החיים א עמ׳ רנט; מ״א תרצו:ה)</span></td></tr>
+          <tr><td><strong>חנוכה</strong></td><td>יש הנמנעים. מנהג מקילים מתיר. יש לעלות בערב חנוכה. <span class="source">(בן איש חי וישב כב; כף החיים תר״ע:כג)</span></td></tr>
+          <tr><td><strong>ראש חודש</strong></td><td>שתי דעות — יש הנמנעים, יש המתירים. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ו)</span></td></tr>
+          <tr><td><strong>חודש ניסן</strong></td><td>יש הנמנעים מלעלות כל חודש ניסן (שאין אומרים תחנון). אחרים מתירים, שהרי מותר להתענות תענית יארצייט בניסן. <span class="source">(נטעי גבריאל פסח ג:ח, אבלות עו:יז; קיצור ש״ע ילקוט יוסף סי׳ מג:ג)</span></td></tr>
+        </tbody>
+      </table>
+      <p class="rule-note">אם היארצייט חל באחד מהימים הנ״ל — יש לעלות בערב אותו יום (מחצות ואילך), או לאחריו.</p>
+    </div>
+  </section>
+
+  <!-- Yahrzeit on special days -->
+  <section class="rule-section">
+    <h2>יארצייט שחל בימים מיוחדים</h2>
+
+    <div class="rule-card">
+      <h3>מה עושים כשאי אפשר לעלות ביום היארצייט?</h3>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>מצב</th>
+            <th>פתרון</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>חל בשבת/יו״ט</td><td>עולים לפני או אחרי</td></tr>
+          <tr><td>חל בחול המועד</td><td>עולים בערב יו״ט <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ה; נטעי גבריאל עו:יד-טו)</span></td></tr>
+          <tr><td>חל בראש חודש</td><td>עולים בערב ר״ח, ואם א״א — למחרת <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ מג:ו; עיקרי הדעת לו:לה; כף החיים תקסח:צד)</span></td></tr>
+          <tr><td>חל בחנוכה</td><td>עולים בערב חנוכה (יש מקילים) <span class="source">(בן איש חי וישב כב; כף החיים תר״ע:כג; נטעי גבריאל עו:טז)</span></td></tr>
+          <tr><td>חל בפורים</td><td>עולים בערב פורים <span class="source">(גשר החיים א עמ׳ רנט; מ״א תרצו:ה)</span></td></tr>
+          <tr><td>חל בניסן</td><td>לנמנעים — עולים בערב ר״ח ניסן. למתירים — עולים ביום היארצייט עצמו. <span class="source">(נטעי גבריאל פסח ג:ח, אבלות עו:יז)</span></td></tr>
+          <tr><td>אי אפשר כלל</td><td>ניתן לשלוח שליח, או לעלות לבית קברות אחר ולהתפלל שם לעילוי הנשמה <span class="source">(נטעי גבריאל עו:ה)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Kohanim -->
+  <section class="rule-section">
+    <h2>כהנים</h2>
+
+    <div class="rule-card">
+      <h3>כהנים ובית הקברות</h3>
+      <ul>
+        <li>כהנים נוהגים לעלות לבית הקברות ביום השבעה, יום השלושים, ויום היארצייט. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ד; נטעי גבריאל עו:יא)</span></li>
+        <li><strong>אסור להם להיכנס לבית הקברות ממש</strong> — עומדים ליד הגדר, בריחוק יותר מד׳ אמות מהקברים.</li>
+        <li>יש להיזהר שלא ללכת תחת אילן שמאהיל על הקברים. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ד)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- What to do at the grave -->
+  <section class="rule-section">
+    <h2>מה עושים בבית הקברות?</h2>
+
+    <div class="rule-card">
+      <h3>הכנות</h3>
+      <ul>
+        <li>יש הנמנעים מאכילה לפני העלייה (שתייה מותרת ואף רצויה).</li>
+        <li>מי שלא ביקר בבית הקברות 30 יום — מברך ברכת ״אשר יצר אתכם בדין״. <span class="source">(שו״ע או״ח רכד:יב)</span></li>
+        <li>נותנים צדקה ליד הקבר לפני התפילה.</li>
+        <li>מכניסים את הציציות לתוך הכיסים. <span class="source">(שו״ע או״ח כג:א)</span></li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>ליד הקבר</h3>
+      <ul>
+        <li>אומרים מזמורי תהלים — מזמור קי״ט לפי אותיות שם הנפטר, ואותיות ״נשמה״.</li>
+        <li>יש המוסיפים פרקי משניות לפי שם הנפטר.</li>
+        <li>יש הנוהגים להקיף את הקבר פעם אחת לפני היציאה.</li>
+        <li>מניחים את יד שמאל על הקבר בעת התפילה.</li>
+        <li>אם נמצאים עשרה אנשים — אומרים קדיש. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג)</span></li>
+        <li>יש הנוהגים להניח אבן על הקבר לפני היציאה.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>ביציאה מבית הקברות</h3>
+      <ul>
+        <li>נוטלים ידיים שלוש פעמים.</li>
+        <li>נוטלים ידיים לפני כניסה לבית.</li>
+        <li>יש הנוהגים לתלוש עשב ולזרוק מאחוריהם.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section class="rule-section">
+    <div class="rule-card disclaimer-card">
+      <h3>הערה חשובה</h3>
+      <p>המידע בדף זה מבוסס על מקורות הלכתיים מוסמכים, אך <strong>אינו מהווה פסק הלכה</strong>. מנהגים משתנים בין עדות וקהילות. במקרה של ספק — יש לפנות לרב.</p>
+    </div>
+  </section>
+
+  <div class="sources">
+    <h3>מקורות</h3>
+    <p>שו״ע יו״ד סי׳ שמד; מחבר או״ח תקפא; טור שמד; קיצור ש״ע ילקוט יוסף סי׳ לה, סי׳ מג; המדריך להלכות אבילות פ״ו:ז; גשר החיים; נטעי גבריאל הלכות אבלות; כף החיים; בן איש חי.</p>
+  </div>
+</div>
+
+<script>
+  import {
+    getJewishMonth,
+    getJewishMonths,
+    getJewishYears,
+    getGregDate,
+    getJewishDate,
+    getPrevMonth,
+    getNextMonth,
+    getHebWeekdays,
+    getHolidays,
+  } from 'jewish-dates-core';
+  import { formatJewishDateInHebrew, JewishMonth, toJewishDate } from 'jewish-date';
+
+  let isIsrael = true;
+
+  function setIsrael(val: boolean) {
+    isIsrael = val;
+    document.getElementById('toggle-israel')!.classList.toggle('active', val);
+    document.getElementById('toggle-diaspora')!.classList.toggle('active', !val);
+    // Re-render if a date is selected
+    const input = document.getElementById('date-input') as HTMLInputElement;
+    if (input.value) render(input.value);
+  }
+  document.getElementById('toggle-israel')?.addEventListener('click', () => setIsrael(true));
+  document.getElementById('toggle-diaspora')?.addEventListener('click', () => setIsrael(false));
+
+  function toDateStr(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  // =====================
+  // Calendar picker (Hebrew-only, simplified from main page)
+  // =====================
+  let calMode: 'jewish' | 'civil' = 'jewish';
+  let jewishState = { year: 0, month: '' as string };
+  let civilState = { year: 0, month: 0 };
+  const civilMonthsHe = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+
+  function numToHebrew(n: number): string {
+    const ones = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'];
+    const tens = ['', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ'];
+    const hundreds = ['', 'ק', 'ר', 'ש', 'ת'];
+    let s = '';
+    const h = Math.floor(n / 100);
+    if (h <= 4) { s += hundreds[h]; }
+    else { const full400s = Math.floor(h / 4); for (let i = 0; i < full400s; i++) s += 'ת'; s += hundreds[h % 4]; }
+    const t = Math.floor((n % 100) / 10);
+    const o = n % 10;
+    if (t === 1 && o === 5) { s += 'טו'; }
+    else if (t === 1 && o === 6) { s += 'טז'; }
+    else { s += tens[t] + ones[o]; }
+    if (s.length > 1) { s = s.slice(0, -1) + '״' + s.slice(-1); }
+    else if (s.length === 1) { s += '׳'; }
+    return s;
+  }
+
+  function jewishYearToHebrew(year: number): string { return numToHebrew(year % 1000); }
+
+  function initCal(targetDate?: Date) {
+    const d = targetDate || new Date();
+    const jd = getJewishDate(d);
+    jewishState.year = jd.year;
+    jewishState.month = jd.monthName;
+    civilState.year = d.getFullYear();
+    civilState.month = d.getMonth();
+  }
+
+  function setCalTab(mode: 'jewish' | 'civil') {
+    calMode = mode;
+    document.getElementById('tab-jewish')!.classList.toggle('active', mode === 'jewish');
+    document.getElementById('tab-civil')!.classList.toggle('active', mode === 'civil');
+    document.getElementById('cal-selects-jewish')!.style.display = mode === 'jewish' ? '' : 'none';
+    document.getElementById('cal-selects-civil')!.style.display = mode === 'civil' ? '' : 'none';
+    renderCal();
+  }
+
+  function getHolidayData() {
+    const yomTovSet = new Set(getHolidays(isIsrael));
+    const cholHamoedDates: string[] = [];
+    const pesachStart = isIsrael ? 16 : 17;
+    for (let d = pesachStart; d <= 20; d++) cholHamoedDates.push(`${d} Nisan`);
+    const sukkotStart = isIsrael ? 16 : 17;
+    for (let d = sukkotStart; d <= 21; d++) cholHamoedDates.push(`${d} Tishri`);
+    return { yomTovSet, cholHamoedSet: new Set(cholHamoedDates) };
+  }
+
+  function renderCal() {
+    if (calMode === 'jewish') renderJewishCal();
+    else renderCivilCal();
+  }
+
+  function renderJewishCal() {
+    const monthSelect = document.getElementById('heb-cal-month') as HTMLSelectElement;
+    const yearSelect = document.getElementById('heb-cal-year') as HTMLSelectElement;
+    const grid = document.getElementById('heb-cal-grid')!;
+    const weekdaysEl = document.getElementById('heb-cal-weekdays')!;
+
+    const months = getJewishMonths(jewishState.year, true);
+    monthSelect.innerHTML = months.map(m =>
+      `<option value="${m.id}" ${m.id === jewishState.month ? 'selected' : ''}>${m.text}</option>`
+    ).join('');
+
+    const currentJewishYear = getJewishDate(new Date()).year;
+    const years = getJewishYears(jewishState.year).filter(y => y >= 5700 && y <= currentJewishYear + 2);
+    yearSelect.innerHTML = years.map(y =>
+      `<option value="${y}" ${y === jewishState.year ? 'selected' : ''}>${jewishYearToHebrew(y)}</option>`
+    ).join('');
+
+    const gregDate = getGregDate({ day: 1, monthName: JewishMonth[jewishState.month as keyof typeof JewishMonth], year: jewishState.year });
+    const calData = getJewishMonth(gregDate);
+    const weekdays = getHebWeekdays();
+    weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
+
+    const { yomTovSet, cholHamoedSet } = getHolidayData();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    grid.innerHTML = calData.days.map(day => {
+      const dateStr = day.dayjsDate.format('YYYY-MM-DD');
+      const hebStr = formatJewishDateInHebrew(day.jewishDate);
+      const dayNum = hebStr.split(' ')[0];
+      const classes = ['heb-cal-day'];
+      if (!day.isCurrentMonth) classes.push('other-month');
+      if (dateStr === todayStr) classes.push('today');
+      const jewishKey = `${day.jewishDate.day} ${day.jewishDate.monthName}`;
+      if (day.isCurrentMonth) {
+        if (yomTovSet.has(jewishKey)) classes.push('yom-tov');
+        else if (cholHamoedSet.has(jewishKey)) classes.push('chol-hamoed');
+        if (day.date.getDay() === 6) classes.push('shabat');
+      }
+      return `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" title="${hebStr}">${dayNum}</button>`;
+    }).join('');
+
+    civilState.year = gregDate.getFullYear();
+    civilState.month = gregDate.getMonth();
+  }
+
+  function renderCivilCal() {
+    const monthSelect = document.getElementById('civil-cal-month') as HTMLSelectElement;
+    const yearSelect = document.getElementById('civil-cal-year') as HTMLSelectElement;
+    const grid = document.getElementById('heb-cal-grid')!;
+    const weekdaysEl = document.getElementById('heb-cal-weekdays')!;
+
+    monthSelect.innerHTML = civilMonthsHe.map((name, i) =>
+      `<option value="${i}" ${i === civilState.month ? 'selected' : ''}>${name}</option>`
+    ).join('');
+
+    const currentCivilYear = new Date().getFullYear();
+    const yearOptions: number[] = [];
+    for (let y = 1940; y <= currentCivilYear + 2; y++) yearOptions.push(y);
+    yearSelect.innerHTML = yearOptions.map(y =>
+      `<option value="${y}" ${y === civilState.year ? 'selected' : ''}>${y}</option>`
+    ).join('');
+
+    const weekdays = getHebWeekdays();
+    weekdaysEl.innerHTML = weekdays.map(w => `<span class="heb-cal-wd">${w}</span>`).join('');
+
+    const firstOfMonth = new Date(civilState.year, civilState.month, 1);
+    const startDay = firstOfMonth.getDay();
+    const daysInMonth = new Date(civilState.year, civilState.month + 1, 0).getDate();
+    const prevMonthDays = new Date(civilState.year, civilState.month, 0).getDate();
+
+    const { yomTovSet, cholHamoedSet } = getHolidayData();
+    const todayStr = new Date().toISOString().split('T')[0];
+    let cells = '';
+
+    for (let i = startDay - 1; i >= 0; i--) {
+      const day = prevMonthDays - i;
+      const d = new Date(civilState.year, civilState.month - 1, day);
+      cells += `<button type="button" class="heb-cal-day other-month" data-date="${d.toISOString().split('T')[0]}">${day}</button>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(civilState.year, civilState.month, day);
+      const dateStr = `${civilState.year}-${String(civilState.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const jd = getJewishDate(d);
+      const jewishKey = `${jd.day} ${jd.monthName}`;
+      const hebStr = formatJewishDateInHebrew(jd);
+      const classes = ['heb-cal-day'];
+      if (dateStr === todayStr) classes.push('today');
+      if (yomTovSet.has(jewishKey)) classes.push('yom-tov');
+      else if (cholHamoedSet.has(jewishKey)) classes.push('chol-hamoed');
+      if (d.getDay() === 6) classes.push('shabat');
+      cells += `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}" title="${day} ${civilMonthsHe[civilState.month]} — ${hebStr}">${day}</button>`;
+    }
+
+    const totalCells = startDay + daysInMonth;
+    const remaining = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+    for (let day = 1; day <= remaining; day++) {
+      const d = new Date(civilState.year, civilState.month + 1, day);
+      cells += `<button type="button" class="heb-cal-day other-month" data-date="${d.toISOString().split('T')[0]}">${day}</button>`;
+    }
+    grid.innerHTML = cells;
+
+    const jdFirst = getJewishDate(firstOfMonth);
+    jewishState.year = jdFirst.year;
+    jewishState.month = jdFirst.monthName;
+  }
+
+  function openCal() {
+    const input = document.getElementById('date-input') as HTMLInputElement;
+    const targetDate = input.value ? new Date(input.value + 'T12:00:00') : new Date();
+    initCal(targetDate);
+    setCalTab('jewish');
+    document.getElementById('cal-overlay')!.style.display = '';
+  }
+
+  function closeCal() {
+    document.getElementById('cal-overlay')!.style.display = 'none';
+  }
+
+  function selectDate(dateStr: string) {
+    const input = document.getElementById('date-input') as HTMLInputElement;
+    input.value = dateStr;
+    updateDisplay(dateStr);
+    render(dateStr);
+    closeCal();
+  }
+
+  function updateDisplay(dateStr: string) {
+    const d = new Date(dateStr + 'T12:00:00');
+    const jd = getJewishDate(d);
+    const hebDate = formatJewishDateInHebrew(jd);
+    const hebDayNames = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'שבת'];
+    const dayName = hebDayNames[d.getDay()];
+    const display = document.getElementById('date-display')!;
+    const isToday = dateStr === toDateStr(new Date());
+    const prefix = isToday ? 'היום — ' : '';
+    display.textContent = `${prefix}${dayName}, ${hebDate}`;
+    display.classList.remove('placeholder');
+  }
+
+  // Event listeners
+  document.getElementById('open-cal-btn')?.addEventListener('click', openCal);
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('heb-cal-day') && !target.classList.contains('other-month')) {
+      selectDate(target.dataset.date!);
+      return;
+    }
+    if (target.id === 'cal-overlay') { closeCal(); }
+  });
+
+  document.getElementById('tab-jewish')?.addEventListener('click', () => setCalTab('jewish'));
+  document.getElementById('tab-civil')?.addEventListener('click', () => setCalTab('civil'));
+
+  document.getElementById('heb-cal-prev')?.addEventListener('click', () => {
+    if (calMode === 'jewish') {
+      const prev = getPrevMonth({ year: jewishState.year, month: JewishMonth[jewishState.month as keyof typeof JewishMonth], isHebrew: true });
+      jewishState.year = prev.year;
+      jewishState.month = JewishMonth[prev.month as keyof typeof JewishMonth] || prev.month;
+      if (typeof prev.month === 'number') jewishState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === prev.month) || jewishState.month;
+    } else {
+      civilState.month--;
+      if (civilState.month < 0) { civilState.month = 11; civilState.year--; }
+    }
+    renderCal();
+  });
+
+  document.getElementById('heb-cal-next')?.addEventListener('click', () => {
+    if (calMode === 'jewish') {
+      const next = getNextMonth({ year: jewishState.year, month: JewishMonth[jewishState.month as keyof typeof JewishMonth], isHebrew: true });
+      jewishState.year = next.year;
+      jewishState.month = JewishMonth[next.month as keyof typeof JewishMonth] || next.month;
+      if (typeof next.month === 'number') jewishState.month = Object.keys(JewishMonth).find(k => JewishMonth[k as keyof typeof JewishMonth] === next.month) || jewishState.month;
+    } else {
+      civilState.month++;
+      if (civilState.month > 11) { civilState.month = 0; civilState.year++; }
+    }
+    renderCal();
+  });
+
+  document.getElementById('heb-cal-month')?.addEventListener('change', (e) => { jewishState.month = (e.target as HTMLSelectElement).value; renderCal(); });
+  document.getElementById('heb-cal-year')?.addEventListener('change', (e) => { jewishState.year = parseInt((e.target as HTMLSelectElement).value); renderCal(); });
+  document.getElementById('civil-cal-month')?.addEventListener('change', (e) => { civilState.month = parseInt((e.target as HTMLSelectElement).value); renderCal(); });
+  document.getElementById('civil-cal-year')?.addEventListener('change', (e) => { civilState.year = parseInt((e.target as HTMLSelectElement).value); renderCal(); });
+  document.getElementById('heb-cal-today')?.addEventListener('click', () => selectDate(toDateStr(new Date())));
+  document.getElementById('heb-cal-close')?.addEventListener('click', closeCal);
+
+  // =====================
+  // Kever status checker
+  // =====================
+  type Status = 'forbidden' | 'avoid' | 'disputed' | 'permitted';
+
+  interface KeverResult {
+    status: Status;
+    title: string;
+    details: string[];
+    source: string;
+  }
+
+  function checkDate(dateStr: string): KeverResult {
+    const d = new Date(dateStr + 'T12:00:00');
+    const dow = d.getDay();
+    const jd = toJewishDate(d);
+    const m = jd.monthName;
+    const day = jd.day;
+
+    if (dow === 6) {
+      return { status: 'forbidden', title: 'אסור — שבת', details: ['אין עולים לבית הקברות בשבת.', 'יש לעלות לפני שבת או אחריה.'], source: 'שו״ע יו״ד שמד:כ' };
+    }
+
+    const ytDays: [string, number[], string][] = isIsrael ? [
+      [JewishMonth.Nisan, [15], 'פסח'],
+      [JewishMonth.Nisan, [21], 'שביעי / אחרון של פסח'],
+      [JewishMonth.Sivan, [6], 'שבועות'],
+      [JewishMonth.Tishrei, [1, 2], 'ראש השנה'],
+      [JewishMonth.Tishrei, [10], 'יום כיפור'],
+      [JewishMonth.Tishrei, [15], 'סוכות'],
+      [JewishMonth.Tishrei, [22], 'שמיני עצרת'],
+    ] : [
+      [JewishMonth.Nisan, [15, 16], 'פסח'],
+      [JewishMonth.Nisan, [21, 22], 'שביעי / אחרון של פסח'],
+      [JewishMonth.Sivan, [6, 7], 'שבועות'],
+      [JewishMonth.Tishrei, [1, 2], 'ראש השנה'],
+      [JewishMonth.Tishrei, [10], 'יום כיפור'],
+      [JewishMonth.Tishrei, [15, 16], 'סוכות'],
+      [JewishMonth.Tishrei, [22, 23], 'שמיני עצרת / שמחת תורה'],
+    ];
+    for (const [month, days, name] of ytDays) {
+      if (m === month && days.includes(day)) {
+        return { status: 'forbidden', title: `אסור — ${name}`, details: ['אין עולים לבית הקברות ביום טוב.', 'יש לעלות לפני החג או אחריו.'], source: 'שו״ע יו״ד שמד:כ' };
+      }
+    }
+
+    const pesachCHMStart = isIsrael ? 16 : 17;
+    if (m === JewishMonth.Nisan && day >= pesachCHMStart && day <= 20) {
+      return { status: 'avoid', title: 'לא ראוי — חול המועד פסח', details: ['לקברי קרובים: לא ראוי לעלות — מגיעים לידי צער ובכי. יש לעלות לפני או אחרי החג.', 'לקברי צדיקים: מותר.'], source: 'קיצור ש״ע ילקוט יוסף סי׳ מג:ה' };
+    }
+
+    const sukkotCHMStart = isIsrael ? 16 : 17;
+    if (m === JewishMonth.Tishrei && day >= sukkotCHMStart && day <= 21) {
+      return { status: 'avoid', title: 'לא ראוי — חול המועד סוכות', details: ['לקברי קרובים: לא ראוי לעלות — מגיעים לידי צער ובכי. יש לעלות לפני או אחרי החג.', 'לקברי צדיקים: מותר.'], source: 'קיצור ש״ע ילקוט יוסף סי׳ מג:ה' };
+    }
+
+    const purimMonths = [JewishMonth.Adar, JewishMonth.AdarII];
+    if (purimMonths.includes(m as any) && day === 14) {
+      return { status: 'avoid', title: 'אין עולים — פורים', details: ['אין עולים לבית הקברות בפורים.', 'יש לעלות בערב פורים (י״ג אדר).'], source: 'גשר החיים א עמ׳ רנט; מ״א תרצו:ה' };
+    }
+
+    if (purimMonths.includes(m as any) && day === 15) {
+      return { status: 'avoid', title: 'אין עולים — שושן פורים', details: ['בערים המוקפות חומה אין עולים לבית הקברות בשושן פורים.', 'בשאר מקומות — מותר.'], source: 'גשר החיים א עמ׳ רנט' };
+    }
+
+    const isChanukah = (m === JewishMonth.Kislev && day >= 25) || (m === JewishMonth.Teves && day <= 3);
+    if (isChanukah) {
+      return { status: 'disputed', title: 'חנוכה — שתי דעות', details: ['יש הנמנעים מלעלות לקבר בחנוכה.', 'מנהג מקילים: מותר.', 'אם אפשר — עדיף לעלות בערב חנוכה.'], source: 'בן איש חי וישב כב; כף החיים תר״ע:כג' };
+    }
+
+    if (day === 1 || day === 30) {
+      return { status: 'disputed', title: 'ראש חודש — שתי דעות', details: ['יש הנמנעים מלעלות לקבר בראש חודש.', 'יש המתירים.'], source: 'קיצור ש״ע ילקוט יוסף סי׳ מג:ו' };
+    }
+
+    if (m === JewishMonth.Nisan) {
+      return { status: 'disputed', title: 'חודש ניסן — שתי דעות', details: ['יש הנמנעים מלעלות לקבר כל חודש ניסן (שאין אומרים תחנון).', 'אחרים מתירים, שהרי מותר להתענות תענית יארצייט בניסן.'], source: 'נטעי גבריאל פסח ג:ח, אבלות עו:יז; קיצור ש״ע ילקוט יוסף סי׳ מג:ג' };
+    }
+
+    if (m === JewishMonth.Elul && day === 29) {
+      return { status: 'permitted', title: 'מותר — ערב ראש השנה', details: ['נוהגים לעלות לקברי קרובים וצדיקים בערב ראש השנה.'], source: 'מחבר או״ח תקפא:ד; רמ״א שם' };
+    }
+
+    if (m === JewishMonth.Av && day === 9) {
+      return { status: 'permitted', title: 'מותר — תשעה באב', details: ['יש הנוהגים לעלות לבית הקברות בתשעה באב אחרי חצות היום.'], source: 'רמ״א או״ח תקנט:י' };
+    }
+
+    return { status: 'permitted', title: 'מותר', details: ['אין מניעה הלכתית לעלות לבית הקברות היום.'], source: '' };
+  }
+
+  function render(dateStr: string) {
+    const result = checkDate(dateStr);
+    const statusEl = document.getElementById('kever-status')!;
+    const statusClass = { forbidden: 'status-forbidden', avoid: 'status-avoid', disputed: 'status-disputed', permitted: 'status-permitted' }[result.status];
+    statusEl.innerHTML = `
+      <div class="kever-status-box ${statusClass}">
+        <div class="kever-status-title">${result.title}</div>
+        ${result.details.map(d => `<p>${d}</p>`).join('')}
+        ${result.source ? `<p class="source">${result.source}</p>` : ''}
+      </div>
+    `;
+  }
+
+  // Init with today
+  const today = toDateStr(new Date());
+  (document.getElementById('date-input') as HTMLInputElement).value = today;
+  updateDisplay(today);
+  render(today);
+</script>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+    position: relative;
+  }
+
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .rule-section {
+    margin-bottom: 2rem;
+  }
+
+  .rule-section h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.4rem;
+    color: #4a3c2c;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #e0d8c8;
+  }
+
+  .rule-card {
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rule-card h3 {
+    font-family: 'Heebo', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #6d5a43;
+    margin-bottom: 0.5rem;
+  }
+
+  .rule-card ul {
+    padding-inline-start: 1.25rem;
+    margin: 0;
+  }
+  .rule-card li {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: #3c3c3c;
+  }
+  .rule-card li strong {
+    color: #4a3c2c;
+  }
+
+  .rule-card p {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    margin-bottom: 0.4rem;
+  }
+
+  .rule-note {
+    font-size: 0.82rem !important;
+    color: #999 !important;
+    margin-top: 0.5rem !important;
+    font-style: italic;
+  }
+
+  .source {
+    font-size: 0.8em;
+    color: #999;
+  }
+
+  .disclaimer-card {
+    background: #fef9ee;
+    border-color: #e6c547;
+  }
+  .disclaimer-card h3 {
+    color: #8a6d00;
+  }
+
+  .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.88rem;
+  }
+  .rules-table th,
+  .rules-table td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e0d8c8;
+    text-align: start;
+  }
+  .rules-table th {
+    background: #f0ebe0;
+    font-weight: 700;
+    color: #6d5a43;
+  }
+  .rules-table td {
+    background: #fff;
+  }
+
+  .sources {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f0ebe0;
+    border-radius: 8px;
+  }
+  .sources h3 {
+    font-size: 0.9rem;
+    color: #6d5a43;
+    margin-bottom: 0.3rem;
+  }
+  .sources p {
+    font-size: 0.82rem;
+    color: #666;
+  }
+
+  /* Israel/Diaspora toggle */
+  .location-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: #f0ebe0;
+    border: 1px solid #e0d8c8;
+    border-radius: 8px;
+  }
+  .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 2px solid #d4c5a9;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .toggle-btn {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    padding: 0.45rem 1.2rem;
+    background: #fff;
+    color: #6d5a43;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toggle-btn + .toggle-btn { border-inline-start: 1px solid #d4c5a9; }
+  .toggle-btn.active { background: #8b7355; color: #fff; font-weight: 700; }
+  .toggle-btn:hover:not(.active) { background: #f0ebe0; }
+
+  /* Date picker trigger */
+  .date-picker-trigger {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 8px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.95rem;
+    color: #4a3c2c;
+    cursor: pointer;
+    text-align: start;
+    transition: border-color 0.15s;
+    margin-bottom: 0.75rem;
+  }
+  .date-picker-trigger:hover { border-color: #8b7355; }
+  .date-picker-display.placeholder { color: #999; }
+
+  /* Calendar tabs */
+  .cal-tabs {
+    display: flex;
+    border-bottom: 2px solid #e0d8c8;
+    margin-bottom: 0.75rem;
+  }
+  .cal-tab {
+    flex: 1;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: -2px;
+  }
+  .cal-tab.active { color: #8b7355; border-bottom-color: #8b7355; }
+  .cal-tab:hover:not(.active) { color: #6d5a43; }
+
+  /* Calendar overlay */
+  .heb-cal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .heb-cal-modal {
+    background: #faf9f6;
+    border: 1px solid #d4c5a9;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 320px;
+    max-width: 95vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .heb-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+  .heb-cal-nav {
+    background: none;
+    border: 1px solid #d4c5a9;
+    border-radius: 6px;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    color: #6d5a43;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .heb-cal-nav:hover { background: #e8e0d0; border-color: #8b7355; }
+  .heb-cal-selects { display: flex; gap: 0.4rem; flex: 1; justify-content: center; }
+  .heb-cal-selects select {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid #d4c5a9;
+    border-radius: 6px;
+    background: #fff;
+    color: #4a3c2c;
+    cursor: pointer;
+  }
+  .heb-cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 0.25rem; }
+  .heb-cal-wd { font-size: 0.78rem; font-weight: 700; color: #8b7355; padding: 0.2rem 0; }
+  .heb-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .heb-cal-day {
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.35rem 0;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.82rem;
+    color: #2c2c2c;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .heb-cal-day:hover { background: #e8e0d0; border-color: #8b7355; }
+  .heb-cal-day.today { border: 2px solid #8b7355; }
+  .heb-cal-day.other-month { color: #ccc; cursor: default; }
+  .heb-cal-day.other-month:hover { background: #fff; border-color: transparent; }
+  .heb-cal-day.yom-tov { background: #fde8e8; color: #b33; font-weight: 700; }
+  .heb-cal-day.yom-tov:hover { background: #f8cccc; border-color: #b33; }
+  .heb-cal-day.chol-hamoed { background: #fef3e0; color: #a67c00; }
+  .heb-cal-day.chol-hamoed:hover { background: #fce4b8; border-color: #a67c00; }
+  .heb-cal-day.shabat { background: #eef3f9; color: #3a5a7c; }
+  .heb-cal-day.shabat:hover { background: #d8e6f3; border-color: #3a5a7c; }
+  .heb-cal-day.yom-tov.shabat { background: #fde8e8; color: #b33; }
+  .heb-cal-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e0d8c8;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; color: #888; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .yom-tov-dot { background: #fde8e8; border: 1px solid #b33; }
+  .chol-hamoed-dot { background: #fef3e0; border: 1px solid #a67c00; }
+  .shabat-dot { background: #eef3f9; border: 1px solid #3a5a7c; }
+  .heb-cal-footer { display: flex; justify-content: space-between; margin-top: 0.75rem; gap: 0.5rem; }
+  .heb-cal-today-btn, .heb-cal-close-btn {
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid #d4c5a9;
+  }
+  .heb-cal-today-btn { background: #8b7355; color: #fff; border-color: #8b7355; }
+  .heb-cal-today-btn:hover { background: #6d5a43; }
+  .heb-cal-close-btn { background: #e8e0d0; color: #6d5a43; }
+  .heb-cal-close-btn:hover { background: #d4c5a9; }
+  .kever-status-box {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .kever-status-box p {
+    font-size: 0.88rem;
+    color: #3c3c3c;
+    margin-bottom: 0.3rem;
+  }
+  .kever-status-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .status-forbidden {
+    background: #fef0f0;
+    border: 1px solid #e8a0a0;
+  }
+  .status-forbidden .kever-status-title { color: #a33; }
+  .status-avoid {
+    background: #fef5ee;
+    border: 1px solid #e6c090;
+  }
+  .status-avoid .kever-status-title { color: #a06020; }
+  .status-disputed {
+    background: #fef9ee;
+    border: 1px solid #e6c547;
+  }
+  .status-disputed .kever-status-title { color: #8a6d00; }
+  .status-permitted {
+    background: #f0f8f0;
+    border: 1px solid #a0c8a0;
+  }
+  .status-permitted .kever-status-title { color: #2a7a2a; }
+
+  @media (max-width: 500px) {
+    .container { padding: 1.5rem 1rem 2rem; }
+    h1 { font-size: 1.6rem; }
+    .rules-table { font-size: 0.8rem; }
+    .rules-table th, .rules-table td { padding: 0.3rem 0.4rem; }
+  }
+</style>
+</body>
+</html>
