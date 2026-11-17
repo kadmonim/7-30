@@ -1,0 +1,252 @@
+---
+// Prayer customs for the shiva house, the year of mourning and the yahrzeit, by custom,
+// plus the text of Kaddish Yatom and Kaddish DeRabbanan with an adjustable font size.
+// Content lives in src/data/tefila.ts and src/data/kaddish.ts.
+import HamburgerMenu from '../components/HamburgerMenu.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
+import { sections, nusachLabels, nusachSources } from '../data/tefila';
+import { kaddish, type Nusach } from '../data/kaddish';
+
+const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
+const kindLabel = { add: 'מוסיפים', skip: 'מדלגים', note: 'שימו לב' } as const;
+
+// {X} = congregation response, ((X)) = variant or instruction. Texts are our own static data.
+const renderLine = (t: string) =>
+  t
+    .replace(/\(\((.+?)\)\)/g, '<span class="k-var">($1)</span>')
+    .replace(/\{(.+?)\}/g, '<span class="k-resp">$1</span>');
+---
+
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>סדר התפילה וקדיש — יתגדל</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+  <script is:inline>
+    // Apply the remembered custom before paint, so the page doesn't flash the default.
+    try {
+      var n = localStorage.getItem('yisgadal-nusach');
+      if (n === 'chabad' || n === 'sefardi' || n === 'ashkenaz') document.documentElement.dataset.nusach = n;
+    } catch (e) {}
+    if (!document.documentElement.dataset.nusach) document.documentElement.dataset.nusach = 'chabad';
+  </script>
+</head>
+<body>
+
+<div class="container">
+  <span class="bsd">בס״ד</span>
+  <HamburgerMenu currentPage="/tefila" />
+  <ReviewBanner />
+
+  <h1>סדר התפילה וקדיש</h1>
+  <p class="subtitle">למי שעובר לפני התיבה בבית האבל, במשך השנה וביום היארצייט: מה מוסיפים, מה מדלגים ומתי. לא כל נוסח התפילה — רק השינויים.</p>
+
+  <div class="nusach-bar" role="tablist" aria-label="מנהג">
+    <span class="nusach-label">מנהג:</span>
+    {nusachim.map((n) => (
+      <button type="button" class="nusach-btn" data-set-nusach={n} role="tab">{nusachLabels[n]}</button>
+    ))}
+  </div>
+  {nusachim.map((n) => (
+    <p class="nusach-source" data-nusach-only={n}>{nusachSources[n]}</p>
+  ))}
+
+  <nav class="toc">
+    {sections.map((s) => <a href={`#${s.id}`}>{s.title}</a>)}
+    <a href="#kaddish">נוסח הקדיש</a>
+  </nav>
+
+  {sections.map((s) => (
+    <section class="rule-section" id={s.id}>
+      <h2>{s.title}</h2>
+      {nusachim.map((n) => (
+        <div class="rule-card" data-nusach-only={n}>
+          {s.items[n].length === 0 ? (
+            <p class="empty">עדיין לא נבדק למנהג זה.</p>
+          ) : (
+            <ul class="items">
+              {s.items[n].map((it) => (
+                <li class={`item item-${it.kind}`}>
+                  <span class={`tag tag-${it.kind}`}>{kindLabel[it.kind]}</span>
+                  <span class="item-text">{it.text} <span class="source">({it.src})</span></span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </section>
+  ))}
+
+  <section class="rule-section" id="kaddish">
+    <h2>נוסח הקדיש</h2>
+    <div class="size-bar">
+      <span>גודל הגופן:</span>
+      <button type="button" id="k-smaller" aria-label="הקטנת הגופן">א−</button>
+      <button type="button" id="k-reset" aria-label="גודל רגיל">א</button>
+      <button type="button" id="k-bigger" aria-label="הגדלת הגופן">א+</button>
+    </div>
+    <p class="k-legend"><span class="k-resp">אמן</span> — תשובת הקהל. <span class="k-all-sample">שורה מודגשת ברקע</span> — אומרים כולם.</p>
+
+    <div class="kaddish-wrap" id="kaddish-wrap">
+      {nusachim.map((n) => (
+        <div data-nusach-only={n}>
+          {([['yatom', 'קדיש יתום'], ['derabbanan', n === 'sefardi' ? 'קדיש על ישראל (דרבנן)' : 'קדיש דרבנן']] as const).map(([key, title]) => (
+            <div class="k-card">
+              <h3>{title}</h3>
+              <div class="k-text">
+                {kaddish[n][key].map((line) => (
+                  <p class={line.all ? 'k-line k-all' : 'k-line'} set:html={renderLine(line.t)} />
+                ))}
+              </div>
+            </div>
+          ))}
+          <p class="k-source">נוסח: {kaddish[n].source}</p>
+          {kaddish[n].notes?.map((note) => <p class="k-note">{note}</p>)}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <div class="sources">
+    <h3>על הדף</h3>
+    <p>כל שורה מציינת את מקורה. מנהגי חב״ד לפי ״המדריך״; מנהגי הספרדים לפי קיצור ילקוט יוסף. מה שלא נבדק מסומן כך, והשאלות הפתוחות רשומות ב<a href="/questions">שאלות פתוחות</a>. אין לסמוך על הדף למעשה בלי לשאול רב.</p>
+  </div>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const valid = ['chabad', 'sefardi', 'ashkenaz'];
+
+  function setNusach(n: string) {
+    if (!valid.includes(n)) return;
+    root.dataset.nusach = n;
+    try { localStorage.setItem('yisgadal-nusach', n); } catch {}
+    document.querySelectorAll<HTMLButtonElement>('[data-set-nusach]').forEach((b) => {
+      const on = b.dataset.setNusach === n;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-set-nusach]').forEach((b) =>
+    b.addEventListener('click', () => setNusach(b.dataset.setNusach!)),
+  );
+  setNusach(root.dataset.nusach || 'chabad');
+
+  // Kaddish font size, remembered per browser.
+  const wrap = document.getElementById('kaddish-wrap')!;
+  const DEFAULT = 1.35, MIN = 1, MAX = 3, STEP = 0.15;
+  let size = DEFAULT;
+  try {
+    const saved = parseFloat(localStorage.getItem('yisgadal-kaddish-size') || '');
+    if (saved >= MIN && saved <= MAX) size = saved;
+  } catch {}
+  function applySize(s: number) {
+    size = Math.min(MAX, Math.max(MIN, Math.round(s * 100) / 100));
+    wrap.style.setProperty('--k-size', `${size}rem`);
+    try { localStorage.setItem('yisgadal-kaddish-size', String(size)); } catch {}
+  }
+  applySize(size);
+  document.getElementById('k-bigger')!.addEventListener('click', () => applySize(size + STEP));
+  document.getElementById('k-smaller')!.addEventListener('click', () => applySize(size - STEP));
+  document.getElementById('k-reset')!.addEventListener('click', () => applySize(DEFAULT));
+</script>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 3rem; position: relative; }
+  .bsd {
+    display: block; text-align: center; font-family: 'Frank Ruhl Libre', serif;
+    font-size: 0.75rem; color: #c4b89a; user-select: none; margin-bottom: -0.5rem;
+  }
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif; font-size: 2rem; font-weight: 700;
+    color: #4a3c2c; text-align: center; margin-top: 2rem; margin-bottom: 0.3rem;
+  }
+  .subtitle { text-align: center; color: #888; font-size: 0.95rem; margin-bottom: 1.25rem; }
+
+  /* Show only the chosen custom's content. */
+  html[data-nusach="chabad"] [data-nusach-only]:not([data-nusach-only="chabad"]),
+  html[data-nusach="sefardi"] [data-nusach-only]:not([data-nusach-only="sefardi"]),
+  html[data-nusach="ashkenaz"] [data-nusach-only]:not([data-nusach-only="ashkenaz"]) { display: none; }
+
+  .nusach-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.4rem;
+    background: #f0ebe1; border: 1px solid #e0d8c8; border-radius: 10px; padding: 0.6rem;
+  }
+  .nusach-label { font-weight: 700; color: #6d5a43; margin-inline-end: 0.3rem; }
+  .nusach-btn {
+    font: inherit; font-weight: 700; cursor: pointer; padding: 0.35rem 1rem;
+    border: 1px solid #d4c5a9; border-radius: 8px; background: #fff; color: #6d5a43;
+  }
+  .nusach-btn.active { background: #8b7355; border-color: #8b7355; color: #fff; }
+  .nusach-source { text-align: center; font-size: 0.82rem; color: #999; margin: 0.4rem 0 1rem; }
+
+  .toc { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; justify-content: center; margin-bottom: 1.5rem; }
+  .toc a { font-size: 0.85rem; color: #8b7355; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .rule-section { margin-bottom: 2rem; scroll-margin-top: 1rem; }
+  .rule-section h2 {
+    font-family: 'Frank Ruhl Libre', serif; font-size: 1.35rem; color: #4a3c2c;
+    margin-bottom: 0.6rem; padding-bottom: 0.3rem; border-bottom: 2px solid #e0d8c8;
+  }
+  .rule-card { background: #fff; border: 1px solid #e0d8c8; border-radius: 10px; padding: 0.9rem 1.1rem; }
+  .items { list-style: none; }
+  .item { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.45rem 0; border-bottom: 1px solid #f1ebe0; font-size: 0.92rem; }
+  .item:last-child { border-bottom: 0; }
+  .tag {
+    flex: none; font-size: 0.72rem; font-weight: 700; padding: 0.05rem 0.5rem; border-radius: 999px;
+    margin-top: 0.2rem; white-space: nowrap;
+  }
+  .tag-add { background: #e6f2e6; color: #2f6b2f; }
+  .tag-skip { background: #f8e3e0; color: #9b3b2f; }
+  .tag-note { background: #efe9dd; color: #6d5a43; }
+  .source { font-size: 0.8em; color: #999; }
+  .empty { font-size: 0.9rem; color: #999; }
+
+  .size-bar { display: flex; align-items: center; gap: 0.4rem; justify-content: center; margin-bottom: 0.5rem; font-size: 0.9rem; color: #6d5a43; }
+  .size-bar button {
+    font: inherit; font-weight: 700; min-width: 2.6rem; padding: 0.3rem 0.6rem; cursor: pointer;
+    border: 1px solid #d4c5a9; border-radius: 8px; background: #fff; color: #6d5a43;
+  }
+  .size-bar button:hover { background: #f5efe4; }
+  .k-legend { text-align: center; font-size: 0.8rem; color: #999; margin-bottom: 0.9rem; }
+
+  .kaddish-wrap { --k-size: 1.35rem; }
+  .k-card { background: #fff; border: 1px solid #e0d8c8; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.9rem; }
+  .k-card h3 { font-family: 'Frank Ruhl Libre', serif; font-size: 1.15rem; color: #6d5a43; margin-bottom: 0.5rem; }
+  .k-text { font-family: 'Frank Ruhl Libre', serif; font-size: var(--k-size); line-height: 1.9; color: #222; }
+  .k-line { margin-bottom: 0.35em; }
+  .k-all, .k-all-sample { background: #faf3e2; border-radius: 6px; padding: 0 0.3em; }
+  .k-resp {
+    font-family: 'Heebo', sans-serif; font-size: 0.62em; font-weight: 700; color: #8b7355;
+    border: 1px solid #e0d8c8; border-radius: 999px; padding: 0 0.45em; margin-inline-start: 0.25em; white-space: nowrap;
+  }
+  .k-legend .k-resp { font-size: 0.9em; }
+  .k-var { font-family: 'Heebo', sans-serif; font-size: 0.62em; color: #8b7355; }
+  .k-source { font-size: 0.8rem; color: #999; margin: -0.3rem 0 0.4rem; }
+  .k-note { font-size: 0.85rem; color: #555; background: #faf6ec; border-radius: 8px; padding: 0.5rem 0.8rem; margin-bottom: 0.5rem; }
+
+  .sources { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e0d8c8; }
+  .sources h3 { font-size: 0.95rem; color: #6d5a43; margin-bottom: 0.3rem; }
+  .sources p { font-size: 0.85rem; color: #777; }
+  .sources a { color: #8b7355; }
+
+  @media (max-width: 520px) {
+    .container { padding: 1.25rem 1rem 2.5rem; }
+    h1 { font-size: 1.6rem; }
+    .rule-card, .k-card { padding: 0.8rem 0.85rem; }
+  }
+</style>
