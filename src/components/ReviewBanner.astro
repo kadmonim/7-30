@@ -1,0 +1,32 @@
+---
+// Shown on every page until the site is launched: the content is still being reviewed
+// by rabbanim. Remove the <ReviewBanner /> lines from the pages when that is done.
+---
+
+<p class="review-banner" role="note">
+  <span class="rb-he">האתר עדיין בבדיקה של רבנים ואינו סופי. אין לסמוך עליו למעשה בלי לשאול רב. <a href="/questions">שאלות פתוחות</a></span>
+  <span class="rb-en">This site is still under rabbinic review and is not final. Do not rely on it in practice without asking a rav. <a href="/questions">Open questions</a></span>
+</p>
+
+<style is:global>
+  .review-banner {
+    margin: 2.75rem auto 0;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+    color: #7a5600;
+    background: #fbf1d8;
+    border: 1px solid #ecd9a4;
+    border-radius: 8px;
+  }
+  .review-banner a {
+    color: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .review-banner + h1 { margin-top: 1.25rem; }
+  /* The page sets <html lang>; show the matching sentence only. */
+  html[lang="he"] .review-banner .rb-en { display: none; }
+  html:not([lang="he"]) .review-banner .rb-he { display: none; }
+</style>

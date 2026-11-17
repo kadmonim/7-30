@@ -1,0 +1,728 @@
+---
+// Changelog: every halachic change to the calculator, what exactly was modified,
+// and how far it has been verified against each custom. Newest entry first.
+import HamburgerMenu from '../components/HamburgerMenu.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
+---
+
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>יומן שינויים — מתי קמים?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container">
+  <span class="bsd">בס״ד</span>
+  <HamburgerMenu currentPage="/changelog" />
+  <ReviewBanner />
+
+  <h1>יומן שינויים</h1>
+  <p class="subtitle">כל שינוי הלכתי במחשבון: מה בדיוק השתנה, מה המקור, ועד כמה הוא נבדק לפי כל מנהג</p>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>יארצייט בחודש ניסן — הודעה על עלייה לקבר</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תוספת למחשבון</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>עכשיו:</strong> כשהיארצייט חל בחודש ניסן, מופיעה בתוצאות המחשבון, מתחת לתאריכי היארצייט, הודעה על המנהגים בעלייה לקבר בניסן, עם קישור לדף ״מתי עולים״.</li>
+        <li><strong>קודם:</strong> המידע הופיע רק בדף ״מתי עולים״.</li>
+        <li><strong>מה לא השתנה:</strong> התאריכים, והנוסח שבדף ״מתי עולים״.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>למה</h3>
+      <ul>
+        <li>הערת רב: מי שנוהג שלא לעלות לקבר בניסן צריך לדעת מראש שעליו לעלות בערב ראש חודש, ולא לגלות זאת ביום היארצייט.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>בדיקה לפי מנהגים</h3>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>מנהג</th><th>הדין</th><th>מקור</th><th>נבדק?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>הנמנעים</td>
+              <td>אין עולים כל חודש ניסן; עולים בערב ראש חודש ניסן.</td>
+              <td>נטעי גבריאל פסח ג:ח, אבלות עו:יז</td>
+              <td class="partial">הועתק מדף ״מתי עולים״; לא נבדק בספר</td>
+            </tr>
+            <tr>
+              <td>ספרדים</td>
+              <td>״אם חל יום השנה בחודש ניסן, מותר לילך לבית הקברות, אם נזהרים שלא להספיד את המת, ושלא לבוא לידי בכי״</td>
+              <td>קיצור ילקוט יוסף סי׳ מ:כז</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+            <tr>
+              <td>חב״ד</td>
+              <td>״אם מוכרחים ללכת בחודש ניסן, מותר אם אין אומרים השכבות והספדים״</td>
+              <td>המדריך ח״ח פ״ב ס״א</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li>ההודעה מופיעה ליארצייט בלבד. עלייה לקבר ביום השבעה או ביום השלושים שחלים בניסן, ושאר הימים שאין עולים בהם (ראש חודש, חנוכה, פורים, חול המועד) — מופיעים עדיין רק בדף ״מתי עולים״.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>פטירה בבין השמשות — תאריך נוסף גם ליארצייט הראשון</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון במחשבון</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם:</strong> כשסומן ״הפטירה היתה בבין השמשות״, המחשבון הציג תאריך נוסף (היום המאוחר) ליארצייט השני ואילך בלבד.</li>
+        <li><strong>עכשיו:</strong> התאריך הנוסף מוצג גם ליארצייט הראשון, שהרי הספק אחד הוא.</li>
+        <li><strong>יוצא מן הכלל:</strong> כשהיום המאוחר הוא תאריך שכבר מוצג ליארצייט הראשון (למשל כשהקבורה היתה למחרת, והוא התאריך ״לפי תאריך הקבורה״), לא נוספת שורה כפולה.</li>
+        <li><strong>מה לא השתנה:</strong> שאר התאריכים.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>מקור ובדיקה</h3>
+      <ul>
+        <li>הערת רב.</li>
+        <li>״אם אין ידוע אם יום הפטירה הי׳ ביום א׳ או למחרתו, או שנפטר בין השמשות… יתפלל ויאמר קדיש בב׳ הימים. אם יש אבלים אחרים… יחזיק את היארצייט ביום המוקדם״ <span class="source">(המדריך ח״ז פ״א ס״ד)</span>. הספר אינו מחלק בין שנה ראשונה לשאר השנים. נבדק בלשון הספר.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>ערב פסח — תיקון המקורות והפרדה לפי מנהגים</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-pending">ממתין לאישור רב</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם:</strong> המחשבון ודף הכללים כתבו לכל אבל ״השבעה/השלושים מסתיימים בחצות היום של ערב פסח״, וציינו ״מחבר או״ח תקמ״ח:יב, יו״ד שצ״ט:ז״.</li>
+        <li><strong>הציון היה שגוי.</strong> שני הסעיפים האלה עוסקים במנין ט״ו הימים של פסח לשלושים, ואין בהם דין חצות.</li>
+        <li><strong>עכשיו, שבעה:</strong> מנהג חב״ד — האבלות נפסקת בחצות היום. מנהג הספרדים — סמוך לכניסת החג.</li>
+        <li><strong>עכשיו, שלושים:</strong> מנהג אשכנז וחב״ד — מותר בכל אחר חצות, ומסתפרים קודם חצות. מנהג הספרדים — מותר בערב החג.</li>
+        <li><strong>קבורה לפני ערב פסח:</strong> ההערה ״קבורה לפני חצות… קבורה אחרי חצות…״ הופיעה גם כשהקבורה היתה בי״ג ניסן או קודם, אף שאז היא בוודאי לפני חצות. עכשיו ההבחנה מופיעה רק כשהקבורה היתה בערב פסח עצמו (הערת רב).</li>
+        <li><strong>מה לא השתנה:</strong> התאריכים. ערב פסח נשאר היום האחרון בשני המקרים; השינוי הוא בשעה שביום, ובמקורות.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>בדיקה לפי מנהגים</h3>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>מנהג</th><th>הדין</th><th>מקור</th><th>נבדק?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>חב״ד — שבעה</td>
+              <td>״אין אבלות נוהגת אחר חצות מזמן שחיטת הפסח ולמעלה״</td>
+              <td>המדריך ח״ד פי״ד ס״ה (דרכי חסד ריז)</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+            <tr>
+              <td>אשכנז וחב״ד — שלושים</td>
+              <td>״ובערב פסח מותר בכל אחר חצות… ועדיף שיגלח קודם חצות״</td>
+              <td>רמ״א יו״ד שצ״ט:ג; המדריך ח״ה פ״ט ס״ד</td>
+              <td class="ok">נבדק בלשון המקורות</td>
+            </tr>
+            <tr>
+              <td>ספרדים — שבעה</td>
+              <td>״אף שהרגל מבטל ממנו גזרת שבעה, כל זה הוא דוקא משיגיע סמוך לחשכה ממש״. זהו דין כללי לכל ערב חג; דין מיוחד לערב פסח לא נמצא בספר.</td>
+              <td>קיצור ילקוט יוסף סי׳ מב:ב</td>
+              <td class="partial">נבדק; הדין הכללי בלבד</td>
+            </tr>
+            <tr>
+              <td>ספרדים — שלושים</td>
+              <td>״ומותר לכבס ולהתרחץ ולהסתפר בערב הרגל״, בלי הגבלת שעה</td>
+              <td>שו״ע יו״ד שצ״ט:ג; קיצור ילקוט יוסף סי׳ מב:כו</td>
+              <td class="ok">נבדק בלשון המקורות</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>קבורה לפני חצות או אחריו.</strong> המחשבון מבחין: קבורה לפני חצות — השבעה מסתיימת בחצות; אחרי חצות — בכניסת החג. ההבחנה הזאת אינה כתובה ב״המדריך״; היא נשארה מהנוסח הקודם.</li>
+        <li><strong>אשכנז — שבעה.</strong> יש פוסקים שהאבלות נמשכת עד הלילה גם בערב פסח, ושדברי הרמ״א נאמרו על השלושים בלבד. לא נבדק במקור.</li>
+        <li><strong>ספרדים בערב פסח.</strong> כתבנו את הדין הכללי של ערב חג. צריך לברר אם יש לספרדים דין מיוחד לערב פסח.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>דף הכללים — יום שישי שבתוך השבעה</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון לפי המקור</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם:</strong> ״האבלים לא קמים מהשבעה ביום שישי עד סמוך לשבת, כשעה ורבע לפני כניסת שבת (לצורך הכנות).״ לשורה לא היה מקור.</li>
+        <li><strong>עכשיו:</strong> מנהג חב״ד — אחרי מנחה קטנה (שעתיים ומחצה קודם הלילה) מתחילים בהכנות לשבת ומסירים את עניני האבלות. מנהג הספרדים — עד סמוך לשקיעה.</li>
+        <li><strong>מה לא השתנה:</strong> המחשבון עצמו. הדין מופיע בדף הכללים בלבד.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>בדיקה לפי מנהגים</h3>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>מנהג</th><th>הדין</th><th>מקור</th><th>נבדק?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>חב״ד</td>
+              <td>״מנהגינו שאחרי מנחה קטנה (ב׳ שעות ומחצה קודם הלילה) יכולים להתחיל ההכנות לשבת ומסירין עניני האבלות… החלפת הנעליים ולבישת בגדי שבת״</td>
+              <td>המדריך ח״ד פי״א ס״ב (דרכי חסד ריז)</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+            <tr>
+              <td>ספרדים</td>
+              <td>יושב על גבי קרקע עד סמוך לשקיעת החמה. על הקמים אחר חצות או סמוך למנחה קטנה: ״טעות הוא בידם״. מחליפים בגדים סמוך לקבלת שבת.</td>
+              <td>קיצור ילקוט יוסף סי׳ לד:א–ב</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+            <tr>
+              <td>אשכנז</td>
+              <td>לא נבדק.</td>
+              <td>—</td>
+              <td class="partial">פתוח</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>דף הכללים — משך בין השמשות</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון נוסח</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם:</strong> בין השמשות הוגדר ״לפי רוב הפוסקים כ-18 דקות״, בלי הסתייגות, בשני מקומות בדף.</li>
+        <li><strong>עכשיו:</strong> ״משכו תלוי במקום ובשיטה: בארץ ישראל נוהגים כ-18 דקות… ובחוץ לארץ הוא יכול להתארך בהרבה.״ במקום השני (״תחילת השבעה״) נמחקו המילים ״כ-18 דקות״.</li>
+        <li><strong>מה לא השתנה:</strong> שתי השורות שמביאות את 18 הדקות בשם ילקוט יוסף ומנהג ארץ ישראל, והמחשבון עצמו — הוא אינו מחשב זמנים, אלא שואל אם הקבורה היתה אחרי צאת הכוכבים.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>למה</h3>
+      <ul>
+        <li>הערה ממי שסייע בעריכת ״המדריך״: 18 דקות תלוי במיקום ובשיטה, ובחוץ לארץ זה יכול להתארך בהרבה.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>יארצייט באדר בשנה מעוברת — מנהג חב״ד לפי ״המדריך״</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון לפי המקור</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם:</strong> ״…או באדר א׳ (מחבר/שו״ע; מנהג חב״ד — המדריך להלכות אבילות פ״ז:ג). לפי מנהג חב״ד אומרים קדיש גם באדר ב׳. יש המחמירים בשניהם.״</li>
+        <li><strong>עכשיו:</strong> ״…או באדר א׳ (מחבר/שו״ע). מנהג חב״ד: עורכים כל עניני היארצייט באדר א׳, ואומרים קדיש גם באדר ב׳ (המדריך ח״ז פ״א ס״ג). יש המחמירים לערוך את היארצייט כולו בשני האדרים (או״ח תקס״ח:ז).״ כך בדף הכללים, ובהתאמה בהערת היארצייט במחשבון.</li>
+        <li><strong>מה לא השתנה:</strong> ייחוס שתי הדעות לפוסקים, והתאריכים שהמחשבון מציג.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>מקור ובדיקה</h3>
+      <ul>
+        <li>הערת רב: בנוסח הקודם מנהג חב״ד נראה כשני דברים שונים. בבדיקה בספר התברר שאלו אכן שני דברים: מנהג חב״ד, והמחמירים בשניהם.</li>
+        <li><strong>מנהג חב״ד:</strong> ״אם הפטירה היתה בשנה פשוטה, אזי בשנה מעוברת עורכים כל עניני היארצייט באדר ראשון ואומרים קדיש גם באדר השני״ <span class="source">(המדריך ח״ז פ״א ס״ג, ע״פ קיצור שו״ע רכ״א:ג)</span>. נבדק בלשון הספר.</li>
+        <li><strong>המחמירים בשניהם:</strong> ״מיהו יש מחמירין להתענות בשניהם״ <span class="source">(או״ח תקס״ח:ז)</span>. נבדק בלשון השו״ע.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>ייחוס הדעות — לבירור.</strong> בדף כתוב אדר ב׳ בשם הרמ״א ואדר א׳ בשם המחבר. בשולחן ערוך או״ח תקס״ח:ז הלשון היא: ״יתענה באדר ב׳. הגה: ויש אומרים דיתענה בראשון… וכן המנהג להתענות בראשון״. הנוסח לא שונה, ויש לברר עם רב.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>דף הכללים — מי ששמע על הפטירה ואינו עם האבלים</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">לפי הוראת רב</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>קודם</strong> (תחת ״שמועה קרובה״): ״אם הגיע למקום השבעה של שאר הקרובים תוך יום דרך אחד, ועדיין יושבים שבעה, וגדול הבית נוכח — מצטרף למניין שלהם.״</li>
+        <li><strong>עכשיו:</strong> ״קרוב שנמצא במקום רחוק ושמע על הפטירה — המנהג הרווח שאינו ממתין עד שיגיע אל שאר האבלים, אלא מתחיל לשבת שבעה מיד במקומו, כדי שספירת שבעת הימים תתחיל.״</li>
+        <li><strong>מה לא השתנה:</strong> המחשבון עצמו. הדין הזה מופיע בדף הכללים בלבד.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>למה</h3>
+      <ul>
+        <li>הערת רב: ״יום דרך אחד״ אינו ברור — בטיסה, ברכב או ברגל? ולמעשה נוהגים להתחיל לשבת מיד כששומעים.</li>
+        <li>בשולחן ערוך הכוונה למהלך עשרה פרסאות, והדין נאמר רק במי שלא ידע על הפטירה עד שהגיע <span class="source">(יו״ד שע״ה:ח–ט)</span>. הנוסח הקודם השמיט את התנאי הזה.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>מנהג הספרדים.</strong> לפי קיצור ילקוט יוסף (סי׳ טו:ג, ה), מי שיכול להגיע אל האבלים בתוך יומיים–שלושה, אפילו בטיסה, לא ישב שבעה במקומו אלא יבוא ויצטרף לגדול הבית ויקום עמו. הדין הזה אינו מופיע עוד בדף.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>דף הכללים — הפרדה בין ביטול השבעה למנין השלושים</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון נוסח</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>״החגים שמבטלים״:</strong> הרשימה הציגה ליד כל חג את אורכו (״פסח — 7 ימים, חו״ל 8 ימים״), וכך נראה כאילו אורך החג נוגע לביטול השבעה. עכשיו כתוב שם שכניסת החג היא שמבטלת את השבעה, בלי קשר לאורכו.</li>
+        <li><strong>״ספירת ימי שווי ערך לשלושים״:</strong> לשם עברה הרשימה של כמה ימים נחשב כל חג, כי רק שם היא נוגעת.</li>
+        <li><strong>ראש השנה ויום כיפור:</strong> במקום ״יומיים״ ו״יום אחד״ כתוב עכשיו שיום כיפור מבטל את השלושים למי ששבעתו בוטלה בראש השנה, וסוכות למי ששבעתו בוטלה ביום כיפור.</li>
+        <li><strong>״סיכום חישובי חגים״:</strong> בפסח ובשבועות היה כתוב ״נדרשים עוד 15 ימים״ בלי להבחין בין ארץ ישראל לחו״ל. תוקן: בפסח — 15 בחו״ל ו-16 בארץ ישראל; בשבועות — 16, ובחו״ל יום ב׳ עולה למנין ה-16.</li>
+        <li><strong>מה לא השתנה:</strong> המחשבון עצמו. הוא כבר חישב כך; רק הנוסח בדף הכללים תוקן.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>מקור ובדיקה</h3>
+      <ul>
+        <li>הערת רב: בדף היה ערבוב בין שבעה לשלושים.</li>
+        <li>״ונהג בו אפילו שעה אחת קודם הרגל — הרגל מפסיק האבלות ומבטל ממנו גזרת שבעה״ <span class="source">(שו״ע יו״ד שצ״ט:א)</span>; מנין הימים לשלושים <span class="source">(שם ז–יא)</span>; י״ד יום ועוד ט״ז <span class="source">(קיצור ילקוט יוסף סי׳ מב:ה, כח)</span>. נבדק בלשון המקורות.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>קבורה ביום שבת — ״אחרי צאת הכוכבים״ מסומן מראש</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">שינוי בטופס</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>עכשיו:</strong> כשתאריך הקבורה הוא יום שבת, התיבה ״הקבורה היתה אחרי צאת הכוכבים״ מסומנת מראש, והשבעה נמנית מיום ראשון. כך גם כשתאריך הקבורה מתמלא מעצמו לפי תאריך הפטירה.</li>
+        <li><strong>קודם:</strong> התיבה היתה ריקה תמיד, ולכן מי שבחר שבת קיבל שבעה שמתחילה בשבת, אלא אם סימן בעצמו.</li>
+        <li><strong>מה לא השתנה:</strong> בשאר ימות השבוע התיבה ריקה כמו קודם. אפשר לבטל את הסימון, והבחירה נשמרת עד שמחליפים תאריך. החישוב עצמו לא השתנה, וקישורים ששותפו בעבר נפתחים כפי שנשמרו.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>למה</h3>
+      <ul>
+        <li>הערת משתמש: בדרך כלל אין קוברים בשבת, ולכן מי שבוחר שבת מתכוון כמעט תמיד למוצאי שבת.</li>
+        <li>זו ברירת מחדל של הטופס ולא פסק הלכה.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>יום טוב.</strong> ברירת המחדל חלה על שבת בלבד. לא שינינו דבר לגבי קבורה בתאריך של יום טוב.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>קבורה בחול המועד סוכות — תיקון תאריכי השבעה</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-verified">תיקון תקלה</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>התקלה:</strong> כשהקבורה היתה בחול המועד סוכות, המחשבון הציג את השבעה <strong>שנה מאוחר מדי</strong> (למשל קבורה בי״ח תשרי תשפ״ז — שבעה באוקטובר 2027), והציג את אותה הערה פעמיים.</li>
+        <li><strong>עכשיו:</strong> השבעה מתחילה למחרת שמיני עצרת (בחו״ל — למחרת שמחת תורה, ויושבים ששה ימים בלבד, כי יום טוב האחרון עולה למנין).</li>
+        <li><strong>מה לא השתנה:</strong> תאריך סיום השלושים במקרה זה, וכל שאר המקרים.</li>
+      </ul>
+      <h4>דוגמה: קבורה ביום שלישי, י״ח תשרי תשפ״ז (29 בספטמבר 2026)</h4>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>מקום</th><th>לפני התיקון</th><th>אחרי התיקון</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ארץ ישראל</td><td>23–29 באוקטובר 2027</td><td>כ״ג–כ״ט תשרי (4–10 באוקטובר 2026), שבעה ימים</td></tr>
+            <tr><td>חו״ל</td><td>24–30 באוקטובר 2027</td><td>כ״ד–כ״ט תשרי (5–10 באוקטובר 2026), ששה ימים</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מקור ובדיקה</h3>
+      <ul>
+        <li>״ולאחר הרגל מתחיל למנות שבעה… ובמקומות שעושים שני ימים מונה השבעה מיום טוב שני האחרון… ומונה מאחריו ששה ימים בלבד״ <span class="source">(שו״ע יו״ד שצ״ט:ב)</span>. אין בזה מחלוקת בין המנהגים.</li>
+        <li>נבדק במחשבון בארץ ישראל ובחו״ל, בשתי שנים שונות (תשפ״ו ותשפ״ז), וכן קבורה בחול המועד פסח לשם השוואה.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>סיום השלושים במקרה זה.</strong> המחשבון מונה שלושים יום מהקבורה. ההערה מביאה גם את הדעה ששמיני עצרת נחשב כשבעה ימים (קיצור ילקוט יוסף מב:כא, וכן עיקר לדינא שם), אך התאריך המוצג הוא לפי הדעה המחמירה בלבד.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="log-entry">
+    <div class="log-head">
+      <h2>אבל על אב ואם כשהחג מבטל את השלושים</h2>
+      <div class="log-meta">
+        <span class="log-date">ז׳ כסלו תשפ״ז · 17 בנובמבר 2026</span>
+        <span class="status status-pending">ממתין לאישור רב</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה השתנה</h3>
+      <ul>
+        <li><strong>במחשבון:</strong> כאשר חג מבטל או מקצר את השלושים, נוספת בתיבת ההערות שורה חדשה שפותחת במילים ״על אב ואם״.</li>
+        <li><strong>בדף הכללים:</strong> נוספה אותה הלכה תחת ״עקרון הביטול״.</li>
+        <li><strong>מה לא השתנה:</strong> שום תאריך לא השתנה. תאריך סיום השלושים והתווית ״בוטל ע״י…״ מוצגים כמו קודם. כשאין חג בתוך השלושים, השורה אינה מופיעה.</li>
+      </ul>
+      <h4>נוסח השורה החדשה</h4>
+      <blockquote>
+        <strong>על אב ואם:</strong> גם כשהרגל מבטל או מקצר את השלושים, איסור התספורת אינו בטל (שו״ע יו״ד שצ״ט:ד; או״ח תקמ״ח:ט). למנהג הספרדים וארץ ישראל — אין להסתפר לפני יום השלושים בפועל, <em>[התאריך]</em>, ואז לאחר שיגערו בו חבריו (קיצור ילקוט יוסף סי׳ מב:כ, כב, כו). למנהג אשכנז וחב״ד — עד שיגערו בו חבריו, ונהגו לשער שלושה חודשים (רמ״א יו״ד ש״צ:ד).
+      </blockquote>
+      <p class="rule-note">התאריך המוצג הוא היום השלושים מהקבורה, בלי לקזז ימים בגלל החג.</p>
+    </div>
+
+    <div class="rule-card">
+      <h3>מה היה קודם ולמה שינינו</h3>
+      <ul>
+        <li>המחשבון אינו שואל על מי מתאבלים. לכן הוא כתב לכל אבל ״החג מבטל את יתרת השלושים״, בלי שום הסתייגות.</li>
+        <li>רב שעבר על המחשבון העיר שבן או בת המתאבלים על הוריהם — החג אינו פוטר אותם, וצריך שלושים יום מלאים.</li>
+      </ul>
+    </div>
+
+    <div class="rule-card">
+      <h3>בדיקה לפי מנהגים</h3>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr><th>מנהג</th><th>הדין</th><th>מקור</th><th>נבדק?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>לכל הדעות</td>
+              <td>החג מבטל שלושים בשאר קרובים. על אב ואם — איסור התספורת (״עד שיגערו בו חבריו״) אינו בטל.</td>
+              <td>שו״ע יו״ד שצ״ט:ד; או״ח תקמ״ח:ט; רמ״א יו״ד ש״צ:ד</td>
+              <td class="ok">נבדק בלשון השו״ע</td>
+            </tr>
+            <tr>
+              <td>ספרדים וארץ ישראל</td>
+              <td>אין להסתפר לפני שלושים יום בפועל, ואז לאחר גערה. ״מנהג ארץ ישראל להצריך שלשים יום בפועל״. בחו״ל, כשאין מנהג ידוע להחמיר, אפשר להקל.</td>
+              <td>קיצור ילקוט יוסף סי׳ מב:כ, כב, כו; סי׳ לז:ג</td>
+              <td class="ok">נבדק בלשון הספר</td>
+            </tr>
+            <tr>
+              <td>אשכנז</td>
+              <td>החג אינו מועיל לתספורת קודם הגערה. נהגו לשער את הגערה בשלושה חודשים, ויש מקומות שנהגו י״ב חודש. לכן יום השלושים אינו התאריך הקובע.</td>
+              <td>רמ״א יו״ד ש״צ:ד; משנה ברורה תקמ״ח:לד</td>
+              <td class="ok">נבדק בלשון הרמ״א</td>
+            </tr>
+            <tr>
+              <td>חב״ד</td>
+              <td>דיני השלושים החמורים בטלים בחג גם על אב ואם. הדינים שנמשכים אחרי השלושים אינם בטלים, ולכן אין להסתפר בערב החג ולא אחריו עד שיעור גערה.</td>
+              <td>אתר ״שולחן ערוך הרב״ (הרב גולדשטיין), פרק כז; מציין לנטעי גבריאל ח״ב ה:ב–ג</td>
+              <td class="partial">נבדק בסיכום בלבד, לא במקור</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rule-card open-card">
+      <h3>מה עדיין פתוח</h3>
+      <ul>
+        <li><strong>היקף הדין.</strong> הרב ניסח ״שלושים יום מלאים״ באופן כללי. המקורות שבדקנו מדברים על תספורת בלבד. לא מצאנו מקור שאומר ששאר דיני השלושים (כיבוס, רחיצה, גיהוץ) נשארים על אב ואם אחרי החג, ולפי הסיכום של מנהג חב״ד הם בטלים. צריך לברר איתו למה התכוון.</li>
+        <li><strong>חו״ל.</strong> לפי ילקוט יוסף אפשר להקל בחו״ל כשאין מנהג להחמיר. השורה במחשבון אינה מבחינה בין ארץ ישראל לחו״ל.</li>
+        <li><strong>שמועה רחוקה</strong> על אב ואם — לפי ילקוט יוסף מב:לד מותר להסתפר בערב הרגל אחרי גערה. המחשבון אינו מטפל בשמועה רחוקה כלל.</li>
+        <li><strong>התאריך הראשי.</strong> ההלכה מופיעה כהערה בלבד. תיקון מלא ידרוש שאלה ״על מי מתאבלים״ ובחירת מנהג, כדי שהתאריך עצמו ישתנה.</li>
+        <li><strong>הנוסח</strong> נכתב בידי מחשב מתוך המקורות, וטרם אושר בידי רב.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="sources">
+    <h3>על היומן</h3>
+    <p>כל שינוי בכללי החישוב או בנוסח ההלכתי נרשם כאן לפני שהוא עולה לאתר: מה היה, מה השתנה, מאיזה מקור, ומה עדיין לא נבדק. המחשבון נועד לסייע בחישוב ראשוני בלבד, ואינו תחליף לשאלת רב.</p>
+  </div>
+</div>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+    position: relative;
+  }
+  .bsd {
+    display: block;
+    text-align: center;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 0.75rem;
+    color: #c4b89a;
+    user-select: none;
+    margin-bottom: -0.5rem;
+  }
+
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .log-entry {
+    margin-bottom: 2.5rem;
+  }
+
+  .log-head {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0d8c8;
+  }
+  .log-head h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.4rem;
+    color: #4a3c2c;
+  }
+  .log-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+  }
+  .log-date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+  }
+  .status-pending {
+    background: #fbf1d8;
+    color: #8a6100;
+    border: 1px solid #ecd9a4;
+  }
+  .status-verified {
+    background: #e6f2e6;
+    color: #2f6b2f;
+    border: 1px solid #c2dcc2;
+  }
+
+  .rule-card {
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  .rule-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #6d5a43;
+    margin-bottom: 0.5rem;
+  }
+  .rule-card h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    margin-top: 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+  .rule-card ul {
+    padding-inline-start: 1.25rem;
+    margin: 0;
+  }
+  .rule-card li {
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    color: #3c3c3c;
+  }
+  .rule-card li strong {
+    color: #4a3c2c;
+  }
+  .rule-card p {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    margin-bottom: 0.4rem;
+  }
+  .rule-note {
+    font-size: 0.82rem !important;
+    color: #999 !important;
+    margin-top: 0.4rem;
+  }
+
+  .source {
+    font-size: 0.8rem;
+    color: #8b7355;
+  }
+
+  blockquote {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    background: #faf6ec;
+    border-inline-start: 3px solid #d4c5a9;
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .open-card {
+    border-color: #ecd9a4;
+    background: #fffcf3;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+  .log-table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .log-table th,
+  .log-table td {
+    text-align: start;
+    vertical-align: top;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid #eee6d6;
+  }
+  .log-table th {
+    color: #6d5a43;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .log-table td:first-child {
+    font-weight: 700;
+    color: #4a3c2c;
+    white-space: nowrap;
+  }
+  .log-table td.ok { color: #2f6b2f; }
+  .log-table td.partial { color: #8a6100; }
+
+  .sources {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0d8c8;
+  }
+  .sources h3 {
+    font-size: 0.95rem;
+    color: #6d5a43;
+    margin-bottom: 0.3rem;
+  }
+  .sources p {
+    font-size: 0.85rem;
+    color: #777;
+  }
+
+  @media (max-width: 520px) {
+    .container { padding: 1.25rem 1rem 2.5rem; }
+    h1 { font-size: 1.6rem; }
+  }
+</style>

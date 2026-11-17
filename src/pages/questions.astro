@@ -1,0 +1,365 @@
+---
+// Open questions: halachic points the site states or computes that still need a rav's
+// answer before launch. One short question each; remove a card once it is answered and
+// the answer is recorded in the changelog.
+import HamburgerMenu from '../components/HamburgerMenu.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
+---
+
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>שאלות פתוחות — מתי קמים?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Frank+Ruhl+Libre:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container">
+  <span class="bsd">בס״ד</span>
+  <HamburgerMenu currentPage="/questions" />
+  <ReviewBanner />
+
+  <h1>שאלות פתוחות</h1>
+  <p class="subtitle">17 שאלות שצריך לברר עם רב לפני שהמחשבון עולה לאוויר</p>
+
+  <section class="rule-section">
+    <h2>אב ואם וחג</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">1</span>כשחג מבטל את השלושים — על אב ואם, מה נשאר אסור עד יום השלושים: תספורת בלבד, או כל דיני השלושים?</p>
+      <p class="q-ctx">במקורות שבדקנו מדובר על תספורת בלבד. הרב ניסח ״שלושים יום מלאים״ באופן כללי.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">2</span>לספרדים בחוץ לארץ — האם להקל בתספורת על אב ואם כשחג ביטל את השלושים?</p>
+      <p class="q-ctx">ילקוט יוסף מב:כב: ״בחו״ל כשאין מנהג ידוע להחמיר אפשר להקל״. המחשבון אינו מבחין.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>ערב פסח</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">3</span>ספרדים: מתי נפסקת השבעה בערב פסח — בחצות, או סמוך לכניסת החג כבכל ערב חג?</p>
+      <p class="q-ctx">כתבנו ״סמוך לכניסת החג״ לפי הדין הכללי (ילקוט יוסף מב:ב). דין מיוחד לערב פסח לא מצאנו.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">4</span>אשכנזים: האם השבעה נפסקת בחצות ערב פסח, או רק בלילה?</p>
+      <p class="q-ctx">ייחסנו את דין חצות בשבעה למנהג חב״ד בלבד.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">5</span>קבורה בערב פסח אחרי חצות — מתי נפסקת השבעה?</p>
+      <p class="q-ctx">המחשבון כותב ״בכניסת החג״. ההבחנה בין לפני חצות לאחריו אינה ב״המדריך״.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>קבורה בחג</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">6</span>קבורה בראש השנה, בארץ ישראל: יושבים אחרי החג שבעה ימים או ששה?</p>
+      <p class="q-ctx">דף הכללים: הספירה מתחילה ביום ב׳ של ראש השנה. המחשבון: בארץ ישראל שבעה ימים אחרי החג, בחו״ל ששה.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">7</span>קבורה בחול המועד סוכות: האם שמיני עצרת נחשב כשבעה ימים למנין השלושים?</p>
+      <p class="q-ctx">המחשבון מציג שלושים יום מהקבורה (הדעה המחמירה). ילקוט יוסף מב:כא מיקל.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">8</span>קבורה בתאריך של יום טוב — האם לסמן מראש ״אחרי צאת הכוכבים״, כמו בשבת?</p>
+      <p class="q-ctx">היום מסומן מראש בשבת בלבד.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>יום השבעה ויום השלושים</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">9</span>כשחג ביטל את השבעה או את השלושים — האם להציג גם את היום השביעי והיום השלושים בפועל, לאזכרה, ללימוד ולסיום?</p>
+      <p class="q-ctx">ילקוט יוסף מב:לג והמדריך ח״ה פ״ט ס״א: מה שעושים לכבוד הנפטר נעשה ביום עצמו. המחשבון מציג רק את התאריך המקוצר.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">10</span>יום השביעי כשאין מנין בבית האבל — מתי קמים?</p>
+      <p class="q-ctx">בדף: ״לאחר שהאבל מתפלל ביחיד, ובלבד שעבר זמן הנץ החמה״. במקור החב״די הדבר תלוי בזמן שהמנחמים רגילים לצאת.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>ערב שבת</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">11</span>אשכנזים: מתי מסירים את עניני האבלות ביום שישי?</p>
+      <p class="q-ctx">כתבנו את מנהג חב״ד (אחרי מנחה קטנה) ואת מנהג הספרדים (סמוך לשקיעה).</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>שמועה ממקום רחוק</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">12</span>האם להחזיר לדף את דין הספרדים, שמי שיכול להגיע אל האבלים — אפילו בטיסה — לא ישב במקומו אלא יצטרף אליהם?</p>
+      <p class="q-ctx">ילקוט יוסף טו:ג, ה. היום כתוב בדף רק שהמנהג להתחיל לשבת מיד.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>יארצייט וקדיש</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">13</span>פטירה באדר בשנה פשוטה: אדר ב׳ — דעת המחבר או הרמ״א?</p>
+      <p class="q-ctx">בדף: אדר ב׳ בשם הרמ״א ואדר א׳ בשם המחבר. בשו״ע או״ח תקס״ח:ז הלשון הפוכה.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">14</span>איזה אדר להציג כתאריך הראשי של היארצייט?</p>
+      <p class="q-ctx">המחשבון מציג את אדר ב׳ ראשון, ואת אדר א׳ כ״דעה שניה״. מנהג חב״ד — אדר א׳.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">15</span>ספרדים: יארצייט שחל בשבת — מתחילים קדיש מליל שבת של אותה שבת, או של השבת שלפניה?</p>
+      <p class="q-ctx">ילקוט יוסף ל:ט: מליל שבת הקודם. בנוסח שבמחשבון זה אינו ברור.</p>
+    </div>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">16</span>האם הציון ״חזון עובדיה אבלות ח״ג עמ׳ קצה״ מדויק?</p>
+      <p class="q-ctx">הספר אינו בידינו ולא נבדק.</p>
+    </div>
+  </section>
+
+  <section class="rule-section">
+    <h2>המקורות</h2>
+    <div class="rule-card q-card">
+      <p class="q"><span class="q-num">17</span>״המדריך״ שבידינו הוא טיוטה מז׳ אדר תשע״ב — האם יש מהדורה מאוחרת יותר שכדאי לעבוד לפיה?</p>
+      <p class="q-ctx">כמה פרקים מסומנים בה ״עדיין לא נשלם״, ובהם דין המצטרף לאבלים.</p>
+    </div>
+  </section>
+
+  <div class="sources">
+    <h3>על הדף</h3>
+    <p>כל שאלה כאן נוגעת למשהו שהמחשבון מחשב או שדף הכללים כותב. כשמתקבלת תשובה, השאלה יורדת מכאן והשינוי נרשם ב<a href="/changelog">יומן השינויים</a>.</p>
+  </div>
+</div>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: #faf9f6;
+    color: #2c2c2c;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+    position: relative;
+  }
+  .bsd {
+    display: block;
+    text-align: center;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 0.75rem;
+    color: #c4b89a;
+    user-select: none;
+    margin-bottom: -0.5rem;
+  }
+
+  h1 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .log-entry {
+    margin-bottom: 2.5rem;
+  }
+
+  .log-head {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0d8c8;
+  }
+  .log-head h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.4rem;
+    color: #4a3c2c;
+  }
+  .log-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+  }
+  .log-date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+  }
+  .status-pending {
+    background: #fbf1d8;
+    color: #8a6100;
+    border: 1px solid #ecd9a4;
+  }
+  .status-verified {
+    background: #e6f2e6;
+    color: #2f6b2f;
+    border: 1px solid #c2dcc2;
+  }
+
+  .rule-card {
+    background: #fff;
+    border: 1px solid #e0d8c8;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  .rule-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #6d5a43;
+    margin-bottom: 0.5rem;
+  }
+  .rule-card h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #4a3c2c;
+    margin-top: 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+  .rule-card ul {
+    padding-inline-start: 1.25rem;
+    margin: 0;
+  }
+  .rule-card li {
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    color: #3c3c3c;
+  }
+  .rule-card li strong {
+    color: #4a3c2c;
+  }
+  .rule-card p {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    margin-bottom: 0.4rem;
+  }
+  .rule-note {
+    font-size: 0.82rem !important;
+    color: #999 !important;
+    margin-top: 0.4rem;
+  }
+
+  .source {
+    font-size: 0.8rem;
+    color: #8b7355;
+  }
+
+  blockquote {
+    font-size: 0.9rem;
+    color: #3c3c3c;
+    background: #faf6ec;
+    border-inline-start: 3px solid #d4c5a9;
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .open-card {
+    border-color: #ecd9a4;
+    background: #fffcf3;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+  .log-table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .log-table th,
+  .log-table td {
+    text-align: start;
+    vertical-align: top;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid #eee6d6;
+  }
+  .log-table th {
+    color: #6d5a43;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .log-table td:first-child {
+    font-weight: 700;
+    color: #4a3c2c;
+    white-space: nowrap;
+  }
+  .log-table td.ok { color: #2f6b2f; }
+  .log-table td.partial { color: #8a6100; }
+
+  .sources {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0d8c8;
+  }
+  .sources h3 {
+    font-size: 0.95rem;
+    color: #6d5a43;
+    margin-bottom: 0.3rem;
+  }
+  .sources p {
+    font-size: 0.85rem;
+    color: #777;
+  }
+
+  @media (max-width: 520px) {
+    .container { padding: 1.25rem 1rem 2.5rem; }
+    h1 { font-size: 1.6rem; }
+  }
+
+  .rule-section { margin-bottom: 1.75rem; }
+  .rule-section h2 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.25rem;
+    color: #4a3c2c;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #e0d8c8;
+  }
+  .q-card { padding: 0.8rem 1.1rem; }
+  .rule-card p.q {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #2c2c2c;
+    margin-bottom: 0.25rem;
+  }
+  .q-num {
+    display: inline-block;
+    min-width: 1.6rem;
+    font-weight: 700;
+    color: #8b7355;
+  }
+  .rule-card p.q-ctx {
+    font-size: 0.84rem;
+    color: #777;
+    margin-bottom: 0;
+    padding-inline-start: 1.6rem;
+  }
+  .sources a { color: #8b7355; }
+</style>

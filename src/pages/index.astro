@@ -1,6 +1,7 @@
 ---
 // Shiva & Shloshim Calculator
 import HamburgerMenu from '../components/HamburgerMenu.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
 ---
 
 <html lang="he" dir="rtl" data-lang="he">
@@ -19,6 +20,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
   <span class="bsd">בס״ד</span>
   <HamburgerMenu currentPage="/" />
   <button id="lang-toggle" class="lang-toggle" type="button">EN</button>
+  <ReviewBanner />
 
   <h1 id="title">מתי קמים?</h1>
   <p id="subtitle" class="subtitle">הזן את תאריך הפטירה והקבורה כדי לחשב מתי נגמרים השבעה והשלושים</p>
@@ -253,6 +255,16 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
             <span id="yahrzeit-first-alt-value" class="result-greg-date"></span>
           </div>
         </div>
+        <div class="yahrzeit-entry" id="yahrzeit-bh-first-alt-entry" style="display:none">
+          <div class="yahrzeit-entry-label">
+            <span id="yahrzeit-bh-first-alt-label" class="yahrzeit-title">יארצייט ראשון (תאריך נוסף)</span>
+            <span id="yahrzeit-bh-first-alt-basis" class="yahrzeit-basis">ספק בין השמשות — יום המאוחר</span>
+          </div>
+          <div class="result-dates">
+            <span id="yahrzeit-bh-first-alt-heb" class="result-value highlight"></span>
+            <span id="yahrzeit-bh-first-alt-value" class="result-greg-date"></span>
+          </div>
+        </div>
         <div class="yahrzeit-entry">
           <div class="yahrzeit-entry-label">
             <span id="yahrzeit-second-label" class="yahrzeit-title">יארצייט שני ואילך</span>
@@ -274,6 +286,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
           </div>
         </div>
         <div id="yahrzeit-bh-notice" class="cancelled-notice" style="display:none"></div>
+        <div id="yahrzeit-nisan-notice" class="cancelled-notice" style="display:none"></div>
         <div class="yahrzeit-entry" id="yahrzeit-adar-alt-entry" style="display:none">
           <div class="yahrzeit-entry-label">
             <span id="yahrzeit-adar-alt-label" class="yahrzeit-title"></span>
@@ -321,6 +334,18 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     getHolidays,
   } from 'jewish-dates-core';
   import { formatJewishDateInHebrew, formatJewishDate, JewishMonth, toGregorianDate, toJewishDate, getJewishMonthsInOrder } from 'jewish-date';
+  import {
+    holidayNames,
+    addDays,
+    daysBetween,
+    isPast,
+    formatDate,
+    calcKaddishEnd,
+    calcYahrzeit,
+    fetchHolidays,
+    groupHolidays,
+    calculateMourning,
+  } from '../lib/mourning';
 
   // =====================
   // Unified Calendar Picker (Jewish + Civil tabs)
@@ -620,11 +645,20 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     calTarget = null;
   }
 
+  // A burial dated Shabbat is almost always on motzei Shabbat, so "after nightfall" starts
+  // ticked for a Saturday and unticked for any other day. Runs only when a burial date is
+  // picked or prefilled, so the user's own tick or untick stays until the date changes.
+  function defaultBurialNightfall(dateStr: string) {
+    const isShabbat = new Date(dateStr + 'T12:00:00').getDay() === 6;
+    (document.getElementById('after-nightfall') as HTMLInputElement).checked = isShabbat;
+  }
+
   function selectCalDate(dateStr: string) {
     if (!calTarget) return;
     const input = document.getElementById(calTarget) as HTMLInputElement;
     input.value = dateStr;
     input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (calTarget === 'burial-date') defaultBurialNightfall(dateStr);
     updateDateDisplay(calTarget);
 
     // When setting death date, prefill burial date if empty
@@ -633,6 +667,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
       if (!burialInput.value) {
         burialInput.value = dateStr;
         burialInput.dispatchEvent(new Event('change', { bubbles: true }));
+        defaultBurialNightfall(dateStr);
         updateDateDisplay('burial-date');
       }
     }
@@ -738,35 +773,6 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
   document.getElementById('heb-cal-close')?.addEventListener('click', closeCal);
 
   // =====================
-  // Types
-  // =====================
-  interface HolidayPeriod {
-    id: string;
-    nameHe: string;
-    nameEn: string;
-    erev: string;        // day before first yom tov (holiday starts at sunset)
-    firstDay: string;
-    lastDay: string;     // last day of entire period including chol hamoed
-    yomTovDays: string[];
-    cholHamoedDays: string[];
-    // How many "equivalent days" this holiday counts toward shloshim when it cancels shiva
-    shloshimEquivalent: number;
-  }
-
-  interface MourningResult {
-    day1: string;
-    shivaEnd: string;
-    shloshimEnd: string;
-    shivaCancelled: boolean;
-    shivaCancelledBy: string | null;
-    shloshimCancelled: boolean;
-    shloshimCancelledBy: string | null;
-    shivaDelayed: boolean;
-    shivaDelayedUntilAfter: string | null;
-    notes: string[];
-  }
-
-  // =====================
   // i18n
   // =====================
   const translations: Record<string, Record<string, string>> = {
@@ -868,15 +874,6 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     },
   };
 
-  // Holiday names
-  const holidayNames: Record<string, {he: string; en: string}> = {
-    pesach:           { he: 'פסח',            en: 'Pesach' },
-    shavuot:          { he: 'שבועות',          en: 'Shavuot' },
-    sukkot:           { he: 'סוכות',           en: 'Sukkot' },
-    'shmini-atzeret': { he: 'שמיני עצרת',      en: 'Shmini Atzeret' },
-    'rosh-hashana':   { he: 'ראש השנה',        en: 'Rosh Hashana' },
-    'yom-kippur':     { he: 'יום כיפור',       en: 'Yom Kippur' },
-  };
 
   let currentLang: 'he' | 'en' = 'he';
   let isIsrael: boolean = true; // Default to Israel
@@ -1035,511 +1032,6 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
   document.getElementById('toggle-diaspora')?.addEventListener('click', () => setIsrael(false));
 
   // =====================
-  // Date helpers
-  // =====================
-  function addDays(dateStr: string, days: number): string {
-    const d = new Date(dateStr + 'T12:00:00');
-    d.setDate(d.getDate() + days);
-    return d.toISOString().split('T')[0];
-  }
-
-  function daysBetween(a: string, b: string): number {
-    const da = new Date(a + 'T12:00:00');
-    const db = new Date(b + 'T12:00:00');
-    return Math.round((db.getTime() - da.getTime()) / 86400000);
-  }
-
-  function isPast(dateStr: string): boolean {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const d = new Date(dateStr + 'T00:00:00');
-    return d < today;
-  }
-
-  function formatDate(dateStr: string, lang: string): string {
-    const d = new Date(dateStr + 'T12:00:00');
-    return d.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    });
-  }
-
-  // =====================
-  // =====================
-  // Kaddish & Yahrzeit helpers
-  // =====================
-
-  /** Format a Date to YYYY-MM-DD without UTC conversion */
-  function toLocalDateStr(d: Date): string {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
-  /**
-   * Calculate when Kaddish ends.
-   * Ashkenazi: 11 Hebrew months from date of passing.
-   * Sefardi: 12 Hebrew months (with ~1 week break at start of month 12).
-   */
-  function calcKaddishEnd(deathDateStr: string, months: number = 11): { gregDate: string; jewishDate: any } {
-    const d = new Date(deathDateStr + 'T12:00:00');
-    const jd = toJewishDate(d);
-
-    let targetYear = jd.year;
-    let targetMonthName = jd.monthName;
-    let monthsToAdd = months;
-
-    // Walk forward N months in the Hebrew calendar
-    const currentMonthsOrder = getJewishMonthsInOrder(targetYear);
-    let idx = currentMonthsOrder.indexOf(jd.monthName);
-
-    while (monthsToAdd > 0) {
-      idx++;
-      const yearMonths = getJewishMonthsInOrder(targetYear);
-      if (idx >= yearMonths.length) {
-        targetYear++;
-        idx = 1; // Skip JewishMonth.None at index 0
-      }
-      const newMonths = getJewishMonthsInOrder(targetYear);
-      targetMonthName = newMonths[idx];
-      monthsToAdd--;
-    }
-
-    // Use the same day, clamped to month length
-    let targetDay = jd.day;
-    // Try to create the date; if day is too high, the library will handle it
-    const targetJd = { day: targetDay, monthName: targetMonthName, year: targetYear };
-    const greg = toGregorianDate(targetJd);
-
-    return {
-      gregDate: toLocalDateStr(greg),
-      jewishDate: targetJd,
-    };
-  }
-
-  /**
-   * Calculate yahrzeit: the Hebrew date of death in future years.
-   * Returns Gregorian date for the given Hebrew year.
-   */
-  function calcYahrzeit(deathDateStr: string, yearOffset: number): {
-    gregDate: string; jewishDate: any;
-    adarAlternate?: { gregDate: string; jewishDate: any; opinion: string };
-  } {
-    const d = new Date(deathDateStr + 'T12:00:00');
-    const jd = toJewishDate(d);
-
-    const targetYear = jd.year + yearOffset;
-    let targetMonthName = jd.monthName;
-    let adarAlternate: { gregDate: string; jewishDate: any; opinion: string } | undefined;
-
-    // Handle Adar in leap/non-leap year transitions
-    const targetMonths = getJewishMonthsInOrder(targetYear);
-    const hasAdarI = targetMonths.includes(JewishMonth.AdarI);
-    const hasAdarII = targetMonths.includes(JewishMonth.AdarII);
-    const sourceMonths = getJewishMonthsInOrder(jd.year);
-    const sourceHasAdarI = sourceMonths.includes(JewishMonth.AdarI);
-
-    if (jd.monthName === JewishMonth.AdarI && !hasAdarI) {
-      // Death in Adar I of leap year, target is non-leap: use Adar
-      targetMonthName = JewishMonth.Adar;
-    } else if (jd.monthName === JewishMonth.AdarII && !hasAdarII) {
-      // Death in Adar II of leap year, target is non-leap: use Adar
-      targetMonthName = JewishMonth.Adar;
-    } else if (jd.monthName === JewishMonth.Adar && hasAdarII) {
-      // Death in Adar of non-leap year, target is leap year:
-      // Primary: Adar II (Rama). Alternate: Adar I (Mechaber/Shulchan Aruch).
-      targetMonthName = JewishMonth.AdarII;
-      const altDay = jd.day;
-      const altJd = { day: altDay, monthName: JewishMonth.AdarI, year: targetYear };
-      const altGreg = toGregorianDate(altJd);
-      adarAlternate = {
-        gregDate: toLocalDateStr(altGreg),
-        jewishDate: altJd,
-        opinion: 'mechaber', // Mechaber/Shulchan Aruch holds Adar I
-      };
-    }
-
-    // Handle 30 Cheshvan / 30 Kislev
-    // Per Chabad custom (HaMadrich 7:2; KSA 221:4): first yahrzeit year determines pattern forever
-    // Case 1: First year's month has 29 days → always 29th
-    // Case 2: First year's month has 30 days → always Rosh Chodesh
-    //   (30th when month is long = 1st day of 2-day RC; 1st of next month when short = 1-day RC)
-    let targetDay = jd.day;
-    if (targetDay === 30 && (targetMonthName === JewishMonth.Cheshvan || targetMonthName === JewishMonth.Kislev)) {
-      // Check the FIRST yahrzeit year to determine the pattern
-      const firstYahrzeitYear = jd.year + 1;
-      const firstYearTest = toGregorianDate({ day: 30, monthName: targetMonthName, year: firstYahrzeitYear });
-      const firstYearBack = toJewishDate(firstYearTest);
-      const firstYearHas30 = firstYearBack.monthName === targetMonthName && firstYearBack.day === 30;
-
-      if (!firstYearHas30) {
-        // Case 1: first year is short → always 29th
-        targetDay = 29;
-      } else {
-        // Case 2: first year is long → always Rosh Chodesh
-        // Check if THIS target year's month has 30 days
-        const thisYearTest = toGregorianDate({ day: 30, monthName: targetMonthName, year: targetYear });
-        const thisYearBack = toJewishDate(thisYearTest);
-        const thisYearHas30 = thisYearBack.monthName === targetMonthName && thisYearBack.day === 30;
-
-        if (thisYearHas30) {
-          // Long month: 30th = 1st day of 2-day Rosh Chodesh
-          targetDay = 30;
-        } else {
-          // Short month: Rosh Chodesh is 1st of next month
-          // Use the next month's 1st day
-          const nextMonthIdx = getJewishMonthsInOrder(targetYear).indexOf(targetMonthName) + 1;
-          const yearMonths = getJewishMonthsInOrder(targetYear);
-          let nextMonth: string;
-          let nextYear = targetYear;
-          if (nextMonthIdx >= yearMonths.length) {
-            nextYear++;
-            nextMonth = getJewishMonthsInOrder(nextYear)[1]; // first real month
-          } else {
-            nextMonth = yearMonths[nextMonthIdx];
-          }
-          const rcJd = { day: 1, monthName: nextMonth, year: nextYear };
-          const rcGreg = toGregorianDate(rcJd);
-          return {
-            gregDate: toLocalDateStr(rcGreg),
-            jewishDate: rcJd,
-            adarAlternate,
-          };
-        }
-      }
-    }
-
-    const targetJd = { day: targetDay, monthName: targetMonthName, year: targetYear };
-    const greg = toGregorianDate(targetJd);
-
-    return {
-      gregDate: toLocalDateStr(greg),
-      jewishDate: targetJd,
-      adarAlternate,
-    };
-  }
-
-  // HebCal API helpers
-  // =====================
-  async function fetchHolidays(startDate: string, endDate: string, israel: boolean): Promise<any[]> {
-    try {
-      const i = israel ? 'on' : 'off';
-      const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=off&mod=off&nx=off&ss=off&mf=off&c=off&i=${i}&start=${startDate}&end=${endDate}`;
-      const resp = await fetch(url);
-      const data = await resp.json();
-      return data.items || [];
-    } catch { return []; }
-  }
-
-  // =====================
-  // Holiday grouping
-  // =====================
-  function groupHolidays(items: any[], israel: boolean): HolidayPeriod[] {
-    const groups: Record<string, { yomTov: string[]; cholHamoed: string[]; all: string[] }> = {};
-
-    for (const item of items) {
-      const title: string = item.title || '';
-      const date: string = item.date;
-      const isYomTov = item.yomtov === true;
-
-      let holidayType: string | null = null;
-
-      if (title.includes('Pesach')) {
-        holidayType = 'pesach';
-      } else if (title.includes('Shavuot')) {
-        holidayType = 'shavuot';
-      } else if (title.includes('Sukkot')) {
-        holidayType = 'sukkot';
-      } else if (title.includes('Shmini Atzeret') || title.includes('Simchat Torah')) {
-        holidayType = 'shmini-atzeret';
-      } else if (title.includes('Rosh Hashana')) {
-        holidayType = 'rosh-hashana';
-      } else if (title.includes('Yom Kippur')) {
-        holidayType = 'yom-kippur';
-      }
-
-      if (!holidayType) continue;
-      // Skip erev entries for grouping purposes
-      if (title.startsWith('Erev ')) continue;
-
-      // Include year in group key so holidays from different years stay separate
-      const year = date.substring(0, 4);
-      const groupId = `${holidayType}:${year}`;
-
-      if (!groups[groupId]) {
-        groups[groupId] = { yomTov: [], cholHamoed: [], all: [] };
-      }
-      groups[groupId].all.push(date);
-      if (isYomTov) {
-        groups[groupId].yomTov.push(date);
-      } else {
-        groups[groupId].cholHamoed.push(date);
-      }
-    }
-
-    const periods: HolidayPeriod[] = [];
-
-    for (const [groupId, g] of Object.entries(groups)) {
-      if (g.all.length === 0) continue;
-      g.all.sort();
-      g.yomTov.sort();
-      g.cholHamoed.sort();
-
-      const id = groupId.split(':')[0]; // Strip year suffix
-      const firstDay = g.all[0];
-      const lastDay = g.all[g.all.length - 1];
-      const erev = addDays(firstDay, -1);
-
-      // Shloshim equivalents when this holiday cancels shiva
-      let equiv = 0;
-      if (id === 'pesach') {
-        equiv = israel ? 7 : 8;
-      } else if (id === 'shavuot') {
-        // First day of Shavuot = 7 equivalent days; second day (diaspora) = 1 more
-        equiv = israel ? 7 : 8;
-      } else if (id === 'sukkot') {
-        equiv = 7; // Just Sukkot proper (7 days); Shmini Atzeret is separate
-      } else if (id === 'shmini-atzeret') {
-        // Shmini Atzeret = 7 equivalent days; Simchat Torah (diaspora) = 1 more
-        equiv = israel ? 7 : 8;
-      } else if (id === 'rosh-hashana') {
-        equiv = 2;
-      } else if (id === 'yom-kippur') {
-        equiv = 1;
-      }
-
-      const names = holidayNames[id] || { he: id, en: id };
-      periods.push({
-        id,
-        nameHe: names.he,
-        nameEn: names.en,
-        erev,
-        firstDay,
-        lastDay,
-        yomTovDays: g.yomTov,
-        cholHamoedDays: g.cholHamoed,
-        shloshimEquivalent: equiv,
-      });
-    }
-
-    // Sort by first day
-    periods.sort((a, b) => a.firstDay.localeCompare(b.firstDay));
-    return periods;
-  }
-
-  // Check if a date falls within a holiday period (yom tov or chol hamoed)
-  function findHolidayAtDate(date: string, holidays: HolidayPeriod[]): HolidayPeriod | null {
-    for (const h of holidays) {
-      if (date >= h.firstDay && date <= h.lastDay) return h;
-    }
-    return null;
-  }
-
-  // =====================
-  // Main mourning calculation
-  // =====================
-  function calculateMourning(
-    deathDate: string,
-    burialDate: string,
-    afterNightfall: boolean,
-    deathAfterNightfall: boolean,
-    holidays: HolidayPeriod[],
-  ): MourningResult {
-    const notes: string[] = [];
-
-    // Effective dates (halachic day)
-    const effectiveDeath = deathAfterNightfall ? addDays(deathDate, 1) : deathDate;
-    let effectiveBurial = afterNightfall ? addDays(burialDate, 1) : burialDate;
-
-    // Check if burial occurred during a holiday/chol hamoed
-    const holidayAtBurial = findHolidayAtDate(effectiveBurial, holidays);
-    let day1: string;
-    let shivaDelayed = false;
-    let shivaDelayedUntilAfter: string | null = null;
-    let shivaDelayedDiasporaDayOff = false;
-
-    if (holidayAtBurial) {
-      // Shiva customs begin the day after the holiday ends (for both Israel and Diaspora)
-      // For calculation: Israel gets 7 full days, Diaspora gets 6 (last day of holiday counted toward 7)
-      day1 = addDays(holidayAtBurial.lastDay, 1); // Display: actual first day of sitting
-      shivaDelayed = true;
-      shivaDelayedUntilAfter = holidayAtBurial.id;
-      // Diaspora: last day of YT counts toward the 7, so only 6 more days of actual sitting
-      shivaDelayedDiasporaDayOff = !isIsrael;
-
-      const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
-      if (currentLang === 'he') {
-        const diasporaNote = !isIsrael ? ` היום האחרון של החג נספר למנין שבעה, ולכן יושבים עוד 6 ימים בלבד.` : '';
-        notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה למחרת החג.${diasporaNote} ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
-      } else {
-        const diasporaNote = !isIsrael ? ` The last day of the holiday counts toward the 7 days, so only 6 additional days of shiva are observed.` : '';
-        notes.push(`Burial occurred during ${name}. Shiva begins the day after the holiday.${diasporaNote} The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
-      }
-    } else {
-      day1 = effectiveBurial;
-    }
-
-    // Also check if death occurred during a holiday but burial after
-    // (If death was during holiday and mourner didn't know, shiva starts after holiday)
-    if (!holidayAtBurial && deathDate !== burialDate) {
-      const holidayAtDeath = findHolidayAtDate(deathDate, holidays);
-      if (holidayAtDeath && effectiveBurial > holidayAtDeath.lastDay) {
-        // Death was during holiday, burial after — shiva starts from burial as normal
-        // No special handling needed, but note it
-      }
-    }
-
-    // Naive end dates
-    // Diaspora Chol Hamoed burial: last day of holiday counted toward 7, so 6 days from day1
-    let shivaEnd = addDays(day1, shivaDelayedDiasporaDayOff ? 5 : 6);
-    let shloshimEnd: string;
-
-    // For shloshim, counting starts from burial date (or effective burial) even if shiva was delayed
-    if (shivaDelayed && holidayAtBurial) {
-      // Holiday days count toward shloshim even though shiva hasn't started
-      shloshimEnd = addDays(effectiveBurial, 29);
-    } else {
-      shloshimEnd = addDays(day1, 29);
-    }
-
-    let shivaCancelled = false;
-    let shivaCancelledBy: string | null = null;
-    let shloshimCancelled = false;
-    let shloshimCancelledBy: string | null = null;
-
-    // Process holidays chronologically for cancellation
-    for (const holiday of holidays) {
-      // Skip the holiday that delayed shiva (already handled)
-      if (shivaDelayed && holiday.id === holidayAtBurial?.id) continue;
-
-      // Chol Hamoed Sukkot burial: Shmini Atzeret is part of the same holiday complex
-      // Shiva doesn't begin until after the entire period (including SA/Simchas Torah)
-      // Dispute: SA counts as 1 actual day (some Poskim) or 7 equivalent (Kitzur Yalkut Yosef 42:21)
-      if (shivaDelayed && shivaDelayedUntilAfter === 'sukkot' && holiday.id === 'shmini-atzeret') {
-        day1 = holiday.lastDay;
-        shivaEnd = addDays(day1, 6);
-        const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-        if (currentLang === 'he') {
-          notes.push(`השבעה מתחילה לאחר ${name}. שתי דעות: ${name} נספר כיום אחד בלבד (יש פוסקים), או כ-7 ימים שווי ערך (קיצור ילקוט יוסף סי׳ מב:כא — הלכה כדברי המיקל באבל).`);
-        } else {
-          notes.push(`Shiva begins after ${name}. Two opinions: ${name} counts as only ${daysBetween(holiday.firstDay, holiday.lastDay) + 1} actual day(s) (some Poskim), or as 7 equivalent days (Kitzur Yalkut Yosef 42:21 — rule leniently in mourning).`);
-        }
-        continue;
-      }
-
-      const holidayStart = holiday.erev; // Holiday begins at sunset of erev
-
-      // Did mourning begin before this holiday?
-      if (day1 <= holidayStart) {
-        if (!shivaCancelled && holidayStart < shivaEnd) {
-          // Holiday cancels remaining shiva
-          shivaCancelled = true;
-          shivaCancelledBy = holiday.id;
-          shivaEnd = holidayStart; // Shiva ends at onset of holiday
-
-          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-          if (holiday.id === 'pesach') {
-            // Erev Pesach: shiva cancelled at midday (chatzos), not sunset (Michaber O.C. 548:12, Y.D. 399:7)
-            if (currentLang === 'he') {
-              notes.push(`${name} מבטל את יתרת השבעה. השבעה מסתיימת בחצות היום של ערב פסח (מחבר או״ח תקמ״ח:יב).`);
-            } else {
-              notes.push(`${name} cancels the remainder of shiva. Shiva ends at midday (chatzos) on Erev Pesach (Michaber O.C. 548:12).`);
-            }
-          } else {
-            if (currentLang === 'he') {
-              notes.push(`${name} מבטל את יתרת השבעה.`);
-            } else {
-              notes.push(`${name} cancels the remainder of shiva.`);
-            }
-          }
-
-          // Calculate shloshim with holiday equivalents
-          // Cancelled shiva counts as full 7 days toward shloshim (YD 399)
-          const totalEquiv = 7 + holiday.shloshimEquivalent;
-
-          if (totalEquiv >= 30) {
-            shloshimEnd = holiday.lastDay;
-            shloshimCancelled = true;
-            shloshimCancelledBy = holiday.id;
-            if (currentLang === 'he') {
-              notes.push(`${name} מבטל גם את יתרת השלושים.`);
-            } else {
-              notes.push(`${name} also cancels the remainder of shloshim.`);
-            }
-          } else {
-            const remaining = 30 - totalEquiv;
-            shloshimEnd = addDays(holiday.lastDay, remaining);
-          }
-        } else if (shivaCancelled && !shloshimCancelled && holidayStart <= shloshimEnd) {
-          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-
-          // Shmini Atzeres after Sukkos cancelled shiva does NOT nullify shloshim
-          // because no recognizable mourning was practiced during Chol Hamoed (Taz 399:6)
-          // Instead, it counts equivalent days toward the remaining shloshim
-          if (shivaCancelledBy === 'sukkot' && holiday.id === 'shmini-atzeret') {
-            const actualDays = daysBetween(holiday.firstDay, holiday.lastDay) + 1;
-            const bonus = holiday.shloshimEquivalent - actualDays;
-            shloshimEnd = addDays(shloshimEnd, -bonus);
-            if (currentLang === 'he') {
-              notes.push(`${name} נחשב כ-${holiday.shloshimEquivalent} ימים לענין השלושים, אך אינו מבטל את השלושים (ט״ז שצ״ט:ו).`);
-            } else {
-              notes.push(`${name} counts as ${holiday.shloshimEquivalent} days toward shloshim but does not cancel it (Taz 399:6).`);
-            }
-          } else {
-            // Standard: holiday cancels remaining shloshim
-            shloshimCancelled = true;
-            shloshimCancelledBy = holiday.id;
-            shloshimEnd = holidayStart;
-            if (holiday.id === 'pesach') {
-              if (currentLang === 'he') {
-                notes.push(`${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח (מחבר יו״ד שצ״ט:ז).`);
-              } else {
-                notes.push(`${name} cancels the remainder of shloshim. Shloshim ends at midday (chatzos) on Erev Pesach (Michaber Y.D. 399:7).`);
-              }
-            } else {
-              if (currentLang === 'he') {
-                notes.push(`${name} מבטל את יתרת השלושים.`);
-              } else {
-                notes.push(`${name} cancels the remainder of shloshim.`);
-              }
-            }
-          }
-        } else if (!shivaCancelled && !shloshimCancelled && holidayStart >= shivaEnd && holidayStart <= shloshimEnd) {
-          // Shiva completed normally before the holiday; holiday cancels shloshim
-          shloshimCancelled = true;
-          shloshimCancelledBy = holiday.id;
-          shloshimEnd = holidayStart;
-
-          const name = currentLang === 'he' ? holiday.nameHe : holiday.nameEn;
-          if (holiday.id === 'pesach') {
-            if (currentLang === 'he') {
-              notes.push(`השבעה מסתיימת לפני ${name}. ${name} מבטל את יתרת השלושים. השלושים מסתיימים בחצות היום של ערב פסח.`);
-            } else {
-              notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim. Shloshim ends at midday on Erev Pesach.`);
-            }
-          } else {
-            if (currentLang === 'he') {
-              notes.push(`השבעה מסתיימת לפני ${name}. ${name} מבטל את יתרת השלושים.`);
-            } else {
-              notes.push(`Shiva completed before ${name}. ${name} cancels the remainder of shloshim.`);
-            }
-          }
-        }
-      }
-    }
-
-    return {
-      day1,
-      shivaEnd,
-      shloshimEnd,
-      shivaCancelled,
-      shivaCancelledBy,
-      shloshimCancelled,
-      shloshimCancelledBy,
-      shivaDelayed,
-      shivaDelayedUntilAfter,
-      notes,
-    };
-  }
-
-  // =====================
   // Form submission
   // =====================
   document.getElementById('calc-form')?.addEventListener('submit', async (e) => {
@@ -1596,14 +1088,26 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     const earliest = deathDate < burialDate ? deathDate : burialDate;
     const rangeStart = addDays(earliest, -30);
     const rangeEnd = addDays(burialDate, 400);
-    const holidayItems = await fetchHolidays(rangeStart, rangeEnd, isIsrael);
+    let holidayItems: any[];
+    try {
+      holidayItems = await fetchHolidays(rangeStart, rangeEnd, isIsrael);
+    } catch {
+      // Without the festival dates every result would be wrong, so show nothing.
+      burialErr.textContent = currentLang === 'he'
+        ? 'לא ניתן לטעון את תאריכי החגים, ולכן אי אפשר לחשב כעת. בדקו את החיבור לאינטרנט ונסו שוב.'
+        : 'The festival dates could not be loaded, so nothing can be calculated right now. Check your connection and try again.';
+      burialErr.style.display = 'block';
+      calcBtn.disabled = false;
+      document.getElementById('calc-btn-text')!.textContent = t['calc-btn-text'];
+      return;
+    }
     const holidays = groupHolidays(holidayItems, isIsrael);
 
     // Use effective halachic dates
     const effectiveDeathDate = deathAfterNightfall ? addDays(deathDate, 1) : deathDate;
 
     // Run calculation
-    const result = calculateMourning(effectiveDeathDate, burialDate, afterNightfall, deathAfterNightfall, holidays);
+    const result = calculateMourning(effectiveDeathDate, burialDate, afterNightfall, deathAfterNightfall, holidays, { lang: currentLang, israel: isIsrael });
 
     // Display results with both Gregorian and Hebrew dates
     document.getElementById('shiva-start-value')!.textContent = formatDate(result.day1, currentLang);
@@ -1658,13 +1162,23 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     const shivaPast = isPast(result.shivaEnd);
     if (result.shivaCancelled) {
       if (result.shivaCancelledBy === 'pesach') {
-        shivaNote.textContent = currentLang === 'he'
-          ? (shivaPast
-            ? `קבורה לפני חצות — השבעה הסתיימה בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה הסתיימה בכניסת החג (מחבר או״ח תקמ״ח:יב).`
-            : `קבורה לפני חצות — השבעה מסתיימת בחצות היום של ערב פסח. קבורה אחרי חצות — השבעה מסתיימת בכניסת החג (מחבר או״ח תקמ״ח:יב).`)
-          : (shivaPast
-            ? `Burial before midday — shiva ended at midday (chatzos) on Erev Pesach. Burial after midday — shiva ended at onset of Pesach (Michaber O.C. 548:12).`
-            : `Burial before midday — shiva ends at midday (chatzos) on Erev Pesach. Burial after midday — shiva ends at onset of Pesach (Michaber O.C. 548:12).`);
+        // The before/after-midday distinction only matters when the burial was on Erev
+        // Pesach itself; a burial on an earlier day is necessarily before that midday.
+        const buriedOnErevPesach = result.day1 === result.shivaEnd;
+        const ended = shivaPast;
+        const sefardiHe = 'מנהג הספרדים: סמוך לכניסת החג (קיצור ילקוט יוסף סי׳ מב:ב).';
+        const sefardiEn = 'Sefardi custom: close to the onset of Pesach (Kitzur Yalkut Yosef 42:2).';
+        if (currentLang === 'he') {
+          const verb = ended ? 'הסתיימה' : 'מסתיימת';
+          shivaNote.textContent = buriedOnErevPesach
+            ? `מנהג חב״ד: קבורה לפני חצות — השבעה ${verb} בחצות היום של ערב פסח; קבורה אחרי חצות — בכניסת החג (המדריך ח״ד פי״ד ס״ה). ${sefardiHe}`
+            : `מנהג חב״ד: השבעה ${verb} בחצות היום של ערב פסח (המדריך ח״ד פי״ד ס״ה). ${sefardiHe}`;
+        } else {
+          const verb = ended ? 'ended' : 'ends';
+          shivaNote.textContent = buriedOnErevPesach
+            ? `Chabad custom: burial before midday — shiva ${verb} at midday (chatzos) on Erev Pesach; burial after midday — at the onset of Pesach (HaMadrich part 4, 14:5). ${sefardiEn}`
+            : `Chabad custom: shiva ${verb} at midday (chatzos) on Erev Pesach (HaMadrich part 4, 14:5). ${sefardiEn}`;
+        }
       } else {
         shivaNote.textContent = currentLang === 'he'
           ? (shivaPast
@@ -1805,16 +1319,34 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     // Bein hashmashot — show alternative yahrzeit (next day) when death was during twilight
     const bhAltEntry = document.getElementById('yahrzeit-bh-alt-entry')!;
     const bhNotice = document.getElementById('yahrzeit-bh-notice')!;
+    const bhFirstAltEntry = document.getElementById('yahrzeit-bh-first-alt-entry')!;
     if (deathBeinHashmashot) {
       // Calculate yahrzeit for the next day (the later possible date)
       const laterDeathDate = addDays(effectiveDeathDate, 1);
       const laterYahrzeit = calcYahrzeit(laterDeathDate, 2);
       bhAltEntry.style.display = '';
+      // The same doubt applies to the first yahrzeit. Skip the extra line only when the
+      // later day is a date already shown there (e.g. it equals the burial-based date).
+      const laterFirst = calcYahrzeit(laterDeathDate, 1);
+      const firstShown = [firstYahrzeitBurial.gregDate, firstYahrzeitDiffers ? firstYahrzeitDeath.gregDate : null];
+      if (!firstShown.includes(laterFirst.gregDate)) {
+        bhFirstAltEntry.style.display = '';
+        document.getElementById('yahrzeit-bh-first-alt-value')!.textContent = formatDate(laterFirst.gregDate, currentLang);
+        document.getElementById('yahrzeit-bh-first-alt-heb')!.textContent = formatHeb(laterFirst.gregDate);
+        document.getElementById('yahrzeit-bh-first-alt-label')!.textContent = currentLang === 'he'
+          ? 'יארצייט ראשון (תאריך נוסף)'
+          : 'First Yahrzeit (alternate date)';
+        document.getElementById('yahrzeit-bh-first-alt-basis')!.textContent = currentLang === 'he'
+          ? 'ספק בין השמשות — יום המאוחר'
+          : 'Twilight uncertainty — later day';
+      } else {
+        bhFirstAltEntry.style.display = 'none';
+      }
       document.getElementById('yahrzeit-bh-alt-value')!.textContent = formatDate(laterYahrzeit.gregDate, currentLang);
       document.getElementById('yahrzeit-bh-alt-heb')!.textContent = formatHeb(laterYahrzeit.gregDate);
       document.getElementById('yahrzeit-bh-alt-label')!.textContent = currentLang === 'he'
         ? 'יארצייט שני (תאריך נוסף)'
-        : 'Yahrzeit (alternate date)';
+        : 'Second Yahrzeit (alternate date)';
       document.getElementById('yahrzeit-bh-alt-basis')!.textContent = currentLang === 'he'
         ? 'ספק בין השמשות — יום המאוחר'
         : 'Twilight uncertainty — later day';
@@ -1824,7 +1356,21 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
         : 'Death was during twilight — uncertain which day applies. If no other mourners, say Kaddish on both days. If others are present, observe the earlier day (HaMadrich 7:4).';
     } else {
       bhAltEntry.style.display = 'none';
+      bhFirstAltEntry.style.display = 'none';
       bhNotice.style.display = 'none';
+    }
+
+    // Yahrzeit in Nisan: customs differ on visiting the grave that month, and those who
+    // avoid it go before Rosh Chodesh — so say it here, where the date is first seen.
+    const nisanNotice = document.getElementById('yahrzeit-nisan-notice')!;
+    const monthOf = (dateStr: string) => getJewishDate(new Date(dateStr + 'T12:00:00')).monthName;
+    if ([firstYahrzeitDeath.gregDate, secondYahrzeit.gregDate].some((d) => monthOf(d) === JewishMonth.Nisan)) {
+      nisanNotice.style.display = '';
+      nisanNotice.innerHTML = currentLang === 'he'
+        ? `<strong>היארצייט חל בחודש ניסן — עלייה לקבר.</strong> יש הנמנעים מלעלות לקבר כל חודש ניסן, ועולים <strong>בערב ראש חודש ניסן</strong> (נטעי גבריאל פסח ג:ח, אבלות עו:יז). למנהג הספרדים מותר לעלות ביום היארצייט, ובלבד שלא יספידו ולא יבואו לידי בכי (קיצור ילקוט יוסף סי׳ מ:כז). מנהג חב״ד: מי שמוכרח ללכת בניסן — מותר, בלי השכבות והספדים (המדריך ח״ח פ״ב ס״א). <a href="/visit">מתי עולים לקבר</a>`
+        : `<strong>The yahrzeit falls in Nisan — visiting the grave.</strong> Some avoid visiting the grave throughout Nisan and go on <strong>the eve of Rosh Chodesh Nisan</strong> instead (Nitei Gavriel Pesach 3:8, Aveilus 76:17). By Sefardi custom one may go on the yahrzeit itself, provided there are no eulogies and no weeping (Kitzur Yalkut Yosef 40:27). Chabad custom: one who must go in Nisan may, without memorial prayers or eulogies (HaMadrich part 8, 2:1). <a href="/visit">When to visit the grave</a>`;
+    } else {
+      nisanNotice.style.display = 'none';
     }
 
     // Adar alternate opinion — show when applicable
@@ -1839,8 +1385,8 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
         ? 'יארצייט (דעה שניה)'
         : 'Yahrzeit (alternate opinion)';
       document.getElementById('yahrzeit-adar-alt-basis')!.textContent = currentLang === 'he'
-        ? 'באדר א׳ — לפי המחבר/שו״ע ומנהג חב״ד (המדריך להלכות אבילות פ״ז:ג)'
-        : 'In Adar I — per Mechaber/Shulchan Aruch & Chabad custom (HaMadrich L\'Hilchos Aveilus 7:3)';
+        ? 'באדר א׳ — לפי המחבר/שו״ע ומנהג חב״ד (המדריך ח״ז פ״א ס״ג)'
+        : 'In Adar I — per Mechaber/Shulchan Aruch & Chabad custom (HaMadrich part 7, 1:3)';
     } else {
       adarAltEntry.style.display = 'none';
     }
@@ -1861,8 +1407,8 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     if (deathMonthName === JewishMonth.AdarI || deathMonthName === JewishMonth.AdarII || deathMonthName === JewishMonth.Adar) {
       if (adarAlt) {
         noteLines.push(currentLang === 'he'
-          ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע ומנהג חב״ד פוסקים באדר א׳, ואומרים קדיש גם באדר ב׳ (המדריך פ״ז:ג). יש המחמירים בשניהם. יש לבדוק לכל שנה.'
-          : 'Rama rules Adar II; Mechaber/Shulchan Aruch & Chabad rule Adar I, with Kaddish also in Adar II (HaMadrich 7:3). Some observe both stringently. Verify each year.');
+          ? 'הרמ״א פוסק באדר ב׳; המחבר/שו״ע פוסקים באדר א׳. מנהג חב״ד: כל עניני היארצייט באדר א׳, וקדיש גם באדר ב׳ (המדריך ח״ז פ״א ס״ג). יש המחמירים לערוך את היארצייט כולו בשני האדרים. יש לבדוק לכל שנה.'
+          : 'Rama rules Adar II; Mechaber/Shulchan Aruch rule Adar I. Chabad custom: all yahrzeit observances in Adar I, with Kaddish also in Adar II (HaMadrich part 7, 1:3). Some are stringent and observe the full yahrzeit in both months. Verify each year.');
       } else {
         noteLines.push(currentLang === 'he'
           ? 'שימו לב: תאריך היארצייט עשוי להשתנות בשנים מעוברות/פשוטות. יש לבדוק לכל שנה.'

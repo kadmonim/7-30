@@ -1,6 +1,7 @@
 ---
 // When is it permitted/forbidden to visit the grave?
 import HamburgerMenu from '../components/HamburgerMenu.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
 ---
 
 <html lang="he" dir="rtl">
@@ -18,6 +19,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
 <div class="container">
   <span class="bsd">בס״ד</span>
   <HamburgerMenu currentPage="/visit" />
+  <ReviewBanner />
 
   <h1>מתי מותר/אסור לעלות לקבר?</h1>
   <p class="subtitle">זמנים שבהם נוהגים לעלות או להימנע מעלייה לבית הקברות</p>
@@ -83,9 +85,9 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     <div class="rule-card">
       <h3>תאריכים מקובלים לעלייה לקבר</h3>
       <ul>
-        <li><strong>יום השביעי (סיום השבעה)</strong> — נוהגים לעלות לקבר בבוקר לאחר שחרית, עם סיום האבלות. אם חל בשבת או בראש חודש — דוחים ליום ראשון. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ)</span></li>
+        <li><strong>יום השביעי (סיום השבעה)</strong> — נוהגים לעלות לקבר בבוקר לאחר שחרית, עם סיום האבלות. אם חל בשבת או בראש חודש — דוחים ליום ראשון. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שד״מ:כ)</span></li>
         <li><strong>הקמת מצבה</strong> — מנהג חב״ד: ביום השמיני לאחר הקבורה. <span class="source">(ספר המנהגים — חב״ד)</span></li>
-        <li><strong>יום השלושים</strong> — יש הנוהגים לעלות ביום השלושים. אם חל בשבת או ראש חודש — מתאימים בהתאם. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שמד:כ; טור שמד)</span></li>
+        <li><strong>יום השלושים</strong> — יש הנוהגים לעלות ביום השלושים. אם חל בשבת או ראש חודש — מתאימים בהתאם. <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג; מחבר יו״ד שד״מ:כ; טור שד״מ)</span></li>
         <li><strong>יום היארצייט</strong> — המנהג העיקרי והמבוסס ביותר. אם אין אפשרות לעלות ביום עצמו, ניתן לעלות בטווח של שלושה ימים לפני או אחרי. <span class="source">(רש״י יבמות קכב ע״א; קב הישר עא; נטעי גבריאל עו:א, עו:יח)</span></li>
         <li><strong>ערב ראש השנה</strong> — נוהגים לעלות לקברי קרובים וצדיקים. <span class="source">(מחבר או״ח תקפא:ד; רמ״א שם)</span></li>
       </ul>
@@ -94,7 +96,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     <div class="rule-card">
       <h3>שנה ראשונה — הגבלות</h3>
       <ul>
-        <li>בשנה הראשונה לאחר הפטירה, פוסקים רבים ממליצים <strong>לא לעלות לקבר</strong> מחוץ לתאריכים הנ״ל (יום 7, 30, יארצייט). <span class="source">(טור שמד בשם כל בו; מהר״ם בריסק ב:כט)</span></li>
+        <li>בשנה הראשונה לאחר הפטירה, פוסקים רבים ממליצים <strong>לא לעלות לקבר</strong> מחוץ לתאריכים הנ״ל (יום 7, 30, יארצייט). <span class="source">(טור שד״מ בשם כל בו; מהר״ם בריסק ב:כט)</span></li>
         <li>הטעם: שלא לצער את הנשמה בתקופה רגישה זו.</li>
         <li>יש המקילים ומתירים ביקורים נוספים, בפרט בקברי אישים חשובים.</li>
         <li><strong>אין עולים לקבר בתוך ימי השבעה</strong> (מלבד קבורה עצמה). <span class="source">(קיצור ש״ע ילקוט יוסף סי׳ לה:ג)</span></li>
@@ -223,7 +225,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
 
   <div class="sources">
     <h3>מקורות</h3>
-    <p>שו״ע יו״ד סי׳ שמד; מחבר או״ח תקפא; טור שמד; קיצור ש״ע ילקוט יוסף סי׳ לה, סי׳ מג; המדריך להלכות אבילות פ״ו:ז; גשר החיים; נטעי גבריאל הלכות אבלות; כף החיים; בן איש חי.</p>
+    <p>שו״ע יו״ד סי׳ שד״מ; מחבר או״ח תקפא; טור שד״מ; קיצור ש״ע ילקוט יוסף סי׳ לה, סי׳ מג; המדריך להלכות אבילות פ״ו:ז; גשר החיים; נטעי גבריאל הלכות אבלות; כף החיים; בן איש חי.</p>
   </div>
 </div>
 
@@ -527,7 +529,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     const day = jd.day;
 
     if (dow === 6) {
-      return { status: 'forbidden', title: 'אסור — שבת', details: ['אין עולים לבית הקברות בשבת.', 'יש לעלות לפני שבת או אחריה.'], source: 'שו״ע יו״ד שמד:כ' };
+      return { status: 'forbidden', title: 'אסור — שבת', details: ['אין עולים לבית הקברות בשבת.', 'יש לעלות לפני שבת או אחריה.'], source: 'שו״ע יו״ד שד״מ:כ' };
     }
 
     const ytDays: [string, number[], string][] = isIsrael ? [
@@ -549,7 +551,7 @@ import HamburgerMenu from '../components/HamburgerMenu.astro';
     ];
     for (const [month, days, name] of ytDays) {
       if (m === month && days.includes(day)) {
-        return { status: 'forbidden', title: `אסור — ${name}`, details: ['אין עולים לבית הקברות ביום טוב.', 'יש לעלות לפני החג או אחריו.'], source: 'שו״ע יו״ד שמד:כ' };
+        return { status: 'forbidden', title: `אסור — ${name}`, details: ['אין עולים לבית הקברות ביום טוב.', 'יש לעלות לפני החג או אחריו.'], source: 'שו״ע יו״ד שד״מ:כ' };
       }
     }
 

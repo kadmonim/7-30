@@ -9,12 +9,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/netlify": "^7.0.4",
     "@neondatabase/serverless": "^1.0.2",
     "astro": "^6.0.8",
     "jewish-dates-core": "^2.0.24"
+  },
+  "devDependencies": {
+    "vitest": "^5.1.0"
   }
 }
