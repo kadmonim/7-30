@@ -5,6 +5,8 @@ interface Props {
 const { currentPage } = Astro.props;
 ---
 
+<a class="site-brand" href="/" data-he="יתגדל" data-en="Yisgadal">יתגדל</a>
+
 <div class="hamburger-wrapper">
   <button class="hamburger-btn" id="hamburger-btn" aria-label="תפריט" aria-expanded="false">
     <span class="hamburger-line"></span>
@@ -21,6 +23,18 @@ const { currentPage } = Astro.props;
 </div>
 
 <style is:global>
+  .site-brand {
+    display: block;
+    width: fit-content;
+    margin: 0.75rem auto 0;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #8b7355;
+    text-decoration: none;
+  }
+  .site-brand:hover { color: #6d5a43; }
   .hamburger-wrapper {
     position: absolute;
     top: 1.5rem;
@@ -104,7 +118,7 @@ const { currentPage } = Astro.props;
   // Update nav text based on language
   function updateNavLang() {
     const lang = document.documentElement.lang === 'he' ? 'he' : 'en';
-    dropdown.querySelectorAll('a[data-he][data-en]').forEach((a) => {
+    document.querySelectorAll('.site-brand, #hamburger-dropdown a[data-he][data-en]').forEach((a) => {
       const el = a as HTMLElement;
       el.textContent = el.dataset[lang] || el.textContent;
     });
