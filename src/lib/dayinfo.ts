@@ -17,6 +17,8 @@ export interface DayInfo {
   holiday: boolean; // Yom Tov or Chol Hamoed (Israel and Diaspora days alike)
   monThu: boolean;
   reading: boolean; // a weekday with a Torah reading at Shacharit
+  /** No Psalm 49 in the shiva house: Rosh Chodesh, Chanukah, Purim, Nisan, Tishrei after Yom Kippur. */
+  noPs49: boolean;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -67,6 +69,8 @@ export function dayInfo(date: string): DayInfo {
     (monthName === JewishMonth.Sivan && (day === 6 || day === 7));
 
   const fast = fasts.includes(date);
+  const purimAdar = isLeapYear(year) ? JewishMonth.AdarII : JewishMonth.Adar;
+  const purim = monthName === purimAdar && (day === 14 || day === 15);
   const monThu = weekday === 1 || weekday === 4;
 
   return {
@@ -81,5 +85,6 @@ export function dayInfo(date: string): DayInfo {
     holiday,
     monThu,
     reading: weekday !== 6 && !holiday && (monThu || rc || chanukah || fast),
+    noPs49: rc || chanukah || purim || monthName === JewishMonth.Nisan || (monthName === JewishMonth.Tishri && day >= 11),
   };
 }

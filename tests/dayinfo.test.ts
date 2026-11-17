@@ -41,4 +41,12 @@ describe('dayInfo', () => {
   it('Chol Hamoed Sukkot is a festival day', () => {
     expect(dayInfo('2026-09-29').holiday).toBe(true);
   });
+
+  it('Psalm 49 days: not on Rosh Chodesh, Chanukah, Nisan, or Tishrei after Yom Kippur', () => {
+    expect(dayInfo('2026-11-17').noPs49).toBe(false);
+    expect(dayInfo('2026-11-11').noPs49).toBe(true); // 1 Kislev
+    expect(dayInfo('2026-12-07').noPs49).toBe(true); // Chanukah
+    expect(dayInfo('2027-04-12').noPs49).toBe(true); // Nisan
+    expect(dayInfo('2026-09-23').noPs49).toBe(true); // 12 Tishrei
+  });
 });

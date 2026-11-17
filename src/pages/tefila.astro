@@ -55,6 +55,8 @@ const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
   <section class="prayer" id="card-M"><h2>מנחה</h2><p class="when"></p><ul class="items"></ul></section>
   <section class="prayer" id="card-A"><h2>ערבית</h2><p class="when"></p><ul class="items"></ul></section>
 
+  <section class="prayer" id="card-Z"><h2>אזכרה והשכבה</h2><p class="when">לא תלוי ביום שנבחר</p><ul class="items"></ul></section>
+
   <p class="kaddish-link"><a href="/kaddish">נוסח הקדיש ←</a></p>
 
   <div class="sources">
@@ -64,7 +66,7 @@ const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
 </div>
 
 <script>
-  import { rules, nusachSources, type Cond, type Prayer } from '../data/tefila';
+  import { rules, memorial, nusachSources, type Cond, type Prayer } from '../data/tefila';
   import { dayInfo, addDays, type DayInfo } from '../lib/dayinfo';
 
   type N = 'chabad' | 'sefardi' | 'ashkenaz';
@@ -95,6 +97,8 @@ const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
       case 'friday': return p === 'M' && civil.weekday === 5;
       case 'shabbatNight': return p === 'A' && civil.weekday === 5;
       case 'motzash': return p === 'A' && civil.weekday === 6;
+      case 'ps49': return !day.noPs49 && !(p === 'M' && civil.weekday === 5);
+      case 'ps16': return day.noPs49 || (p === 'M' && civil.weekday === 5);
     }
   }
 
@@ -109,7 +113,7 @@ const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
     return c;
   }
 
-  function fill(p: Prayer, items: { kind: 'add' | 'skip' | 'note'; text: string; src: string }[], message?: string) {
+  function fill(p: Prayer | 'Z', items: { kind: 'add' | 'skip' | 'note'; text: string; src: string }[], message?: string) {
     const ul = document.querySelector(`#card-${p} .items`)!;
     if (message) { ul.innerHTML = `<li class="msg">${message}</li>`; return; }
     ul.innerHTML = items.length
@@ -142,6 +146,7 @@ const nusachim: Nusach[] = ['chabad', 'sefardi', 'ashkenaz'];
 
     const festival = 'יום טוב או חול המועד — דיני השבעה שונים בחג. ראו <a href="/rules">כללים</a> ושאלו רב.';
     fill('G', pick('G', civil));
+    fill('Z', memorial[nusach], memorial[nusach].length ? undefined : 'עדיין לא נבדק למנהג זה.');
     if (isShabbat) {
       fill('S', [], 'שבת — הדף אינו מיועד לשבת.');
       fill('M', [], 'שבת — הדף אינו מיועד לשבת.');
