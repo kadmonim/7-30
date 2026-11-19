@@ -19,6 +19,10 @@ export interface DayInfo {
   reading: boolean; // a weekday with a Torah reading at Shacharit
   /** No Psalm 49 in the shiva house: Rosh Chodesh, Chanukah, Purim, Nisan, Tishrei after Yom Kippur. */
   noPs49: boolean;
+  /** A day Tachanun is not said (the common Ashkenaz list — see noTachanunDay). */
+  noTachanun: boolean;
+  /** Tachanun is not said at this day's Mincha: such a day, or the eve of one (and Friday is handled by the page). */
+  noTachanunMincha: boolean;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -40,6 +44,35 @@ function fastDate(day: number, monthName: string, year: number, back = false): s
   const d = gregOf(day, monthName, year);
   if (at(d).getDay() !== 6) return d;
   return addDays(d, back ? -2 : 1);
+}
+
+/**
+ * Days Tachanun is not said, by the common Ashkenaz list: Rosh Chodesh, Chanukah, all Nisan,
+ * Pesach Sheni, Lag BaOmer, 1–12 Sivan, Tisha B'Av, 15 Av, Erev Rosh Hashana, from Erev Yom
+ * Kippur to the end of Tishrei, 15 Shevat, Purim and Shushan Purim (in a leap year also
+ * Purim Katan). `eve`: the Mincha before it omits Tachanun too (not before Pesach Sheni,
+ * Erev Rosh Hashana or Erev Yom Kippur).
+ */
+function noTachanunDay(date: string): { no: boolean; eve: boolean } {
+  const { day, monthName: m, year } = toJewishDate(at(date));
+  const leap = isLeapYear(year);
+  const rc = day === 30 || (day === 1 && m !== JewishMonth.Tishri);
+  const start = gregOf(25, JewishMonth.Kislev, year);
+  const since = Math.round((at(date).getTime() - at(start).getTime()) / 86400000);
+  const chanukah = since >= 0 && since <= 7;
+  const purim = (day === 14 || day === 15) && (m === JewishMonth.Adar || m === JewishMonth.AdarII || (leap && m === JewishMonth.AdarI));
+  const noEve =
+    (m === JewishMonth.Iyyar && day === 14) || (m === JewishMonth.Elul && day === 29) || (m === JewishMonth.Tishri && day === 9);
+  const no =
+    noEve || rc || chanukah || purim ||
+    m === JewishMonth.Nisan ||
+    (m === JewishMonth.Iyyar && day === 18) ||
+    (m === JewishMonth.Sivan && day <= 12) ||
+    date === fastDate(9, JewishMonth.Av, year) ||
+    (m === JewishMonth.Av && day === 15) ||
+    (m === JewishMonth.Tishri && (day <= 2 || day >= 9)) ||
+    (m === JewishMonth.Shevat && day === 15);
+  return { no, eve: no && !noEve };
 }
 
 export function dayInfo(date: string): DayInfo {
@@ -86,5 +119,7 @@ export function dayInfo(date: string): DayInfo {
     monThu,
     reading: weekday !== 6 && !holiday && (monThu || rc || chanukah || fast),
     noPs49: rc || chanukah || purim || monthName === JewishMonth.Nisan || (monthName === JewishMonth.Tishri && day >= 11),
+    noTachanun: noTachanunDay(date).no,
+    noTachanunMincha: noTachanunDay(date).no || noTachanunDay(addDays(date, 1)).eve,
   };
 }

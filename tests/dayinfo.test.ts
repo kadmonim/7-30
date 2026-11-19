@@ -49,4 +49,16 @@ describe('dayInfo', () => {
     expect(dayInfo('2027-04-12').noPs49).toBe(true); // Nisan
     expect(dayInfo('2026-09-23').noPs49).toBe(true); // 12 Tishrei
   });
+
+  it('days without Tachanun (Ashkenaz list), and the Mincha before them', () => {
+    expect(dayInfo('2026-11-17').noTachanun).toBe(false);
+    expect(dayInfo('2026-11-11').noTachanun).toBe(true); // 1 Kislev
+    expect(dayInfo('2026-11-09').noTachanunMincha).toBe(true); // 29 Cheshvan, eve of Rosh Chodesh
+    expect(dayInfo('2026-11-09').noTachanun).toBe(false);
+    expect(dayInfo('2027-05-25').noTachanun).toBe(true); // 18 Iyar, Lag BaOmer
+    expect(dayInfo('2027-06-15').noTachanun).toBe(true); // 10 Sivan
+    expect(dayInfo('2027-01-23').noTachanun).toBe(true); // 15 Shevat
+    expect(dayInfo('2027-05-20').noTachanunMincha).toBe(false); // 13 Iyar, eve of Pesach Sheni
+    expect(dayInfo('2027-05-21').noTachanun).toBe(true); // 14 Iyar, Pesach Sheni
+  });
 });
