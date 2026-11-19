@@ -388,15 +388,22 @@ export function calculateMourning(
     day1 = addDays(holidayAtBurial.lastDay, 1); // Display: actual first day of sitting
     shivaDelayed = true;
     shivaDelayedUntilAfter = holidayAtBurial.id;
-    // Diaspora: last day of YT counts toward the 7, so only 6 more days of actual sitting
-    shivaDelayedDiasporaDayOff = !isIsrael;
+    // Diaspora: last day of YT counts toward the 7, so only 6 more days of actual sitting.
+    // Rosh Hashana is two days in Eretz Yisrael as well, and its second day counts toward
+    // the seven there too (Kitzur S.A. 219:6; disputed, see /changelog 19 Nov 2026).
+    const isRoshHashana = holidayAtBurial.id === 'rosh-hashana';
+    shivaDelayedDiasporaDayOff = !isIsrael || isRoshHashana;
 
     const name = currentLang === 'he' ? holidayAtBurial.nameHe : holidayAtBurial.nameEn;
     if (currentLang === 'he') {
-      const diasporaNote = !isIsrael ? ` היום האחרון של החג נספר למנין שבעה, ולכן יושבים עוד 6 ימים בלבד.` : '';
+      const diasporaNote = isRoshHashana
+        ? ` יום ב׳ של ראש השנה נספר למנין שבעה, ולכן יושבים עוד 6 ימים בלבד (קיצור שו״ע רי״ט:ו); ויש בזה מחלוקת.`
+        : !isIsrael ? ` היום האחרון של החג נספר למנין שבעה, ולכן יושבים עוד 6 ימים בלבד.` : '';
       notes.push(`הקבורה חלה בתוך ${name}. השבעה מתחילה למחרת החג.${diasporaNote} ימי החג נספרים למנין ל׳ יום של השלושים, אף שדיני השלושים מתחילים רק לאחר החג.`);
     } else {
-      const diasporaNote = !isIsrael ? ` The last day of the holiday counts toward the 7 days, so only 6 additional days of shiva are observed.` : '';
+      const diasporaNote = isRoshHashana
+        ? ` The second day of Rosh Hashana counts toward the 7 days, so only 6 additional days of shiva are observed (Kitzur Shulchan Aruch 219:6); this is disputed.`
+        : !isIsrael ? ` The last day of the holiday counts toward the 7 days, so only 6 additional days of shiva are observed.` : '';
       notes.push(`Burial occurred during ${name}. Shiva begins the day after the holiday.${diasporaNote} The holiday days count toward the 30-day shloshim total, even though shloshim customs only begin after the holiday.`);
     }
   } else {
@@ -568,6 +575,13 @@ export function calculateMourning(
       return currentLang === 'he' ? formatJewishDateInHebrew(jd) : formatJewishDate(jd);
     };
     const day30 = `${formatHeb(fullThirtyEnd)} (${formatDate(fullThirtyEnd, currentLang)})`;
+    // What is done for the soul on the thirtieth day stays on the actual thirtieth day
+    // even when a festival cancelled or shortened shloshim. See /changelog 19 Nov 2026.
+    if (currentLang === 'he') {
+      notes.push(`<strong>יום השלושים בפועל:</strong> ${day30}. מה שעושים לכבוד הנשמה ביום השלושים — אזכרה, לימוד, ״סיום״ — נעשה ביום זה, אף שהחג ביטל או קיצר את דיני השלושים (המדריך ח״ה פ״ט ס״א; קיצור ילקוט יוסף סי׳ מב:לג).`);
+    } else {
+      notes.push(`<strong>The actual thirtieth day:</strong> ${day30}. What is done for the soul on the thirtieth day (memorial gathering, learning, a siyum) is held on this day, even though the festival cancelled or shortened the shloshim restrictions (HaMadrich part 5, 9:1; Kitzur Yalkut Yosef 42:33).`);
+    }
     if (currentLang === 'he') {
       notes.push(`<strong>על אב ואם:</strong> גם כשהרגל מבטל או מקצר את השלושים, איסור התספורת אינו בטל (שו״ע יו״ד שצ״ט:ד; או״ח תקמ״ח:ט). למנהג הספרדים וארץ ישראל — אין להסתפר לפני יום השלושים בפועל, ${day30}, ואז לאחר שיגערו בו חבריו (קיצור ילקוט יוסף סי׳ מב:כ, כב, כו). למנהג אשכנז וחב״ד — עד שיגערו בו חבריו, ונהגו לשער שלושה חודשים (רמ״א יו״ד ש״צ:ד).`);
     } else {

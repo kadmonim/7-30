@@ -61,6 +61,11 @@ const rows: Row[] = [
   { name: 'shiva cut by Rosh Hashana, shloshim by Yom Kippur', source: 'Y.D. 399:9',
     burial: '2026-09-08', shiva: ['2026-09-08', '2026-09-11'], shloshimEnd: '2026-09-20',
     shivaCancelledBy: 'rosh-hashana', shloshimCancelledBy: 'yom-kippur' },
+  // Six days after Rosh Hashana in Eretz Yisrael as abroad: its second day counts toward
+  // the seven (Kitzur S.A. 219:6). Changed 19 Nov 2026 on a rav's answer; before that
+  // Israel showed seven days, 14-20 Sep.
+  { name: 'burial on the first day of Rosh Hashana', source: 'Kitzur S.A. 219:6',
+    burial: '2026-09-12', shiva: ['2026-09-14', '2026-09-19'], shloshimEnd: '2026-09-20', shloshimCancelledBy: 'yom-kippur' },
   { name: 'burial on 3 Tishrei', source: 'Y.D. 399:9',
     burial: '2026-09-14', shiva: ['2026-09-14', '2026-09-20'], shloshimEnd: '2026-09-20', shloshimCancelledBy: 'yom-kippur' },
   { name: 'shiva cut by Yom Kippur, shloshim by Sukkot', source: 'Y.D. 399:10',
